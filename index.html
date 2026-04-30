@@ -162,6 +162,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:10px 20px;border-radius:99px;font-size:12px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;}
 
+/* EXTRA TASKS */
+.extra-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;background:var(--bg);position:relative;}
+.extra-rm{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:#e8e8e8;border:none;cursor:pointer;font-size:13px;color:var(--text2);display:flex;align-items:center;justify-content:center;line-height:1;}
+.extra-rm:hover{background:#e08080;color:white;}
+.add-extra-btn{width:100%;padding:9px;border:1.5px dashed var(--border2);border-radius:var(--radius-sm);background:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.12s;}
+.add-extra-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-lt);}
+
 .loading{text-align:center;padding:30px;color:var(--text3);font-size:13px;}
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -294,7 +301,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
             <div class="nippo-tabs">
               <div class="ntab active" onclick="switchNTab(this,'todo')">✓ Todoリスト</div>
               <div class="ntab" onclick="switchNTab(this,'customer')">👥 お客様情報</div>
-              <div class="ntab" onclick="switchNTab(this,'notes')">📝 その他連絡</div>
+              <div class="ntab" onclick="switchNTab(this,'notes')">📝 その他業務・連絡</div>
             </div>
           </div>
 
@@ -314,11 +321,22 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
             <div id="room-panels"></div>
           </div>
 
-          <!-- その他連絡タブ -->
+          <!-- その他業務・連絡事項タブ -->
           <div class="ntab-panel" id="ntab-notes" style="padding:14px 16px;">
+
+            <!-- 通常業務以外 -->
+            <div style="margin-bottom:18px;">
+              <div class="sec-hd" style="margin-top:0;">通常業務以外</div>
+              <p style="font-size:11px;color:var(--text3);margin-bottom:8px;">施設改善・任務タスク・その他を記録してください</p>
+              <div id="extra-list"></div>
+              <button class="add-extra-btn" onclick="addExtra()">＋ 追加する</button>
+            </div>
+
+            <!-- 連絡事項 -->
+            <div class="sec-hd">連絡事項</div>
             <div class="field">
               <label>引き継ぎ・気になること・申し送り事項など</label>
-              <textarea id="my-notes" rows="6" placeholder="自由に記入してください"></textarea>
+              <textarea id="my-notes" rows="5" placeholder="自由に記入してください" oninput="scheduleSave()"></textarea>
             </div>
           </div>
 
@@ -681,6 +699,7 @@ async function autoSave() {
       startTime: document.getElementById('my-start').value,
       endTime: document.getElementById('my-end').value,
       notes: document.getElementById('my-notes').value,
+      extras: collectExtras(),
       roomData: roomData,
       updatedAt: serverTimestamp()
     });
@@ -729,6 +748,7 @@ window.fullSend = async function() {
     completedTasks: done,
     incompleteTasks: undone,
     customers,
+    extraTasks: collectExtras(),
     notes: document.getElementById('my-notes').value.trim()
   };
   try {
@@ -755,7 +775,7 @@ function initRooms() {
   document.getElementById('room-panels').innerHTML = ROOMS.map((r,i) => `
     <div class="room-panel${i===0?' active':''}" id="rpanel-${r}">
       <div class="field" style="margin-bottom:8px;">
-        <label>お客様名（任意）</label>
+        <label>お客様名</label>
         <input type="text" id="rname-${r}" placeholder="例：田中様" oninput="markRoom('${r}');scheduleSave()">
       </div>
       <div class="field" style="margin-bottom:8px;"><label>年代</label>
@@ -871,6 +891,59 @@ window.scheduleSave = scheduleSave;
 document.getElementById('my-notes').addEventListener('input', scheduleSave);
 document.getElementById('my-start').addEventListener('change', scheduleSave);
 document.getElementById('my-end').addEventListener('change', scheduleSave);
+
+// ===== 通常業務以外 =====
+let extraCount = 0;
+
+window.addExtra = function() {
+  extraCount++;
+  const id = 'ex' + extraCount;
+  const div = document.createElement('div');
+  div.className = 'extra-card'; div.id = id;
+  div.innerHTML = `
+    <button class="extra-rm" onclick="document.getElementById('${id}').remove();scheduleSave()">×</button>
+    <div class="field" style="margin-bottom:8px;padding-right:28px;">
+      <label>種別</label>
+      <select id="${id}-type" onchange="toggleReason('${id}');scheduleSave()">
+        <option value="">選択してください</option>
+        <option>施設改善</option>
+        <option>任務されているタスク</option>
+        <option>その他</option>
+      </select>
+    </div>
+    <div class="field" style="margin-bottom:8px;">
+      <label>内容</label>
+      <input type="text" id="${id}-content" placeholder="何を行ったか" oninput="scheduleSave()">
+    </div>
+    <div class="field" style="margin-bottom:8px;">
+      <label>所要時間</label>
+      <input type="text" id="${id}-dur" placeholder="例：30分" oninput="scheduleSave()">
+    </div>
+    <div id="${id}-rblock" style="display:none;">
+      <div class="field" style="margin-bottom:0;">
+        <label>なぜ行おうと思ったか（理由・背景）</label>
+        <textarea id="${id}-reason" rows="2" placeholder="理由・背景を記載してください" oninput="scheduleSave()"></textarea>
+      </div>
+    </div>`;
+  document.getElementById('extra-list').appendChild(div);
+}
+
+window.toggleReason = function(id) {
+  const v = document.getElementById(id+'-type').value;
+  document.getElementById(id+'-rblock').style.display = v==='施設改善' ? 'block' : 'none';
+}
+
+function collectExtras() {
+  return Array.from(document.querySelectorAll('.extra-card')).map(c => {
+    const id = c.id;
+    return {
+      type: (document.getElementById(id+'-type')||{}).value||'',
+      content: (document.getElementById(id+'-content')||{}).value||'',
+      duration: (document.getElementById(id+'-dur')||{}).value||'',
+      reason: (document.getElementById(id+'-reason')||{}).value||''
+    };
+  }).filter(x => x.type||x.content);
+}
 </script>
 </body>
 </html>
