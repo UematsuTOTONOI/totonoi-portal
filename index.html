@@ -191,6 +191,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
         <option>阿部</option>
         <option>りょうな</option>
         <option>りこ</option>
+        <option>テスト</option>
       </select>
     </div>
     <div class="login-field">
@@ -379,7 +380,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const PASSWORDS = {'里吉':'3847','梶原':'9162','ほのか':'5031','阿部':'7284','りょうな':'6519','りこ':'2473'};
+const PASSWORDS = {'里吉':'3847','梶原':'9162','ほのか':'5031','阿部':'7284','りょうな':'6519','りこ':'2473','テスト':'0000'};
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx55qhEqhaXZPMKIuSEhjmTBqprKlJFENmfygkBa2uMOjZ7BzsYkY3QCmxW0UsrVJ-_/exec';
 
 // ===== タスク定義 =====
