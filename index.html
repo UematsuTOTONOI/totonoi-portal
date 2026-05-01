@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -18,36 +19,62 @@
 body{font-family:'Noto Sans JP','Hiragino Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
 /* LOGIN */
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);}
-.login-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:36px 28px;width:340px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.06);}
-.login-logo{font-size:22px;font-weight:700;color:var(--green);letter-spacing:0.08em;}
-.login-sub{font-size:12px;color:var(--text3);margin-bottom:28px;margin-top:4px;}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(–bg);}
+.login-box{background:var(–white);border:1px solid var(–border);border-radius:var(–radius);padding:36px 28px;width:340px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.06);}
+.login-logo{font-size:22px;font-weight:700;color:var(–green);letter-spacing:0.08em;}
+.login-sub{font-size:12px;color:var(–text3);margin-bottom:28px;margin-top:4px;}
 .login-field{margin-bottom:12px;text-align:left;}
-.login-field label{font-size:11px;color:var(--text3);display:block;margin-bottom:4px;}
-.login-field input,.login-field select{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;font-family:inherit;background:var(--white);color:var(--text);outline:none;}
-.login-field input:focus,.login-field select:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(42,107,85,0.1);}
-.login-btn{width:100%;padding:11px;background:var(--green);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:6px;transition:background 0.12s;}
-.login-btn:hover{background:var(--green-dk);}
+.login-field label{font-size:11px;color:var(–text3);display:block;margin-bottom:4px;}
+.login-field input,.login-field select{width:100%;border:1px solid var(–border);border-radius:var(–radius-sm);padding:9px 12px;font-size:13px;font-family:inherit;background:var(–white);color:var(–text);outline:none;}
+.login-field input:focus,.login-field select:focus{border-color:var(–green);box-shadow:0 0 0 2px rgba(42,107,85,0.1);}
+.login-btn{width:100%;padding:11px;background:var(–green);color:white;border:none;border-radius:var(–radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:6px;transition:background 0.12s;}
+.login-btn:hover{background:var(–green-dk);}
 .login-err{font-size:11px;color:#c0392b;margin-top:8px;display:none;}
 
 /* TOPBAR */
-.topbar{background:var(--green);color:white;padding:0 16px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.topbar{background:var(–green);color:white;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
 .topbar-logo{font-size:14px;font-weight:600;letter-spacing:0.05em;}
 .topbar-logo span{opacity:0.6;font-size:11px;margin-left:6px;font-weight:400;}
 .topbar-right{display:flex;align-items:center;gap:8px;}
 .user-chip{font-size:12px;background:rgba(255,255,255,0.15);padding:4px 10px;border-radius:99px;}
-.hiyari-btn{background:var(--orange);color:white;border:none;padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;}
+.hiyari-btn{background:var(–orange);color:white;border:none;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;}
+.menu-btn{background:none;border:none;color:white;cursor:pointer;padding:6px;display:none;flex-direction:column;gap:5px;align-items:center;justify-content:center;}
+.menu-btn span{display:block;width:22px;height:2px;background:white;border-radius:2px;transition:all 0.2s;}
 
 /* LAYOUT */
-.layout{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 48px);}
-.sidebar{background:var(--white);border-right:1px solid var(--border);padding:12px 0;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
-.sb-section{font-size:10px;color:var(--text3);padding:12px 16px 4px;letter-spacing:0.06em;text-transform:uppercase;}
-.sb-item{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:12px;color:var(--text2);cursor:pointer;border-left:3px solid transparent;transition:all 0.12s;}
-.sb-item:hover{background:var(--bg);color:var(--text);}
-.sb-item.active{background:var(--green-lt);color:var(--green);border-left-color:var(--green);font-weight:600;}
+.layout{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 52px);}
+.sidebar{background:var(–white);border-right:1px solid var(–border);padding:12px 0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;transition:transform 0.25s ease;}
+.sb-section{font-size:10px;color:var(–text3);padding:12px 16px 4px;letter-spacing:0.06em;text-transform:uppercase;}
+.sb-item{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;color:var(–text2);cursor:pointer;border-left:3px solid transparent;transition:all 0.12s;}
+.sb-item:hover{background:var(–bg);color:var(–text);}
+.sb-item.active{background:var(–green-lt);color:var(–green);border-left-color:var(–green);font-weight:600;}
 .sb-item.disabled{opacity:0.4;cursor:default;pointer-events:none;}
-.sb-icon{font-size:14px;width:16px;text-align:center;}
-.sb-badge{background:var(--orange);color:white;font-size:9px;padding:1px 5px;border-radius:99px;margin-left:auto;}
+.sb-icon{font-size:15px;width:18px;text-align:center;}
+.sb-badge{background:var(–orange);color:white;font-size:9px;padding:1px 5px;border-radius:99px;margin-left:auto;}
+
+/* OVERLAY */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:149;}
+.sidebar-overlay.show{display:block;}
+
+/* MOBILE */
+@media(max-width:640px){
+.menu-btn{display:flex;}
+.hiyari-btn span{display:none;}
+.layout{grid-template-columns:1fr;}
+.sidebar{
+position:fixed;top:52px;left:0;height:calc(100vh - 52px);
+width:240px;z-index:150;
+transform:translateX(-100%);
+box-shadow:4px 0 16px rgba(0,0,0,0.12);
+}
+.sidebar.open{transform:translateX(0);}
+.page{padding:12px;}
+.page-hd{flex-direction:column;gap:10px;}
+.btn-row{width:100%;justify-content:flex-end;}
+.stat-grid{grid-template-columns:repeat(3,1fr);}
+.form-row{grid-template-columns:1fr;}
+.nippo-tabs .ntab{font-size:11px;padding:6px 4px;}
+}
 
 /* MAIN */
 .main{overflow-y:auto;}
@@ -55,128 +82,130 @@ body{font-family:'Noto Sans JP','Hiragino Sans',sans-serif;background:var(--bg);
 .page.active{display:block;}
 .page-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:8px;}
 .page-title{font-size:16px;font-weight:600;}
-.page-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.page-sub{font-size:11px;color:var(–text3);margin-top:2px;}
 .btn-row{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-.btn{padding:6px 14px;border-radius:99px;border:1px solid var(--border2);background:var(--white);font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:all 0.12s;}
-.btn:hover{background:var(--bg);}
-.btn.primary{background:var(--green);color:white;border-color:var(--green);}
-.btn.primary:hover{background:var(--green-dk);}
-.btn.orange{background:var(--orange);color:white;border-color:var(--orange);}
+.btn{padding:6px 14px;border-radius:99px;border:1px solid var(–border2);background:var(–white);font-size:12px;color:var(–text2);cursor:pointer;font-family:inherit;transition:all 0.12s;}
+.btn:hover{background:var(–bg);}
+.btn.primary{background:var(–green);color:white;border-color:var(–green);}
+.btn.primary:hover{background:var(–green-dk);}
+.btn.orange{background:var(–orange);color:white;border-color:var(–orange);}
 
 /* CARD */
-.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;}
-.card-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.card{background:var(–white);border:1px solid var(–border);border-radius:var(–radius);padding:14px 16px;margin-bottom:12px;}
+.card-title{font-size:11px;font-weight:600;color:var(–text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(–border);}
 
 /* STATS */
 .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
-.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center;}
+.stat{background:var(–white);border:1px solid var(–border);border-radius:var(–radius);padding:12px;text-align:center;}
 .stat-n{font-size:24px;font-weight:600;}
-.stat-n.green{color:var(--green);}
+.stat-n.green{color:var(–green);}
 .stat-n.amber{color:#c47a00;}
-.stat-l{font-size:10px;color:var(--text3);margin-top:2px;}
+.stat-l{font-size:10px;color:var(–text3);margin-top:2px;}
 
 /* PROGRESS */
 .prog-wrap{margin-bottom:14px;}
 .prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
-.prog-label{font-size:11px;color:var(--text2);}
-.prog-pct{font-size:12px;font-weight:600;color:var(--green);}
-.prog-bg{height:6px;background:var(--bg);border-radius:99px;overflow:hidden;}
-.prog-fill{height:100%;background:var(--green);border-radius:99px;transition:width 0.4s;}
+.prog-label{font-size:11px;color:var(–text2);}
+.prog-pct{font-size:12px;font-weight:600;color:var(–green);}
+.prog-bg{height:6px;background:var(–bg);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:var(–green);border-radius:99px;transition:width 0.4s;}
 
 /* FILTER */
 .filter-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
-.ftab{padding:5px 12px;border-radius:99px;border:1px solid var(--border);background:var(--white);font-size:11px;color:var(--text2);cursor:pointer;transition:all 0.12s;}
-.ftab.active{background:var(--green);color:white;border-color:var(--green);}
-select.filter-sel{padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--white);font-size:11px;color:var(--text2);font-family:inherit;cursor:pointer;}
+.ftab{padding:5px 12px;border-radius:99px;border:1px solid var(–border);background:var(–white);font-size:11px;color:var(–text2);cursor:pointer;transition:all 0.12s;}
+.ftab.active{background:var(–green);color:white;border-color:var(–green);}
+select.filter-sel{padding:5px 10px;border-radius:var(–radius-sm);border:1px solid var(–border);background:var(–white);font-size:11px;color:var(–text2);font-family:inherit;cursor:pointer;}
 
 /* TASK ITEMS */
 .shift-block{margin-bottom:16px;}
-.shift-hd{font-size:11px;font-weight:600;color:var(--text2);background:var(--bg);padding:6px 10px;border-radius:var(--radius-sm);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
-.shift-badge{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--green-lt);color:var(--green);}
-.task-item{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:8px;border:1px solid var(--border);background:var(--white);margin-bottom:4px;transition:all 0.15s;}
-.task-item.done{background:var(--bg);opacity:0.5;}
-.task-item.done .task-label{text-decoration:line-through;color:var(--text3);}
+.shift-hd{font-size:11px;font-weight:600;color:var(–text2);background:var(–bg);padding:6px 10px;border-radius:var(–radius-sm);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.shift-badge{font-size:10px;padding:2px 7px;border-radius:99px;background:var(–green-lt);color:var(–green);}
+.task-item{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:8px;border:1px solid var(–border);background:var(–white);margin-bottom:4px;transition:all 0.15s;}
+.task-item.done{background:var(–bg);opacity:0.5;}
+.task-item.done .task-label{text-decoration:line-through;color:var(–text3);}
 .task-item.hi-red{border-color:#f09595;background:#fdf5f5;}
-.task-item.done.hi-red{border-color:var(--border);background:var(--bg);}
-.task-cb{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all 0.12s;margin-top:1px;}
-.task-cb.done{background:var(--green);border-color:var(--green);}
+.task-item.done.hi-red{border-color:var(–border);background:var(–bg);}
+.task-cb{width:17px;height:17px;border-radius:4px;border:1.5px solid var(–border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all 0.12s;margin-top:1px;}
+.task-cb.done{background:var(–green);border-color:var(–green);}
 .task-body{flex:1;}
 .task-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.task-label{font-size:12px;color:var(--text);flex:1;}
-.task-time{font-size:10px;color:var(--text3);background:var(--bg);padding:1px 6px;border-radius:4px;white-space:nowrap;}
-.task-who{font-size:10px;padding:1px 7px;border-radius:99px;background:var(--green-lt);color:var(--green);white-space:nowrap;}
-.task-note{font-size:10px;color:var(--text3);margin-top:2px;}
+.task-label{font-size:12px;color:var(–text);flex:1;}
+.task-time{font-size:10px;color:var(–text3);background:var(–bg);padding:1px 6px;border-radius:4px;white-space:nowrap;}
+.task-who{font-size:10px;padding:1px 7px;border-radius:99px;background:var(–green-lt);color:var(–green);white-space:nowrap;}
+.task-note{font-size:10px;color:var(–text3);margin-top:2px;}
 
 /* NIPPO TABS */
-.nippo-header{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;padding:14px 16px;}
-.nippo-tabs{display:flex;gap:4px;background:var(--bg);border-radius:var(--radius-sm);padding:3px;margin-bottom:0;}
-.ntab{flex:1;text-align:center;padding:7px;font-size:12px;cursor:pointer;border-radius:6px;color:var(--text2);transition:all 0.12s;}
-.ntab.active{background:var(--white);color:var(--green);font-weight:600;border:1px solid var(--border);}
+.nippo-header{background:var(–white);border:1px solid var(–border);border-radius:var(–radius);margin-bottom:12px;padding:14px 16px;}
+.nippo-tabs{display:flex;gap:4px;background:var(–bg);border-radius:var(–radius-sm);padding:3px;margin-bottom:0;}
+.ntab{flex:1;text-align:center;padding:7px;font-size:12px;cursor:pointer;border-radius:6px;color:var(–text2);transition:all 0.12s;}
+.ntab.active{background:var(–white);color:var(–green);font-weight:600;border:1px solid var(–border);}
 .ntab-panel{display:none;}
 .ntab-panel.active{display:block;}
 
 /* FORM FIELDS */
 .field{margin-bottom:12px;}
-.field label{font-size:11px;color:var(--text3);display:block;margin-bottom:4px;}
-input[type=date],input[type=time],input[type=text],select,textarea{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;font-family:inherit;background:var(--white);color:var(--text);outline:none;}
-input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(42,107,85,0.1);}
+.field label{font-size:11px;color:var(–text3);display:block;margin-bottom:4px;}
+input[type=date],input[type=time],input[type=text],select,textarea{width:100%;border:1px solid var(–border);border-radius:var(–radius-sm);padding:8px 10px;font-size:12px;font-family:inherit;background:var(–white);color:var(–text);outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(–green);box-shadow:0 0 0 2px rgba(42,107,85,0.1);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .shift-row{display:flex;gap:6px;flex-wrap:wrap;}
-.shbtn{padding:5px 12px;border-radius:99px;border:1px solid var(--border);background:var(--white);font-size:12px;color:var(--text2);cursor:pointer;transition:all 0.12s;}
-.shbtn.active{background:var(--green);color:white;border-color:var(--green);}
-.sec-hd{font-size:11px;font-weight:600;color:var(--text2);margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.shbtn{padding:5px 12px;border-radius:99px;border:1px solid var(–border);background:var(–white);font-size:12px;color:var(–text2);cursor:pointer;transition:all 0.12s;}
+.shbtn.active{background:var(–green);color:white;border-color:var(–green);}
+.sec-hd{font-size:11px;font-weight:600;color:var(–text2);margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid var(–border);}
 
 /* MY TASKS */
 .my-task-item{display:flex;align-items:center;gap:8px;padding:6px 4px;border-radius:6px;cursor:pointer;margin-bottom:2px;}
-.my-task-item:hover{background:var(--bg);}
-.my-task-item.done .my-task-label{text-decoration:line-through;color:var(--text3);}
-.my-task-item.done .my-cb{background:var(--green);border-color:var(--green);}
-.my-cb{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.12s;}
-.my-task-label{font-size:12px;color:var(--text);flex:1;}
-.my-task-time{font-size:10px;color:var(--text3);background:var(--bg);padding:1px 6px;border-radius:4px;}
+.my-task-item:hover{background:var(–bg);}
+.my-task-item.done .my-task-label{text-decoration:line-through;color:var(–text3);}
+.my-task-item.done .my-cb{background:var(–green);border-color:var(–green);}
+.my-cb{width:17px;height:17px;border-radius:4px;border:1.5px solid var(–border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.12s;}
+.my-task-label{font-size:12px;color:var(–text);flex:1;}
+.my-task-time{font-size:10px;color:var(–text3);background:var(–bg);padding:1px 6px;border-radius:4px;}
 
 /* CUSTOMER */
 .room-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
-.room-tab{padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--white);font-size:12px;cursor:pointer;color:var(--text2);transition:all 0.12s;}
-.room-tab.active{background:var(--green);color:white;border-color:var(--green);}
+.room-tab{padding:4px 10px;border-radius:6px;border:1px solid var(–border);background:var(–white);font-size:12px;cursor:pointer;color:var(–text2);transition:all 0.12s;}
+.room-tab.active{background:var(–green);color:white;border-color:var(–green);}
 .room-tab.filled{border-color:#85b7eb;color:#185fa5;background:#e6f1fb;}
 .room-panel{display:none;}
 .room-panel.active{display:block;}
 .pill-group{display:flex;gap:5px;flex-wrap:wrap;}
-.pill{padding:5px 11px;border-radius:99px;border:1px solid var(--border);background:var(--white);font-size:12px;cursor:pointer;color:var(--text2);transition:all 0.12s;}
-.pill.active{background:var(--green);color:white;border-color:var(--green);}
-.pill.sat-active{background:var(--amber);color:white;border-color:var(--amber);}
+.pill{padding:5px 11px;border-radius:99px;border:1px solid var(–border);background:var(–white);font-size:12px;cursor:pointer;color:var(–text2);transition:all 0.12s;}
+.pill.active{background:var(–green);color:white;border-color:var(–green);}
+.pill.sat-active{background:var(–amber);color:white;border-color:var(–amber);}
 .pill.na-active{background:#888;color:white;border-color:#888;}
 
 /* SEND FOOTER */
-.send-footer{background:var(--bg);border-top:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);padding:10px 14px;display:flex;align-items:center;gap:8px;margin-top:14px;}
-.save-hint{font-size:10px;color:var(--text3);flex:1;}
-.save-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px;vertical-align:middle;}
+.send-footer{background:var(–bg);border-top:1px solid var(–border);border-radius:0 0 var(–radius) var(–radius);padding:10px 14px;display:flex;align-items:center;gap:8px;margin-top:14px;}
+.save-hint{font-size:10px;color:var(–text3);flex:1;}
+.save-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(–green);margin-right:4px;vertical-align:middle;}
 
 /* NOTIFY */
-.notify{background:#fff5e0;border:1px solid #f0c060;border-radius:var(--radius-sm);padding:8px 12px;font-size:11px;color:#8c5a00;margin-bottom:12px;display:none;}
+.notify{background:#fff5e0;border:1px solid #f0c060;border-radius:var(–radius-sm);padding:8px 12px;font-size:11px;color:#8c5a00;margin-bottom:12px;display:none;}
 .notify.show{display:block;}
-.notify.info{background:var(--green-lt);border-color:var(--green-md);color:var(--green-dk);}
+.notify.info{background:var(–green-lt);border-color:var(–green-md);color:var(–green-dk);}
 
 /* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:10px 20px;border-radius:99px;font-size:12px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;}
 
 /* EXTRA TASKS */
-.extra-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;background:var(--bg);position:relative;}
-.extra-rm{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:#e8e8e8;border:none;cursor:pointer;font-size:13px;color:var(--text2);display:flex;align-items:center;justify-content:center;line-height:1;}
+.extra-card{border:1px solid var(–border);border-radius:var(–radius-sm);padding:12px;margin-bottom:8px;background:var(–bg);position:relative;}
+.extra-rm{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:#e8e8e8;border:none;cursor:pointer;font-size:13px;color:var(–text2);display:flex;align-items:center;justify-content:center;line-height:1;}
 .extra-rm:hover{background:#e08080;color:white;}
-.add-extra-btn{width:100%;padding:9px;border:1.5px dashed var(--border2);border-radius:var(--radius-sm);background:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.12s;}
-.add-extra-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-lt);}
+.add-extra-btn{width:100%;padding:9px;border:1.5px dashed var(–border2);border-radius:var(–radius-sm);background:none;color:var(–text3);font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.12s;}
+.add-extra-btn:hover{border-color:var(–green);color:var(–green);background:var(–green-lt);}
 
-.loading{text-align:center;padding:30px;color:var(--text3);font-size:13px;}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle;}
+.loading{text-align:center;padding:30px;color:var(–text3);font-size:13px;}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(–border);border-top-color:var(–green);border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg);}}
 </style>
+
 </head>
 <body>
 
 <!-- LOGIN -->
+
 <div id="loginWrap" class="login-wrap">
   <div class="login-box">
     <div class="login-logo">TOTONOI</div>
@@ -204,17 +233,24 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
 </div>
 
 <!-- PORTAL -->
+
 <div id="portalWrap" style="display:none;">
   <div class="topbar">
-    <div class="topbar-logo">TOTONOI <span>社員ポータル</span></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="menu-btn" id="menuBtn" onclick="toggleSidebar()" aria-label="メニュー">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-logo">TOTONOI <span>社員ポータル</span></div>
+    </div>
     <div class="topbar-right">
       <div class="user-chip" id="userChip">-</div>
       <button class="hiyari-btn" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSfP3joxX75U2y5emIFSJ9uuib4r0y7dTmXQ3v7tpFVg5oeKJw/viewform','_blank')">⚠ ヒヤリハット</button>
     </div>
   </div>
 
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
   <div class="layout">
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
       <div class="sb-section">メニュー</div>
       <div class="sb-item active" onclick="nav('board',this)"><span class="sb-icon">✓</span>Todoリスト<span class="sb-badge" id="remain-badge" style="display:none"></span></div>
       <div class="sb-item" onclick="nav('nippo',this)"><span class="sb-icon">📋</span>日報入力</div>
@@ -225,139 +261,142 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
       <div class="sb-item disabled"><span class="sb-icon">👥</span>顧客検索</div>
     </div>
 
-    <div class="main">
+```
+<div class="main">
 
-      <!-- ===== BOARD ===== -->
-      <div class="page active" id="page-board">
-        <div class="page-hd">
-          <div>
-            <div class="page-title">本日のTodoボード</div>
-            <div class="page-sub" id="board-date"></div>
-          </div>
-          <div class="btn-row">
-            <select class="filter-sel" id="shift-filter" onchange="renderBoard()">
-              <option value="all">全シフト</option>
-              <option value="早番">早番</option>
-              <option value="中番（現場）">中番（現場）</option>
-              <option value="遅番">遅番</option>
-            </select>
-          </div>
-        </div>
-        <div class="notify" id="board-notify"></div>
-        <div class="stat-grid">
-          <div class="stat"><div class="stat-n amber" id="s-remain">-</div><div class="stat-l">残りタスク</div></div>
-          <div class="stat"><div class="stat-n green" id="s-done">-</div><div class="stat-l">完了済み</div></div>
-          <div class="stat"><div class="stat-n" id="s-pct">-%</div><div class="stat-l">達成率</div></div>
-        </div>
-        <div class="prog-wrap">
-          <div class="prog-row"><span class="prog-label">本日の進捗</span><span class="prog-pct" id="board-pct">0%</span></div>
-          <div class="prog-bg"><div class="prog-fill" id="board-prog" style="width:0%"></div></div>
-        </div>
-        <div class="filter-row">
-          <div class="ftab active" onclick="setFilter(this,'all')">すべて</div>
-          <div class="ftab" onclick="setFilter(this,'todo')">未完了のみ</div>
-          <div class="ftab" onclick="setFilter(this,'done')">完了済みのみ</div>
-        </div>
-        <div id="board-list"><div class="loading"><span class="spinner"></span>読み込み中...</div></div>
+  <!-- ===== BOARD ===== -->
+  <div class="page active" id="page-board">
+    <div class="page-hd">
+      <div>
+        <div class="page-title">本日のTodoボード</div>
+        <div class="page-sub" id="board-date"></div>
       </div>
-
-      <!-- ===== 日報入力 ===== -->
-      <div class="page" id="page-nippo">
-        <div class="page-hd">
-          <div>
-            <div class="page-title">日報入力</div>
-            <div class="page-sub">途中保存で次回続きから入力できます</div>
-          </div>
-          <div class="btn-row">
-            <button class="btn orange" onclick="partialSave()">途中保存</button>
-            <button class="btn primary" onclick="fullSend()">最終送信</button>
-          </div>
-        </div>
-
-        <div class="notify info" id="resume-bar"></div>
-
-        <!-- 基本情報 -->
-        <div class="card">
-          <div class="card-title">基本情報</div>
-          <div class="form-row">
-            <div class="field">
-              <label>担当者名</label>
-              <div style="padding:8px 10px;font-size:13px;font-weight:600;color:var(--green);background:var(--green-lt);border-radius:var(--radius-sm);border:1px solid var(--green-md);" id="my-staff-display">-</div>
-            </div>
-            <div class="field">
-              <label>勤務日</label>
-              <input type="date" id="my-date">
-            </div>
-          </div>
-          <div class="field">
-            <label>シフト</label>
-            <div class="shift-row" id="my-shift-row">
-              <button class="shbtn" onclick="selShift(this,'早番')">早番</button>
-              <button class="shbtn" onclick="selShift(this,'中番（現場）')">中番（現場）</button>
-              <button class="shbtn" onclick="selShift(this,'中番（定期清掃）')">中番（定期清掃）</button>
-              <button class="shbtn" onclick="selShift(this,'遅番')">遅番</button>
-            </div>
-          </div>
-          <div class="form-row" style="margin-bottom:0;">
-            <div class="field" style="margin-bottom:0;"><label>勤務開始</label><input type="time" id="my-start"></div>
-            <div class="field" style="margin-bottom:0;"><label>勤務終了</label><input type="time" id="my-end"></div>
-          </div>
-        </div>
-
-        <!-- タブ -->
-        <div class="card" style="padding:0;overflow:hidden;">
-          <div style="padding:12px 16px 0;">
-            <div class="nippo-tabs">
-              <div class="ntab active" onclick="switchNTab(this,'todo')">✓ Todoリスト</div>
-              <div class="ntab" onclick="switchNTab(this,'customer')">👥 お客様情報</div>
-              <div class="ntab" onclick="switchNTab(this,'notes')">📝 その他業務・連絡</div>
-            </div>
-          </div>
-
-          <!-- TODO タブ -->
-          <div class="ntab-panel active" id="ntab-todo" style="padding:14px 16px;">
-            <div class="prog-wrap">
-              <div class="prog-row"><span class="prog-label" id="my-prog-txt">シフトを選択してください</span><span class="prog-pct" id="my-pct"></span></div>
-              <div class="prog-bg"><div class="prog-fill" id="my-prog" style="width:0%"></div></div>
-            </div>
-            <div id="my-task-list"><div style="color:var(--text3);font-size:12px;padding:8px 0;">シフトを選択するとタスクが表示されます</div></div>
-          </div>
-
-          <!-- お客様情報タブ -->
-          <div class="ntab-panel" id="ntab-customer" style="padding:14px 16px;">
-            <p style="font-size:11px;color:var(--text3);margin-bottom:10px;">チェックインがあった棟を記録してください</p>
-            <div class="room-tabs" id="room-tabs"></div>
-            <div id="room-panels"></div>
-          </div>
-
-          <!-- その他業務・連絡事項タブ -->
-          <div class="ntab-panel" id="ntab-notes" style="padding:14px 16px;">
-
-            <!-- 通常業務以外 -->
-            <div style="margin-bottom:18px;">
-              <div class="sec-hd" style="margin-top:0;">通常業務以外</div>
-              <p style="font-size:11px;color:var(--text3);margin-bottom:8px;">施設改善・任務タスク・その他を記録してください</p>
-              <div id="extra-list"></div>
-              <button class="add-extra-btn" onclick="addExtra()">＋ 追加する</button>
-            </div>
-
-            <!-- 連絡事項 -->
-            <div class="sec-hd">連絡事項</div>
-            <div class="field">
-              <label>引き継ぎ・気になること・申し送り事項など</label>
-              <textarea id="my-notes" rows="5" placeholder="自由に記入してください" oninput="scheduleSave()"></textarea>
-            </div>
-          </div>
-
-          <div class="send-footer">
-            <span class="save-hint"><span class="save-dot"></span><span id="save-time">自動保存待機中</span></span>
-            <button class="btn" onclick="partialSave()">途中保存</button>
-            <button class="btn primary" onclick="fullSend()">最終送信</button>
-          </div>
-        </div>
+      <div class="btn-row">
+        <select class="filter-sel" id="shift-filter" onchange="renderBoard()">
+          <option value="all">全シフト</option>
+          <option value="早番">早番</option>
+          <option value="中番（現場）">中番（現場）</option>
+          <option value="遅番">遅番</option>
+        </select>
       </div>
-
     </div>
+    <div class="notify" id="board-notify"></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-n amber" id="s-remain">-</div><div class="stat-l">残りタスク</div></div>
+      <div class="stat"><div class="stat-n green" id="s-done">-</div><div class="stat-l">完了済み</div></div>
+      <div class="stat"><div class="stat-n" id="s-pct">-%</div><div class="stat-l">達成率</div></div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-row"><span class="prog-label">本日の進捗</span><span class="prog-pct" id="board-pct">0%</span></div>
+      <div class="prog-bg"><div class="prog-fill" id="board-prog" style="width:0%"></div></div>
+    </div>
+    <div class="filter-row">
+      <div class="ftab active" onclick="setFilter(this,'all')">すべて</div>
+      <div class="ftab" onclick="setFilter(this,'todo')">未完了のみ</div>
+      <div class="ftab" onclick="setFilter(this,'done')">完了済みのみ</div>
+    </div>
+    <div id="board-list"><div class="loading"><span class="spinner"></span>読み込み中...</div></div>
+  </div>
+
+  <!-- ===== 日報入力 ===== -->
+  <div class="page" id="page-nippo">
+    <div class="page-hd">
+      <div>
+        <div class="page-title">日報入力</div>
+        <div class="page-sub">途中保存で次回続きから入力できます</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn orange" onclick="partialSave()">途中保存</button>
+        <button class="btn primary" onclick="fullSend()">最終送信</button>
+      </div>
+    </div>
+
+    <div class="notify info" id="resume-bar"></div>
+
+    <!-- 基本情報 -->
+    <div class="card">
+      <div class="card-title">基本情報</div>
+      <div class="form-row">
+        <div class="field">
+          <label>担当者名</label>
+          <div style="padding:8px 10px;font-size:13px;font-weight:600;color:var(--green);background:var(--green-lt);border-radius:var(--radius-sm);border:1px solid var(--green-md);" id="my-staff-display">-</div>
+        </div>
+        <div class="field">
+          <label>勤務日</label>
+          <input type="date" id="my-date">
+        </div>
+      </div>
+      <div class="field">
+        <label>シフト</label>
+        <div class="shift-row" id="my-shift-row">
+          <button class="shbtn" onclick="selShift(this,'早番')">早番</button>
+          <button class="shbtn" onclick="selShift(this,'中番（現場）')">中番（現場）</button>
+          <button class="shbtn" onclick="selShift(this,'中番（定期清掃）')">中番（定期清掃）</button>
+          <button class="shbtn" onclick="selShift(this,'遅番')">遅番</button>
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:0;">
+        <div class="field" style="margin-bottom:0;"><label>勤務開始</label><input type="time" id="my-start"></div>
+        <div class="field" style="margin-bottom:0;"><label>勤務終了</label><input type="time" id="my-end"></div>
+      </div>
+    </div>
+
+    <!-- タブ -->
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:12px 16px 0;">
+        <div class="nippo-tabs">
+          <div class="ntab active" onclick="switchNTab(this,'todo')">✓ Todoリスト</div>
+          <div class="ntab" onclick="switchNTab(this,'customer')">👥 お客様情報</div>
+          <div class="ntab" onclick="switchNTab(this,'notes')">📝 その他業務・連絡</div>
+        </div>
+      </div>
+
+      <!-- TODO タブ -->
+      <div class="ntab-panel active" id="ntab-todo" style="padding:14px 16px;">
+        <div class="prog-wrap">
+          <div class="prog-row"><span class="prog-label" id="my-prog-txt">シフトを選択してください</span><span class="prog-pct" id="my-pct"></span></div>
+          <div class="prog-bg"><div class="prog-fill" id="my-prog" style="width:0%"></div></div>
+        </div>
+        <div id="my-task-list"><div style="color:var(--text3);font-size:12px;padding:8px 0;">シフトを選択するとタスクが表示されます</div></div>
+      </div>
+
+      <!-- お客様情報タブ -->
+      <div class="ntab-panel" id="ntab-customer" style="padding:14px 16px;">
+        <p style="font-size:11px;color:var(--text3);margin-bottom:10px;">チェックインがあった棟を記録してください</p>
+        <div class="room-tabs" id="room-tabs"></div>
+        <div id="room-panels"></div>
+      </div>
+
+      <!-- その他業務・連絡事項タブ -->
+      <div class="ntab-panel" id="ntab-notes" style="padding:14px 16px;">
+
+        <!-- 通常業務以外 -->
+        <div style="margin-bottom:18px;">
+          <div class="sec-hd" style="margin-top:0;">通常業務以外</div>
+          <p style="font-size:11px;color:var(--text3);margin-bottom:8px;">施設改善・任務タスク・その他を記録してください</p>
+          <div id="extra-list"></div>
+          <button class="add-extra-btn" onclick="addExtra()">＋ 追加する</button>
+        </div>
+
+        <!-- 連絡事項 -->
+        <div class="sec-hd">連絡事項</div>
+        <div class="field">
+          <label>引き継ぎ・気になること・申し送り事項など</label>
+          <textarea id="my-notes" rows="5" placeholder="自由に記入してください" oninput="scheduleSave()"></textarea>
+        </div>
+      </div>
+
+      <div class="send-footer">
+        <span class="save-hint"><span class="save-dot"></span><span id="save-time">自動保存待機中</span></span>
+        <button class="btn" onclick="partialSave()">途中保存</button>
+        <button class="btn primary" onclick="fullSend()">最終送信</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+```
+
   </div>
 </div>
 
@@ -795,164 +834,158 @@ function initRooms() {
       </div>
       <div class="field" style="margin-bottom:8px;"><label>話した内容・印象</label>
         <textarea id="rconv-${r}" rows="2" placeholder="お客様との会話・気づきなど" oninput="markRoom('${r}');scheduleSave()"></textarea>
-      </div>
-      <div class="field" style="margin-bottom:0;"><label>推定満足度</label>
-        <div class="pill-group">
-          ${SATS.map(s=>{
-            const lbl = s==='判断できない'?'不明':'★'+s;
-            return `<button class="pill" id="rsat-${r}-${s}" onclick="setSat('${r}','${s}',this)">${lbl}</button>`;
-          }).join('')}
-        </div>
-      </div>
-    </div>`).join('');
+
+```
+  </div>
+  <div class="field" style="margin-bottom:0;"><label>推定満足度</label>
+    <div class="pill-group">
+      ${SATS.map(s=>{
+        const lbl = s==='判断できない'?'不明':'★'+s;
+        return `<button class="pill" id="rsat-${r}-${s}" onclick="setSat('${r}','${s}',this)">${lbl}</button>`;
+      }).join('')}
+    </div>
+  </div>
+</div>`).join('');
+```
+
 }
 
 function restoreRoomData() {
-  ROOMS.forEach(r => {
-    const rd = roomData[r];
-    if (!rd) return;
-    if (rd.name) { const el = document.getElementById(`rname-${r}`); if(el) el.value = rd.name; }
-    if (rd.conv) { const el = document.getElementById(`rconv-${r}`); if(el) el.value = rd.conv; }
-    if (rd.age) { const el = document.getElementById(`rage-${r}-${rd.age}`); if(el) { el.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); } }
-    if (rd.type) { const el = document.getElementById(`rtype-${r}-${rd.type}`); if(el) { el.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); } }
-    if (rd.sat) { const el = document.getElementById(`rsat-${r}-${rd.sat}`); if(el) { el.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active','sat-active','na-active')); el.classList.add(rd.sat==='判断できない'?'na-active':'sat-active'); } }
-    markRoom(r);
-  });
+ROOMS.forEach(r => {
+const rd = roomData[r];
+if (!rd) return;
+if (rd.name) { const el = document.getElementById(`rname-${r}`); if(el) el.value = rd.name; }
+if (rd.conv) { const el = document.getElementById(`rconv-${r}`); if(el) el.value = rd.conv; }
+if (rd.age) { const el = document.getElementById(`rage-${r}-${rd.age}`); if(el) { el.closest(’.pill-group’).querySelectorAll(’.pill’).forEach(p=>p.classList.remove(‘active’)); el.classList.add(‘active’); } }
+if (rd.type) { const el = document.getElementById(`rtype-${r}-${rd.type}`); if(el) { el.closest(’.pill-group’).querySelectorAll(’.pill’).forEach(p=>p.classList.remove(‘active’)); el.classList.add(‘active’); } }
+if (rd.sat) { const el = document.getElementById(`rsat-${r}-${rd.sat}`); if(el) { el.closest(’.pill-group’).querySelectorAll(’.pill’).forEach(p=>p.classList.remove(‘active’,‘sat-active’,‘na-active’)); el.classList.add(rd.sat===‘判断できない’?‘na-active’:‘sat-active’); } }
+markRoom(r);
+});
 }
 
 window.switchRoom = function(r) {
-  document.querySelectorAll('.room-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.room-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('rtab-'+r).classList.add('active');
-  document.getElementById('rpanel-'+r).classList.add('active');
+document.querySelectorAll(’.room-tab’).forEach(t=>t.classList.remove(‘active’));
+document.querySelectorAll(’.room-panel’).forEach(p=>p.classList.remove(‘active’));
+document.getElementById(‘rtab-’+r).classList.add(‘active’);
+document.getElementById(‘rpanel-’+r).classList.add(‘active’);
 }
 
 window.setRoom = function(room, key, val, btn) {
-  btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if (!roomData[room]) roomData[room] = {};
-  roomData[room][key] = val;
-  markRoom(room); scheduleSave();
+btn.closest(’.pill-group’).querySelectorAll(’.pill’).forEach(b=>b.classList.remove(‘active’));
+btn.classList.add(‘active’);
+if (!roomData[room]) roomData[room] = {};
+roomData[room][key] = val;
+markRoom(room); scheduleSave();
 }
 
 window.setSat = function(room, val, btn) {
-  btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active','sat-active','na-active'));
-  btn.classList.add(val==='判断できない'?'na-active':'sat-active');
-  if (!roomData[room]) roomData[room] = {};
-  roomData[room].sat = val;
-  markRoom(room); scheduleSave();
+btn.closest(’.pill-group’).querySelectorAll(’.pill’).forEach(b=>b.classList.remove(‘active’,‘sat-active’,‘na-active’));
+btn.classList.add(val===‘判断できない’?‘na-active’:‘sat-active’);
+if (!roomData[room]) roomData[room] = {};
+roomData[room].sat = val;
+markRoom(room); scheduleSave();
 }
 
 window.markRoom = function(r) {
-  const conv = (document.getElementById('rconv-'+r)||{}).value||'';
-  const name = (document.getElementById('rname-'+r)||{}).value||'';
-  const rd = roomData[r]||{};
-  const tab = document.getElementById('rtab-'+r);
-  if (rd.age||rd.type||rd.sat||conv.trim()||name.trim()) tab.classList.add('filled');
-  else tab.classList.remove('filled');
+const conv = (document.getElementById(‘rconv-’+r)||{}).value||’’;
+const name = (document.getElementById(‘rname-’+r)||{}).value||’’;
+const rd = roomData[r]||{};
+const tab = document.getElementById(‘rtab-’+r);
+if (rd.age||rd.type||rd.sat||conv.trim()||name.trim()) tab.classList.add(‘filled’);
+else tab.classList.remove(‘filled’);
 }
 
 function collectRooms() {
-  return ROOMS.map(r => {
-    const conv = (document.getElementById('rconv-'+r)||{}).value||'';
-    const name = (document.getElementById('rname-'+r)||{}).value||'';
-    const rd = roomData[r]||{};
-    if (!rd.age&&!rd.type&&!rd.sat&&!conv.trim()&&!name.trim()) return null;
-    return { room:r, customerName:name.trim(), age:rd.age||'', type:rd.type||'', conversation:conv.trim(), satisfaction:rd.sat||'' };
-  }).filter(Boolean);
+return ROOMS.map(r => {
+const conv = (document.getElementById(‘rconv-’+r)||{}).value||’’;
+const name = (document.getElementById(‘rname-’+r)||{}).value||’’;
+const rd = roomData[r]||{};
+if (!rd.age&&!rd.type&&!rd.sat&&!conv.trim()&&!name.trim()) return null;
+return { room:r, customerName:name.trim(), age:rd.age||’’, type:rd.type||’’, conversation:conv.trim(), satisfaction:rd.sat||’’ };
+}).filter(Boolean);
 }
 
 // ===== ナビ =====
 window.nav = function(id, el) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  if (el) el.classList.add('active');
-  else {
-    const map = {board:0, nippo:1};
-    if (map[id]!==undefined) document.querySelectorAll('.sb-item')[map[id]].classList.add('active');
-  }
+document.querySelectorAll(’.page’).forEach(p=>p.classList.remove(‘active’));
+document.querySelectorAll(’.sb-item’).forEach(b=>b.classList.remove(‘active’));
+document.getElementById(‘page-’+id).classList.add(‘active’);
+if (el) el.classList.add(‘active’);
+else {
+const map = {board:0, nippo:1};
+if (map[id]!==undefined) document.querySelectorAll(’.sb-item’)[map[id]].classList.add(‘active’);
+}
+closeSidebar();
+}
+
+window.toggleSidebar = function() {
+const sb = document.getElementById(‘sidebar’);
+const ov = document.getElementById(‘sidebarOverlay’);
+sb.classList.toggle(‘open’);
+ov.classList.toggle(‘show’);
+}
+
+window.closeSidebar = function() {
+document.getElementById(‘sidebar’).classList.remove(‘open’);
+document.getElementById(‘sidebarOverlay’).classList.remove(‘show’);
 }
 
 window.switchNTab = function(el, tab) {
-  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.ntab-panel').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('ntab-'+tab).classList.add('active');
+document.querySelectorAll(’.ntab’).forEach(t=>t.classList.remove(‘active’));
+document.querySelectorAll(’.ntab-panel’).forEach(p=>p.classList.remove(‘active’));
+el.classList.add(‘active’);
+document.getElementById(‘ntab-’+tab).classList.add(‘active’);
 }
 
 // ===== ユーティリティ =====
 function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 3000);
+const el = document.getElementById(‘toast’);
+el.textContent = msg; el.classList.add(‘show’);
+setTimeout(()=>el.classList.remove(‘show’), 3000);
 }
 
 function showNotify(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 5000);
+const el = document.getElementById(id);
+el.textContent = msg; el.classList.add(‘show’);
+setTimeout(()=>el.classList.remove(‘show’), 5000);
 }
 
 window.scheduleSave = scheduleSave;
 
 // ===== テキストエリア自動保存 =====
-document.getElementById('my-notes').addEventListener('input', scheduleSave);
-document.getElementById('my-start').addEventListener('change', scheduleSave);
-document.getElementById('my-end').addEventListener('change', scheduleSave);
+document.getElementById(‘my-notes’).addEventListener(‘input’, scheduleSave);
+document.getElementById(‘my-start’).addEventListener(‘change’, scheduleSave);
+document.getElementById(‘my-end’).addEventListener(‘change’, scheduleSave);
 
 // ===== 通常業務以外 =====
 let extraCount = 0;
 
 window.addExtra = function() {
-  extraCount++;
-  const id = 'ex' + extraCount;
-  const div = document.createElement('div');
-  div.className = 'extra-card'; div.id = id;
-  div.innerHTML = `
-    <button class="extra-rm" onclick="document.getElementById('${id}').remove();scheduleSave()">×</button>
-    <div class="field" style="margin-bottom:8px;padding-right:28px;">
-      <label>種別</label>
-      <select id="${id}-type" onchange="toggleReason('${id}');scheduleSave()">
-        <option value="">選択してください</option>
-        <option>施設改善</option>
-        <option>任務されているタスク</option>
-        <option>その他</option>
-      </select>
-    </div>
-    <div class="field" style="margin-bottom:8px;">
-      <label>内容</label>
-      <input type="text" id="${id}-content" placeholder="何を行ったか" oninput="scheduleSave()">
-    </div>
-    <div class="field" style="margin-bottom:8px;">
-      <label>所要時間</label>
-      <input type="text" id="${id}-dur" placeholder="例：30分" oninput="scheduleSave()">
-    </div>
-    <div id="${id}-rblock" style="display:none;">
-      <div class="field" style="margin-bottom:0;">
-        <label>なぜ行おうと思ったか（理由・背景）</label>
-        <textarea id="${id}-reason" rows="2" placeholder="理由・背景を記載してください" oninput="scheduleSave()"></textarea>
-      </div>
-    </div>`;
-  document.getElementById('extra-list').appendChild(div);
+extraCount++;
+const id = ‘ex’ + extraCount;
+const div = document.createElement(‘div’);
+div.className = ‘extra-card’; div.id = id;
+div.innerHTML = ` <button class="extra-rm" onclick="document.getElementById('${id}').remove();scheduleSave()">×</button> <div class="field" style="margin-bottom:8px;padding-right:28px;"> <label>種別</label> <select id="${id}-type" onchange="toggleReason('${id}');scheduleSave()"> <option value="">選択してください</option> <option>施設改善</option> <option>任務されているタスク</option> <option>その他</option> </select> </div> <div class="field" style="margin-bottom:8px;"> <label>内容</label> <input type="text" id="${id}-content" placeholder="何を行ったか" oninput="scheduleSave()"> </div> <div class="field" style="margin-bottom:8px;"> <label>所要時間</label> <input type="text" id="${id}-dur" placeholder="例：30分" oninput="scheduleSave()"> </div> <div id="${id}-rblock" style="display:none;"> <div class="field" style="margin-bottom:0;"> <label>なぜ行おうと思ったか（理由・背景）</label> <textarea id="${id}-reason" rows="2" placeholder="理由・背景を記載してください" oninput="scheduleSave()"></textarea> </div> </div>`;
+document.getElementById(‘extra-list’).appendChild(div);
 }
 
 window.toggleReason = function(id) {
-  const v = document.getElementById(id+'-type').value;
-  document.getElementById(id+'-rblock').style.display = v==='施設改善' ? 'block' : 'none';
+const v = document.getElementById(id+’-type’).value;
+document.getElementById(id+’-rblock’).style.display = v===‘施設改善’ ? ‘block’ : ‘none’;
 }
 
 function collectExtras() {
-  return Array.from(document.querySelectorAll('.extra-card')).map(c => {
-    const id = c.id;
-    return {
-      type: (document.getElementById(id+'-type')||{}).value||'',
-      content: (document.getElementById(id+'-content')||{}).value||'',
-      duration: (document.getElementById(id+'-dur')||{}).value||'',
-      reason: (document.getElementById(id+'-reason')||{}).value||''
-    };
-  }).filter(x => x.type||x.content);
+return Array.from(document.querySelectorAll(’.extra-card’)).map(c => {
+const id = c.id;
+return {
+type: (document.getElementById(id+’-type’)||{}).value||’’,
+content: (document.getElementById(id+’-content’)||{}).value||’’,
+duration: (document.getElementById(id+’-dur’)||{}).value||’’,
+reason: (document.getElementById(id+’-reason’)||{}).value||’’
+};
+}).filter(x => x.type||x.content);
 }
 </script>
+
 </body>
 </html>
