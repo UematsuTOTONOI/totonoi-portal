@@ -182,11 +182,23 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
     <div class="login-logo">TOTONOI</div>
     <div class="login-sub">社員ポータル</div>
     <div class="login-field">
+      <label>担当者名</label>
+      <select id="loginStaff">
+        <option value="">選択してください</option>
+        <option>里吉</option>
+        <option>梶原</option>
+        <option>ほのか</option>
+        <option>阿部</option>
+        <option>りょうな</option>
+        <option>りこ</option>
+      </select>
+    </div>
+    <div class="login-field">
       <label>パスワード</label>
-      <input type="password" id="loginPass" placeholder="パスワードを入力" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="loginPass" placeholder="4桁の数字" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <button class="login-btn" onclick="doLogin()">ログイン</button>
-    <div class="login-err" id="loginErr">パスワードが違います</div>
+    <div class="login-err" id="loginErr">担当者またはパスワードが違います</div>
   </div>
 </div>
 
@@ -269,11 +281,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
           <div class="form-row">
             <div class="field">
               <label>担当者名</label>
-              <select id="my-staff" onchange="onStaffChange()">
-                <option value="">選択してください</option>
-                <option>里吉</option><option>梶原</option><option>ほのか</option>
-                <option>阿部</option><option>りょうな</option><option>りこ</option>
-              </select>
+              <div style="padding:8px 10px;font-size:13px;font-weight:600;color:var(--green);background:var(--green-lt);border-radius:var(--radius-sm);border:1px solid var(--green-md);" id="my-staff-display">-</div>
             </div>
             <div class="field">
               <label>勤務日</label>
@@ -371,7 +379,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const PASSWORD = 'totonoi26@';
+const PASSWORDS = {'里吉':'3847','梶原':'9162','ほのか':'5031','阿部':'7284','りょうな':'6519','りこ':'2473'};
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx55qhEqhaXZPMKIuSEhjmTBqprKlJFENmfygkBa2uMOjZ7BzsYkY3QCmxW0UsrVJ-_/exec';
 
 // ===== タスク定義 =====
@@ -519,28 +527,28 @@ function chkSvg() {
 }
 
 // ===== ログイン =====
-window.doLogin = function() {
+window.doLogin = async function() {
+  const staff = document.getElementById('loginStaff').value;
   const p = document.getElementById('loginPass').value;
-  if (p !== PASSWORD) {
-    document.getElementById('loginErr').style.display = 'block';
+  const errEl = document.getElementById('loginErr');
+  if (!staff || PASSWORDS[staff] !== p) {
+    errEl.style.display = 'block';
     return;
   }
+  errEl.style.display = 'none';
+  currentUser = staff;
   document.getElementById('loginWrap').style.display = 'none';
   document.getElementById('portalWrap').style.display = 'block';
+  document.getElementById('userChip').textContent = staff;
   const now = new Date();
   todayKey = getDateKey(now);
   const days = ['日','月','火','水','木','金','土'];
   document.getElementById('board-date').textContent = `${now.getMonth()+1}月${now.getDate()}日（${days[now.getDay()]}）`;
   document.getElementById('my-date').value = todayKey;
+  document.getElementById('my-staff-display').textContent = staff;
   initRooms();
   startBoardListener();
-}
-
-// ===== 担当者変更 =====
-window.onStaffChange = async function() {
-  currentUser = document.getElementById('my-staff').value;
-  document.getElementById('userChip').textContent = currentUser || '-';
-  if (currentUser) await loadSavedState();
+  await loadSavedState();
 }
 
 // ===== 一時保存の読み込み =====
@@ -775,7 +783,7 @@ function initRooms() {
   document.getElementById('room-panels').innerHTML = ROOMS.map((r,i) => `
     <div class="room-panel${i===0?' active':''}" id="rpanel-${r}">
       <div class="field" style="margin-bottom:8px;">
-        <label>お客様名</label>
+        <label>お客様名（任意）</label>
         <input type="text" id="rname-${r}" placeholder="例：田中様" oninput="markRoom('${r}');scheduleSave()">
       </div>
       <div class="field" style="margin-bottom:8px;"><label>年代</label>
