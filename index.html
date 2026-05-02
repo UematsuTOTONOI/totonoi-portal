@@ -215,10 +215,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
         <option value="">選択してください</option>
         <option>里吉</option>
         <option>梶原</option>
-        <option>ほのか</option>
+        <option>保乃圭</option>
         <option>阿部</option>
-        <option>りょうな</option>
-        <option>りこ</option>
+        <option>稜奈</option>
+        <option>璃胡</option>
         <option>テスト</option>
       </select>
     </div>
@@ -251,7 +251,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
     <div class="sidebar" id="sidebar">
       <div class="sb-section">メニュー</div>
       <div class="sb-item active" onclick="nav('board',this)"><span class="sb-icon">✓</span>Todoリスト<span class="sb-badge" id="remain-badge" style="display:none"></span></div>
-      <div class="sb-item" onclick="nav('nippo',this)"><span class="sb-icon">📋</span>日報入力</div>
+      <div class="sb-item" onclick="nav('nippo',this)"><span class="sb-icon">📋</span>日報･Todo入力</div>
       <div class="sb-item disabled"><span class="sb-icon">📖</span>業務マニュアル</div>
       <div class="sb-item disabled"><span class="sb-icon">📅</span>予約表</div>
       <div class="sb-item disabled"><span class="sb-icon">⭐</span>アンケート履歴</div>
@@ -414,7 +414,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const PASSWORDS = {'里吉':'3847','梶原':'9162','ほのか':'5031','阿部':'7284','りょうな':'6519','りこ':'2473','テスト':'0000'};
+const PASSWORDS = {'里吉':'3847','梶原':'9162','保乃圭':'5031','阿部':'7284','稜奈':'6519','璃胡':'2473','テスト':'0000'};
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx55qhEqhaXZPMKIuSEhjmTBqprKlJFENmfygkBa2uMOjZ7BzsYkY3QCmxW0UsrVJ-_/exec';
 
 // ===== タスク定義 =====
@@ -478,15 +478,13 @@ const TASKS_DEF = {
     {id:'c02',label:'ウェーバーガス口清掃'},
     {id:'c03',label:'布団洗い2棟'},
     {id:'c04',label:'洗車'},
-    {id:'c05',label:'Bドームスチーム'},
-    {id:'c06',label:'Cドームスチーム'},
-    {id:'c07',label:'Gドームスチーム'},
-    {id:'c08',label:'AガゼボSteam'},
-    {id:'c09',label:'BガゼボSteam'},
-    {id:'c10',label:'CガゼボSteam'},
-    {id:'c11',label:'DガゼボSteam'},
-    {id:'c12',label:'EガゼボSteam'},
-    {id:'c13',label:'FガゼボSteam'},
+    {id:'c05',label:'Aドームスチーム'},
+    {id:'c06',label:'Bドームスチーム'},
+    {id:'c07',label:'Cドームスチーム'},
+    {id:'c08',label:'Dドームスチーム'},
+    {id:'c09',label:'Eドームスチーム'},
+    {id:'c10',label:'Fドームスチーム'},
+    {id:'c11',label:'Gドームスチーム'},
     {id:'c14',label:'受付棟スチーム'},
     {id:'c15',label:'キッチン換気扇'},
     {id:'c16',label:'トイレ換気扇'},
