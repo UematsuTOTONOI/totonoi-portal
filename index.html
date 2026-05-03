@@ -215,7 +215,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
       <div class="sb-item" onclick="nav('board',this)"><span class="sb-icon">✓</span>Todoリスト<span class="sb-badge" id="remain-badge" style="display:none"></span></div>
       <div class="sb-item" onclick="nav('nippo',this)"><span class="sb-icon">📋</span>日報･Todo入力</div>
       <div class="sb-item" onclick="window.open('https://docs.google.com/spreadsheets/d/1EuOL-cRqWtaYXqfSl-Kf4DLUTmqF20xMNUfs7fnpJbw/edit?gid=1290538806#gid=1290538806','_blank');closeSidebar()"><span class="sb-icon">📅</span>予約表</div>
-<div class="sb-item" onclick="window.open('https://uematsutotonoi.github.io/survey/dashboard.html','_blank');closeSidebar()"><span class="sb-icon">⭐</span>アンケート履歴</div>
+      <div class="sb-item" onclick="window.open('https://uematsutotonoi.github.io/survey/dashboard.html','_blank');closeSidebar()"><span class="sb-icon">⭐</span>アンケート履歴</div>
       <div class="sb-item disabled"><span class="sb-icon">📖</span>業務マニュアル</div>
       <div class="sb-item disabled"><span class="sb-icon">📊</span>売上進捗</div>
       <div class="sb-item disabled"><span class="sb-icon">👥</span>顧客検索</div>
@@ -358,7 +358,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
         </div>
       </div>
     </div>
-</div>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 <script type="module">
@@ -395,154 +395,186 @@ window.doLogin=async function(){
   initRooms();startBoardListener();startNoticeListener();loadShift();
   await loadSavedState();
 };
-// ★ スプレッドシートからシフトを自動取得
 async function loadShift(){
-try{
-const res=await fetch(`${GAS_URL}?action=getShift&date=${todayKey}`);
-const json=await res.json();
-if(json.status==='ok'&&json.shifts&&Object.keys(json.shifts).length>0){
-shiftTimeData=json.shifts;
-const snap=await getDoc(doc(db,'shifts',todayKey));
-shiftData=snap.exists()?(snap.data().staff||{}):{};
-for(const[name,info]of Object.entries(json.shifts)){
-if(!shiftData[name]){
-if(info.start){shiftData[name]=info.start+'〜'+info.end;}
-else{shiftData[name]=info.status==='×'?'休み':(info.status||'未設定');}
-}
-}
-}else throw new Error('no data');
-}catch(e){
-try{const snap=await getDoc(doc(db,'shifts',todayKey));shiftData=snap.exists()?(snap.data().staff||{}):{};
-}catch(e2){shiftData={};}
-}
-renderShiftTable();
+  try{
+    const res=await fetch(`${GAS_URL}?action=getShift&date=${todayKey}`);
+    const json=await res.json();
+    if(json.status==='ok'&&json.shifts&&Object.keys(json.shifts).length>0){
+      shiftTimeData=json.shifts;
+      const snap=await getDoc(doc(db,'shifts',todayKey));
+      shiftData=snap.exists()?(snap.data().staff||{}):{};
+      for(const[name,info]of Object.entries(json.shifts)){
+        if(!shiftData[name]){
+          if(info.start){shiftData[name]=info.start+'〜'+info.end;}
+          else{shiftData[name]=info.status==='×'?'休み':(info.status||'未設定');}
+        }
+      }
+    }else throw new Error('no data');
+  }catch(e){
+    try{const snap=await getDoc(doc(db,'shifts',todayKey));shiftData=snap.exists()?(snap.data().staff||{}):{};
+    }catch(e2){shiftData={};}
+  }
+  renderShiftTable();
 }
 function renderShiftTable(){
-const colorMap={"早番":"早番","中番（現場）":"中番","中番（定期清掃）":"定期","遅番":"遅番","休み":"休み"};
-let html='<table class="shift-table"><thead><tr><th>スタッフ</th><th>シフト / 時間</th></tr></thead><tbody>';
-STAFF_LIST.forEach(s=>{
-const sh=shiftData[s]||"";
-const timeInfo=shiftTimeData[s];
-let display="";
-if(sh){
-// 出退勤時刻があれば表示
-const timeStr=timeInfo&&timeInfo.start?`<span style="font-size:10px;color:var(--text3);margin-left:6px;">${timeInfo.start}〜${timeInfo.end}</span>`:"";
-display=`<span class="shift-tag ${colorMap[sh]||''}">${sh}</span>${timeStr}`;
-}else{
-display=`<span style="color:var(--text3);font-size:11px;">未設定</span>`;
-}
-html+=`<tr><td style="font-weight:500;">${s}</td><td>${display}</td></tr>`;
-});
-html+="</tbody></table>";document.getElementById("shift-table-wrap").innerHTML=html;
+  const colorMap={"早番":"早番","中番（現場）":"中番","中番（定期清掃）":"定期","遅番":"遅番","休み":"休み"};
+  let html='<table class="shift-table"><thead><tr><th>スタッフ</th><th>シフト / 時間</th></tr></thead><tbody>';
+  STAFF_LIST.forEach(s=>{
+    const sh=shiftData[s]||"";
+    const timeInfo=shiftTimeData[s];
+    let display="";
+    if(sh){
+      const timeStr=timeInfo&&timeInfo.start?`<span style="font-size:10px;color:var(--text3);margin-left:6px;">${timeInfo.start}〜${timeInfo.end}</span>`:"";
+      display=`<span class="shift-tag ${colorMap[sh]||''}">${sh}</span>${timeStr}`;
+    }else{
+      display=`<span style="color:var(--text3);font-size:11px;">未設定</span>`;
+    }
+    html+=`<tr><td style="font-weight:500;">${s}</td><td>${display}</td></tr>`;
+  });
+  html+="</tbody></table>";document.getElementById("shift-table-wrap").innerHTML=html;
 }
 window.openShiftEdit=function(){
-let html="";
-STAFF_LIST.forEach(s=>{const cur=shiftData[s]||"";html+=`<div class="field" style="margin-bottom:10px;"><label>${s}</label><select id="shift-sel-${s}" style="font-size:12px;"><option value="">未設定</option>${SHIFT_OPTIONS.map(o=>`<option${o===cur?" selected":""}>${o}</option>`).join("")}</select></div>`;});
-document.getElementById("shift-edit-fields").innerHTML=html;
-document.getElementById("shift-modal").style.display="flex";
+  let html="";
+  STAFF_LIST.forEach(s=>{const cur=shiftData[s]||"";html+=`<div class="field" style="margin-bottom:10px;"><label>${s}</label><select id="shift-sel-${s}" style="font-size:12px;"><option value="">未設定</option>${SHIFT_OPTIONS.map(o=>`<option${o===cur?" selected":""}>${o}</option>`).join("")}</select></div>`;});
+  document.getElementById("shift-edit-fields").innerHTML=html;
+  document.getElementById("shift-modal").style.display="flex";
 };
 window.closeShiftEdit=function(){document.getElementById("shift-modal").style.display="none";};
 window.saveShift=async function(){
-const newData={};STAFF_LIST.forEach(s=>{const v=document.getElementById(`shift-sel-${s}`).value;if(v)newData[s]=v;});
-try{await setDoc(doc(db,"shifts",todayKey),{staff:newData,updatedAt:serverTimestamp()});shiftData=newData;renderShiftTable();closeShiftEdit();showToast("シフトを保存しました");}catch(e){showToast("保存エラー: "+e.message);}
+  const newData={};STAFF_LIST.forEach(s=>{const v=document.getElementById(`shift-sel-${s}`).value;if(v)newData[s]=v;});
+  try{await setDoc(doc(db,"shifts",todayKey),{staff:newData,updatedAt:serverTimestamp()});shiftData=newData;renderShiftTable();closeShiftEdit();showToast("シフトを保存しました");}catch(e){showToast("保存エラー: "+e.message);}
 };
 function startNoticeListener(){
-if(unsubNotice)unsubNotice();
-const q=query(collection(db,"notices"),orderBy("createdAt","desc"));
-unsubNotice=onSnapshot(q,snap=>{
-const now=new Date(),notices=[];
-snap.forEach(d=>notices.push({id:d.id,...d.data()}));
-const active=notices.filter(n=>{if(!n.expireAt)return true;return n.expireAt.toDate()>now;});
-if(!active.length){document.getElementById("notice-list").innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px 0;">伝達事項はありません</div>';return;}
-let html="";
-active.forEach(n=>{
-const expDate=n.expireAt?n.expireAt.toDate():null;
-const expStr=expDate?`${expDate.getMonth()+1}/${expDate.getDate()}まで`:"";
-const creStr=n.createdAt?(()=>{const d=n.createdAt.toDate();return`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`;})():"";
-html+=`<div class="notice-item"><div class="notice-hd"><span class="notice-who">${n.author||"不明"}</span><span class="notice-date">${creStr}</span>${expStr?`<span class="notice-expire">${expStr}</span>`:""}</div><div class="notice-body">${n.body.replace(/\n/g,"<br>")}</div>${n.author===currentUser?`<button class="notice-rm" onclick="deleteNotice('${n.id}')">×</button>`:""}</div>`;
-});
-document.getElementById("notice-list").innerHTML=html;
-});
+  if(unsubNotice)unsubNotice();
+  const q=query(collection(db,"notices"),orderBy("createdAt","desc"));
+  unsubNotice=onSnapshot(q,snap=>{
+    const now=new Date(),notices=[];
+    snap.forEach(d=>notices.push({id:d.id,...d.data()}));
+    const active=notices.filter(n=>{if(!n.expireAt)return true;return n.expireAt.toDate()>now;});
+    if(!active.length){document.getElementById("notice-list").innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px 0;">伝達事項はありません</div>';return;}
+    let html="";
+    active.forEach(n=>{
+      const expDate=n.expireAt?n.expireAt.toDate():null;
+      const expStr=expDate?`${expDate.getMonth()+1}/${expDate.getDate()}まで`:"";
+      const creStr=n.createdAt?(()=>{const d=n.createdAt.toDate();return`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`;})():"";
+      html+=`<div class="notice-item"><div class="notice-hd"><span class="notice-who">${n.author||"不明"}</span><span class="notice-date">${creStr}</span>${expStr?`<span class="notice-expire">${expStr}</span>`:""}</div><div class="notice-body">${n.body.replace(/\n/g,"<br>")}</div>${n.author===currentUser?`<button class="notice-rm" onclick="deleteNotice('${n.id}')">×</button>`:""}</div>`;
+    });
+    document.getElementById("notice-list").innerHTML=html;
+  });
 }
 window.toggleNoticeForm=function(){const f=document.getElementById("notice-form");f.style.display=f.style.display==="none"?"block":"none";};
 window.postNotice=async function(){
-const body=document.getElementById("notice-input").value.trim();
-if(!body){showToast("内容を入力してください");return;}
-const days=parseInt(document.getElementById("notice-expire").value),expireAt=new Date();
-expireAt.setDate(expireAt.getDate()+days);
-try{await addDoc(collection(db,"notices"),{author:currentUser,body,expireAt:Timestamp.fromDate(expireAt),createdAt:serverTimestamp()});document.getElementById("notice-input").value="";document.getElementById("notice-form").style.display="none";showToast("投稿しました");}catch(e){showToast("エラー: "+e.message);}
+  const body=document.getElementById("notice-input").value.trim();
+  if(!body){showToast("内容を入力してください");return;}
+  const days=parseInt(document.getElementById("notice-expire").value),expireAt=new Date();
+  expireAt.setDate(expireAt.getDate()+days);
+  try{await addDoc(collection(db,"notices"),{author:currentUser,body,expireAt:Timestamp.fromDate(expireAt),createdAt:serverTimestamp()});document.getElementById("notice-input").value="";document.getElementById("notice-form").style.display="none";showToast("投稿しました");}catch(e){showToast("エラー: "+e.message);}
 };
 window.deleteNotice=async function(id){
-if(!confirm("削除しますか？"))return;
-try{await deleteDoc(doc(db,"notices",id));showToast("削除しました");}catch(e){showToast("エラー: "+e.message);}
+  if(!confirm("削除しますか？"))return;
+  try{await deleteDoc(doc(db,"notices",id));showToast("削除しました");}catch(e){showToast("エラー: "+e.message);}
 };
 function startBoardListener(){
-if(unsubBoard)unsubBoard();
-unsubBoard=onSnapshot(doc(db,"todo_boards",todayKey),snap=>{
-const prev=Object.keys(boardDone).length;
-boardDone=snap.exists()?(snap.data().done||{}):{};
-renderBoard();
-if(Object.keys(boardDone).length>prev&&prev>0)showNotify("board-notify","📢 タスクが更新されました");
-updateBadge();
-});
+  if(unsubBoard)unsubBoard();
+  unsubBoard=onSnapshot(doc(db,"todo_boards",todayKey),snap=>{
+    const prev=Object.keys(boardDone).length;
+    boardDone=snap.exists()?(snap.data().done||{}):{};
+    renderBoard();
+    if(Object.keys(boardDone).length>prev&&prev>0)showNotify("board-notify","📢 タスクが更新されました");
+    updateBadge();
+  });
 }
 window.renderBoard=function(){
-const sf=document.getElementById("shift-filter").value,keys=sf==="all"?Object.keys(TASKS_DEF):[sf];
-let allCount=0,doneCount=0,html="";
-keys.forEach(sk=>{
-const tasks=TASKS_DEF[sk];if(!tasks)return;
-const visible=tasks.filter(t=>{const d=!!boardDone[t.id];if(showFilter==="todo")return!d;if(showFilter==="done")return d;return true;});
-const sd=tasks.filter(t=>boardDone[t.id]).length;allCount+=tasks.length;doneCount+=sd;if(!visible.length)return;
-html+=`<div class="shift-block"><div class="shift-hd"><span class="shift-badge">${sk}</span><span style="font-size:10px;color:var(--text3);">${sd}/${tasks.length}完了</span></div>`;
-visible.forEach(t=>{const done=!!boardDone[t.id],who=boardDone[t.id];html+=`<div class="task-item${done?" done":""}${t.cls?" "+t.cls:""}"><div class="task-cb${done?" done":""}">${done?chkSvg():""}</div><div class="task-body"><div class="task-row"><span class="task-label">${t.label}</span>${t.time?`<span class="task-time">${t.time}</span>`:""}${who&&done?`<span class="task-who">${who}</span>`:""}</div>${t.note?`<div class="task-note">${t.note}</div>`:""}</div></div>`;});
-html+="</div>";
-});
-document.getElementById("board-list").innerHTML=html||'<div class="loading">表示するタスクがありません</div>';
-const remain=allCount-doneCount,pct=allCount?Math.round(doneCount/allCount100):0;
-document.getElementById("s-remain").textContent=remain;document.getElementById("s-done").textContent=doneCount;
-document.getElementById("s-pct").textContent=pct+"%";document.getElementById("board-pct").textContent=pct+"%";
-document.getElementById("board-prog").style.width=pct+"%";updateBadge(remain);
+  const sf=document.getElementById("shift-filter").value,keys=sf==="all"?Object.keys(TASKS_DEF):[sf];
+  let allCount=0,doneCount=0,html="";
+  keys.forEach(sk=>{
+    const tasks=TASKS_DEF[sk];if(!tasks)return;
+    const visible=tasks.filter(t=>{const d=!!boardDone[t.id];if(showFilter==="todo")return!d;if(showFilter==="done")return d;return true;});
+    const sd=tasks.filter(t=>boardDone[t.id]).length;allCount+=tasks.length;doneCount+=sd;if(!visible.length)return;
+    html+=`<div class="shift-block"><div class="shift-hd"><span class="shift-badge">${sk}</span><span style="font-size:10px;color:var(--text3);">${sd}/${tasks.length}完了</span></div>`;
+    visible.forEach(t=>{const done=!!boardDone[t.id],who=boardDone[t.id];html+=`<div class="task-item${done?" done":""}${t.cls?" "+t.cls:""}"><div class="task-cb${done?" done":""}">${done?chkSvg():""}</div><div class="task-body"><div class="task-row"><span class="task-label">${t.label}</span>${t.time?`<span class="task-time">${t.time}</span>`:""}${who&&done?`<span class="task-who">${who}</span>`:""}</div>${t.note?`<div class="task-note">${t.note}</div>`:""}</div></div>`;});
+    html+="</div>";
+  });
+  document.getElementById("board-list").innerHTML=html||'<div class="loading">表示するタスクがありません</div>';
+  const remain=allCount-doneCount,pct=allCount?Math.round(doneCount/allCount*100):0;
+  document.getElementById("s-remain").textContent=remain;document.getElementById("s-done").textContent=doneCount;
+  document.getElementById("s-pct").textContent=pct+"%";document.getElementById("board-pct").textContent=pct+"%";
+  document.getElementById("board-prog").style.width=pct+"%";updateBadge(remain);
 };
 function updateBadge(remain){const el=document.getElementById("remain-badge");if(remain>0){el.textContent=remain;el.style.display="";}else el.style.display="none";}
 window.setFilter=function(el,f){showFilter=f;document.querySelectorAll(".ftab").forEach(t=>t.classList.remove("active"));el.classList.add("active");renderBoard();};
 window.selShift=function(btn,s){document.querySelectorAll(".shbtn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");myShift=s;myChecked=new Set();renderMyTasks();scheduleSave();};
 function renderMyTasks(){
-const tasks=TASKS_DEF[myShift]||[];
-if(!tasks.length){document.getElementById("my-task-list").innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px 0;">シフトを選択するとタスクが表示されます</div>';document.getElementById("my-prog-txt").textContent="シフトを選択してください";document.getElementById("my-pct").textContent="";return;}
-const done=tasks.filter(t=>myChecked.has(t.id)).length,pct=Math.round(done/tasks.length100);
-document.getElementById("my-prog-txt").textContent=`${done} / ${tasks.length} 完了`;document.getElementById("my-pct").textContent=pct+"%";document.getElementById("my-prog").style.width=pct+"%";
-document.getElementById("my-task-list").innerHTML=tasks.map(t=>{const isDone=myChecked.has(t.id);return`<div class="my-task-item${isDone?" done":""}${t.cls?" "+t.cls:""}" onclick="toggleMy('${t.id}')"><div class="my-cb">${isDone?chkSvg():""}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;"><span class="my-task-label">${t.label}</span>${t.time?`<span class="my-task-time">${t.time}</span>`:""}</div>${t.note?`<div class="task-note">${t.note}</div>`:""}</div></div>`;}).join("");
+  const tasks=TASKS_DEF[myShift]||[];
+  if(!tasks.length){document.getElementById("my-task-list").innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px 0;">シフトを選択するとタスクが表示されます</div>';document.getElementById("my-prog-txt").textContent="シフトを選択してください";document.getElementById("my-pct").textContent="";return;}
+  const done=tasks.filter(t=>myChecked.has(t.id)).length,pct=Math.round(done/tasks.length*100);
+  document.getElementById("my-prog-txt").textContent=`${done} / ${tasks.length} 完了`;document.getElementById("my-pct").textContent=pct+"%";document.getElementById("my-prog").style.width=pct+"%";
+  document.getElementById("my-task-list").innerHTML=tasks.map(t=>{const isDone=myChecked.has(t.id);return`<div class="my-task-item${isDone?" done":""}${t.cls?" "+t.cls:""}" onclick="toggleMy('${t.id}')"><div class="my-cb">${isDone?chkSvg():""}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;"><span class="my-task-label">${t.label}</span>${t.time?`<span class="my-task-time">${t.time}</span>`:""}</div>${t.note?`<div class="task-note">${t.note}</div>`:""}</div></div>`;}).join("");
 }
 window.toggleMy=function(id){if(myChecked.has(id))myChecked.delete(id);else myChecked.add(id);renderMyTasks();scheduleSave();};
 async function autoSave(){
-if(!currentUser||!myShift)return;
-try{await setDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`),{shift:myShift,checked:[...myChecked],startTime:document.getElementById("my-start").value,endTime:document.getElementById("my-end").value,notes:document.getElementById("my-notes").value,extras:collectExtras(),roomData,updatedAt:serverTimestamp()});
-const now=new Date();document.getElementById("save-time").textContent=`自動保存済み（${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}）`;}catch(e){console.error(e);}
+  if(!currentUser||!myShift)return;
+  try{await setDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`),{shift:myShift,checked:[...myChecked],startTime:document.getElementById("my-start").value,endTime:document.getElementById("my-end").value,notes:document.getElementById("my-notes").value,extras:collectExtras(),roomData,updatedAt:serverTimestamp()});
+  const now=new Date();document.getElementById("save-time").textContent=`自動保存済み（${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}）`;}catch(e){console.error(e);}
 }
 async function loadSavedState(){
-if(!currentUser)return;
-try{const snap=await getDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`));
-if(snap.exists()&&!snap.data().cleared){const data=snap.data();if(data.shift){myShift=data.shift;myChecked=new Set(data.checked||[]);document.querySelectorAll(".shbtn").forEach(b=>b.classList.toggle("active",b.textContent===myShift));if(data.startTime)document.getElementById("my-start").value=data.startTime;if(data.endTime)document.getElementById("my-end").value=data.endTime;if(data.notes)document.getElementById("my-notes").value=data.notes;if(data.roomData){roomData=data.roomData;restoreRoomData();}renderMyTasks();const rb=document.getElementById("resume-bar");rb.textContent="💾 前回の途中保存データがあります。続きから入力できます";rb.classList.add("show");document.getElementById("save-time").textContent="前回の保存を復元しました";}}}catch(e){console.log("保存データなし");}
+  if(!currentUser)return;
+  try{const snap=await getDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`));
+    if(snap.exists()&&!snap.data().cleared){const data=snap.data();if(data.shift){myShift=data.shift;myChecked=new Set(data.checked||[]);document.querySelectorAll(".shbtn").forEach(b=>b.classList.toggle("active",b.textContent===myShift));if(data.startTime)document.getElementById("my-start").value=data.startTime;if(data.endTime)document.getElementById("my-end").value=data.endTime;if(data.notes)document.getElementById("my-notes").value=data.notes;if(data.roomData){roomData=data.roomData;restoreRoomData();}renderMyTasks();const rb=document.getElementById("resume-bar");rb.textContent="💾 前回の途中保存データがあります。続きから入力できます";rb.classList.add("show");document.getElementById("save-time").textContent="前回の保存を復元しました";}}}catch(e){console.log("保存データなし");}
 }
 window.partialSave=async function(){
-if(!currentUser){showToast("担当者を選択してください");return;}if(!myShift){showToast("シフトを選択してください");return;}
-try{const ref=doc(db,"todo_boards",todayKey),snap=await getDoc(ref),existing=snap.exists()?(snap.data().done||{}):{};myChecked.forEach(id=>{existing[id]=currentUser;});await setDoc(ref,{done:existing,updatedAt:serverTimestamp()});await autoSave();showToast(`💾 途中保存しました（${myChecked.size}件完了）`);}catch(e){showToast("保存エラー: "+e.message);}
+  if(!currentUser){showToast("担当者を選択してください");return;}if(!myShift){showToast("シフトを選択してください");return;}
+  try{const ref=doc(db,"todo_boards",todayKey),snap=await getDoc(ref),existing=snap.exists()?(snap.data().done||{}):{};myChecked.forEach(id=>{existing[id]=currentUser;});await setDoc(ref,{done:existing,updatedAt:serverTimestamp()});await autoSave();showToast(`💾 途中保存しました（${myChecked.size}件完了）`);}catch(e){showToast("保存エラー: "+e.message);}
 };
 window.fullSend=async function(){
-if(!currentUser){showToast("担当者を選択してください");return;}if(!myShift){showToast("シフトを選択してください");return;}
-const tasks=TASKS_DEF[myShift]||[],done=tasks.filter(t=>myChecked.has(t.id)).map(t=>t.label),undone=tasks.filter(t=>!myChecked.has(t.id)).map(t=>t.label);
-const workDate=document.getElementById("my-date").value,d=new Date(workDate+"T00:00:00"),days=["日","月","火","水","木","金","土"];
-const payload={timestamp:new Date().toISOString(),staffName:currentUser,workDate,dayName:days[d.getDay()],shift:myShift,startTime:document.getElementById("my-start").value,endTime:document.getElementById("my-end").value,completedCount:done.length,totalCount:tasks.length,completedTasks:done,incompleteTasks:undone,customers:collectRooms(),extraTasks:collectExtras(),notes:document.getElementById("my-notes").value.trim()};
-try{const ref=doc(db,"todo_boards",todayKey),snap=await getDoc(ref),existing=snap.exists()?(snap.data().done||{}):{};myChecked.forEach(id=>{existing[id]=currentUser;});await setDoc(ref,{done:existing,updatedAt:serverTimestamp()});await setDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`),{cleared:true,updatedAt:serverTimestamp()});fetch(GAS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});showToast("✓ 最終送信しました！お疲れ様でした");nav("home",null);}catch(e){showToast("送信エラー: "+e.message);}
+  if(!currentUser){showToast("担当者を選択してください");return;}if(!myShift){showToast("シフトを選択してください");return;}
+  const tasks=TASKS_DEF[myShift]||[],done=tasks.filter(t=>myChecked.has(t.id)).map(t=>t.label),undone=tasks.filter(t=>!myChecked.has(t.id)).map(t=>t.label);
+  const workDate=document.getElementById("my-date").value,d=new Date(workDate+"T00:00:00"),days=["日","月","火","水","木","金","土"];
+  const payload={timestamp:new Date().toISOString(),staffName:currentUser,workDate,dayName:days[d.getDay()],shift:myShift,startTime:document.getElementById("my-start").value,endTime:document.getElementById("my-end").value,completedCount:done.length,totalCount:tasks.length,completedTasks:done,incompleteTasks:undone,customers:collectRooms(),extraTasks:collectExtras(),notes:document.getElementById("my-notes").value.trim()};
+  try{const ref=doc(db,"todo_boards",todayKey),snap=await getDoc(ref),existing=snap.exists()?(snap.data().done||{}):{};myChecked.forEach(id=>{existing[id]=currentUser;});await setDoc(ref,{done:existing,updatedAt:serverTimestamp()});await setDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`),{cleared:true,updatedAt:serverTimestamp()});fetch(GAS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});showToast("✓ 最終送信しました！お疲れ様でした");nav("home",null);}catch(e){showToast("送信エラー: "+e.message);}
 };
 function initRooms(){
-document.getElementById("room-tabs").innerHTML=ROOMS.map((r,i)=>`<button class="room-tab${i===0?" active":""}" id="rtab-${r}" onclick="switchRoom('${r}')">${r}</button>`).join("");
-document.getElementById("room-panels").innerHTML=ROOMS.map((r,i)=>`<div class="room-panel${i===0?" active":""}" id="rpanel-${r}"><div class="field" style="margin-bottom:8px;"><label>お客様名</label><input type="text" id="rname-${r}" placeholder="例：田中様" oninput="markRoom('${r}');scheduleSave()"></div><div class="field" style="margin-bottom:8px;"><label>年代</label><div class="pill-group">${AGES.map(a=>`<button class="pill" id="rage-${r}-${a}" onclick="setRoom('${r}','age','${a}',this)">${a}</button>`).join("")}</div></div><div class="field" style="margin-bottom:8px;"><label>属性</label><div class="pill-group">${TYPES.map(t=>`<button class="pill" id="rtype-${r}-${t}" onclick="setRoom('${r}','type','${t}',this)">${t}</button>`).join("")}</div></div><div class="field" style="margin-bottom:8px;"><label>話した内容・印象</label><textarea id="rconv-${r}" rows="2" placeholder="お客様との会話・気づきなど" oninput="markRoom('${r}');scheduleSave()"></textarea></div><div class="field" style="margin-bottom:0;"><label>推定満足度</label><div class="pill-group">${SATS.map(s=>{const lbl=s==="判断できない"?"不明":"★"+s;return`<button class="pill" id="rsat-${r}-${s}" onclick="setSat('${r}','${s}',this)">${lbl}</button>`;}).join("")}</div></div></div>`).join("");
+  document.getElementById("room-tabs").innerHTML=ROOMS.map((r,i)=>`<button class="room-tab${i===0?" active":""}" id="rtab-${r}" onclick="switchRoom('${r}')">${r}</button>`).join("");
+  document.getElementById("room-panels").innerHTML=ROOMS.map((r,i)=>`<div class="room-panel${i===0?" active":""}" id="rpanel-${r}"><div class="field" style="margin-bottom:8px;"><label>お客様名</label><input type="text" id="rname-${r}" placeholder="例：田中様" oninput="markRoom('${r}');scheduleSave()"></div><div class="field" style="margin-bottom:8px;"><label>年代</label><div class="pill-group">${AGES.map(a=>`<button class="pill" id="rage-${r}-${a}" onclick="setRoom('${r}','age','${a}',this)">${a}</button>`).join("")}</div></div><div class="field" style="margin-bottom:8px;"><label>属性</label><div class="pill-group">${TYPES.map(t=>`<button class="pill" id="rtype-${r}-${t}" onclick="setRoom('${r}','type','${t}',this)">${t}</button>`).join("")}</div></div><div class="field" style="margin-bottom:8px;"><label>話した内容・印象</label><textarea id="rconv-${r}" rows="2" placeholder="お客様との会話・気づきなど" oninput="markRoom('${r}');scheduleSave()"></textarea></div><div class="field" style="margin-bottom:0;"><label>推定満足度</label><div class="pill-group">${SATS.map(s=>{const lbl=s==="判断できない"?"不明":"★"+s;return`<button class="pill" id="rsat-${r}-${s}" onclick="setSat('${r}','${s}',this)">${lbl}</button>`;}).join("")}</div></div></div>`).join("");
 }
-function restoreRoomData(){ROOMS.forEach(r=>{const rd=roomData[r];if(!rd)return;if(rd.name){const el=document.getElementById(`rname-${r}`);if(el)el.value=rd.name;}if(rd.conv){const el=document.getElementById(`rconv-${r}`);if(el)el.value=rd.conv;}if(rd.age){const el=document.getElementById(`rage-${r}-${rd.age}`);if(el){el.closest(".pill-group").querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));el.classList.add("active");}}if(rd.type){const el=document.getElementById(`rtype-${r}-${rd.type}`);if(el){el.closest(".pill-group").querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));el.classList.add("active");}}if(rd.sat){const el=document.getElementById(`rsat-${r}-${rd.sat}`);if(el){el.closest(".pill-group").querySelectorAll(".pill").forEach(p=>p.classList.remove("active","sat-active","na-active"));el.classList.add(rd.sat==="判断できない"?"na-active":"sat-active");}}markRoom(r);});}
+function restoreRoomData(){
+  ROOMS.forEach(r=>{
+    const rd=roomData[r];if(!rd)return;
+    if(rd.name){const el=document.getElementById(`rname-${r}`);if(el)el.value=rd.name;}
+    if(rd.conv){const el=document.getElementById(`rconv-${r}`);if(el)el.value=rd.conv;}
+    if(rd.age){const el=document.getElementById(`rage-${r}-${rd.age}`);if(el){el.closest(".pill-group").querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));el.classList.add("active");}}
+    if(rd.type){const el=document.getElementById(`rtype-${r}-${rd.type}`);if(el){el.closest(".pill-group").querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));el.classList.add("active");}}
+    if(rd.sat){const el=document.getElementById(`rsat-${r}-${rd.sat}`);if(el){el.closest(".pill-group").querySelectorAll(".pill").forEach(p=>p.classList.remove("active","sat-active","na-active"));el.classList.add(rd.sat==="判断できない"?"na-active":"sat-active");}}
+    markRoom(r);
+  });
+}
 window.switchRoom=function(r){document.querySelectorAll(".room-tab").forEach(t=>t.classList.remove("active"));document.querySelectorAll(".room-panel").forEach(p=>p.classList.remove("active"));document.getElementById("rtab-"+r).classList.add("active");document.getElementById("rpanel-"+r).classList.add("active");};
-window.setRoom=function(room,key,val,btn){btn.closest(".pill-group").querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));btn.classList.add("active");if(!roomData[room])roomData[room]={};roomData[room][key]=val;markRoom(room);scheduleSave();};
-window.setSat=function(room,val,btn){btn.closest(".pill-group").querySelectorAll(".pill").forEach(b=>b.classList.remove("active","sat-active","na-active"));btn.classList.add(val==="判断できない"?"na-active":"sat-active");if(!roomData[room])roomData[room]={};roomData[room].sat=val;markRoom(room);scheduleSave();};
+// ★ 修正：再クリックで選択解除できるようにした setRoom
+window.setRoom=function(room,key,val,btn){
+  const isActive=btn.classList.contains("active");
+  btn.closest(".pill-group").querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
+  if(!isActive){
+    btn.classList.add("active");
+    if(!roomData[room])roomData[room]={};
+    roomData[room][key]=val;
+  }else{
+    if(roomData[room])delete roomData[room][key];
+  }
+  markRoom(room);scheduleSave();
+};
+// ★ 修正：再クリックで選択解除できるようにした setSat
+window.setSat=function(room,val,btn){
+  const isActive=btn.classList.contains("sat-active")||btn.classList.contains("na-active");
+  btn.closest(".pill-group").querySelectorAll(".pill").forEach(b=>b.classList.remove("active","sat-active","na-active"));
+  if(!isActive){
+    btn.classList.add(val==="判断できない"?"na-active":"sat-active");
+    if(!roomData[room])roomData[room]={};
+    roomData[room].sat=val;
+  }else{
+    if(roomData[room])delete roomData[room].sat;
+  }
+  markRoom(room);scheduleSave();
+};
 window.markRoom=function(r){const conv=(document.getElementById("rconv-"+r)||{}).value||"",name=(document.getElementById("rname-"+r)||{}).value||"",rd=roomData[r]||{},tab=document.getElementById("rtab-"+r);if(rd.age||rd.type||rd.sat||conv.trim()||name.trim())tab.classList.add("filled");else tab.classList.remove("filled");};
 function collectRooms(){return ROOMS.map(r=>{const conv=(document.getElementById("rconv-"+r)||{}).value||"",name=(document.getElementById("rname-"+r)||{}).value||"",rd=roomData[r]||{};if(!rd.age&&!rd.type&&!rd.sat&&!conv.trim()&&!name.trim())return null;return{room:r,customerName:name.trim(),age:rd.age||"",type:rd.type||"",conversation:conv.trim(),satisfaction:rd.sat||""};}).filter(Boolean);}
 window.nav=function(id,el){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.querySelectorAll(".sb-item").forEach(b=>b.classList.remove("active"));document.getElementById("page-"+id).classList.add("active");if(el)el.classList.add("active");else{const map={home:0,board:1,nippo:2};if(map[id]!==undefined)document.querySelectorAll(".sb-item")[map[id]].classList.add("active");}closeSidebar();};
