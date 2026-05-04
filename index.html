@@ -512,11 +512,26 @@ function renderMyTasks(){
   document.getElementById("my-task-list").innerHTML=tasks.map(t=>{const isDone=myChecked.has(t.id);return`<div class="my-task-item${isDone?" done":""}${t.cls?" "+t.cls:""}" onclick="toggleMy('${t.id}')"><div class="my-cb">${isDone?chkSvg():""}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;"><span class="my-task-label">${t.label}</span>${t.time?`<span class="my-task-time">${t.time}</span>`:""}</div>${t.note?`<div class="task-note">${t.note}</div>`:""}</div></div>`;}).join("");
 }
 window.toggleMy=function(id){if(myChecked.has(id))myChecked.delete(id);else myChecked.add(id);renderMyTasks();scheduleSave();};
+
+// ★ 修正：autoSave前にDOMのname/convをroomDataへ同期
 async function autoSave(){
   if(!currentUser||!myShift)return;
+  // お客様名・話した内容をroomDataへ同期してから保存
+  ROOMS.forEach(r=>{
+    const nameEl=document.getElementById("rname-"+r);
+    const convEl=document.getElementById("rconv-"+r);
+    const name=nameEl?nameEl.value||"":"";
+    const conv=convEl?convEl.value||"":"";
+    if(name||conv){
+      if(!roomData[r])roomData[r]={};
+      roomData[r].name=name;
+      roomData[r].conv=conv;
+    }
+  });
   try{await setDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`),{shift:myShift,checked:[...myChecked],startTime:document.getElementById("my-start").value,endTime:document.getElementById("my-end").value,notes:document.getElementById("my-notes").value,extras:collectExtras(),roomData,updatedAt:serverTimestamp()});
   const now=new Date();document.getElementById("save-time").textContent=`自動保存済み（${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}）`;}catch(e){console.error(e);}
 }
+
 async function loadSavedState(){
   if(!currentUser)return;
   try{const snap=await getDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`));
@@ -549,7 +564,6 @@ function restoreRoomData(){
   });
 }
 window.switchRoom=function(r){document.querySelectorAll(".room-tab").forEach(t=>t.classList.remove("active"));document.querySelectorAll(".room-panel").forEach(p=>p.classList.remove("active"));document.getElementById("rtab-"+r).classList.add("active");document.getElementById("rpanel-"+r).classList.add("active");};
-// ★ 修正：再クリックで選択解除できるようにした setRoom
 window.setRoom=function(room,key,val,btn){
   const isActive=btn.classList.contains("active");
   btn.closest(".pill-group").querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
@@ -562,7 +576,6 @@ window.setRoom=function(room,key,val,btn){
   }
   markRoom(room);scheduleSave();
 };
-// ★ 修正：再クリックで選択解除できるようにした setSat
 window.setSat=function(room,val,btn){
   const isActive=btn.classList.contains("sat-active")||btn.classList.contains("na-active");
   btn.closest(".pill-group").querySelectorAll(".pill").forEach(b=>b.classList.remove("active","sat-active","na-active"));
