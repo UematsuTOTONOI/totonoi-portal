@@ -515,31 +515,43 @@ window.toggleMy=function(id){if(myChecked.has(id))myChecked.delete(id);else myCh
 
 // ★ 修正：autoSave前にDOMのname/convをroomDataへ同期
 async function autoSave(){
-  if(!currentUser||!myShift)return;
-  // お客様名・話した内容をroomDataへ同期してから保存
+  if(!currentUser)return;
+  // お客様名・話した内容をroomDataへ必ず同期してから保存
   ROOMS.forEach(r=>{
     const nameEl=document.getElementById("rname-"+r);
     const convEl=document.getElementById("rconv-"+r);
-    const name=nameEl?nameEl.value||"":"";
-    const conv=convEl?convEl.value||"":"";
-    if(name||conv){
-      if(!roomData[r])roomData[r]={};
-      roomData[r].name=name;
-      roomData[r].conv=conv;
-    }
+    const name=nameEl?nameEl.value:"";
+    const conv=convEl?convEl.value:"";
+    if(!roomData[r])roomData[r]={};
+    roomData[r].name=name;
+    roomData[r].conv=conv;
   });
-  try{await setDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`),{shift:myShift,checked:[...myChecked],startTime:document.getElementById("my-start").value,endTime:document.getElementById("my-end").value,notes:document.getElementById("my-notes").value,extras:collectExtras(),roomData,updatedAt:serverTimestamp()});
+  // roomDataをディープコピーして確実にシリアライズ
+  const roomDataCopy=JSON.parse(JSON.stringify(roomData));
+  try{await setDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`),{shift:myShift,checked:[...myChecked],startTime:document.getElementById("my-start").value,endTime:document.getElementById("my-end").value,notes:document.getElementById("my-notes").value,extras:collectExtras(),roomData:roomDataCopy,updatedAt:serverTimestamp()});
   const now=new Date();document.getElementById("save-time").textContent=`自動保存済み（${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}）`;}catch(e){console.error(e);}
 }
 
 async function loadSavedState(){
   if(!currentUser)return;
   try{const snap=await getDoc(doc(db,"temp_saves",`${todayKey}_${currentUser}`));
-    if(snap.exists()&&!snap.data().cleared){const data=snap.data();if(data.shift){myShift=data.shift;myChecked=new Set(data.checked||[]);document.querySelectorAll(".shbtn").forEach(b=>b.classList.toggle("active",b.textContent===myShift));if(data.startTime)document.getElementById("my-start").value=data.startTime;if(data.endTime)document.getElementById("my-end").value=data.endTime;if(data.notes)document.getElementById("my-notes").value=data.notes;if(data.roomData){roomData=data.roomData;restoreRoomData();}renderMyTasks();const rb=document.getElementById("resume-bar");rb.textContent="💾 前回の途中保存データがあります。続きから入力できます";rb.classList.add("show");document.getElementById("save-time").textContent="前回の保存を復元しました";}}}catch(e){console.log("保存データなし");}
+    if(snap.exists()&&!snap.data().cleared){const data=snap.data();
+      if(data.shift){myShift=data.shift;myChecked=new Set(data.checked||[]);document.querySelectorAll(".shbtn").forEach(b=>b.classList.toggle("active",b.textContent===myShift));}
+      if(data.startTime)document.getElementById("my-start").value=data.startTime;
+      if(data.endTime)document.getElementById("my-end").value=data.endTime;
+      if(data.notes)document.getElementById("my-notes").value=data.notes;
+      if(data.roomData){roomData=data.roomData;restoreRoomData();}
+      renderMyTasks();
+      const rb=document.getElementById("resume-bar");rb.textContent="💾 前回の途中保存データがあります。続きから入力できます";rb.classList.add("show");
+      document.getElementById("save-time").textContent="前回の保存を復元しました";
+    }}catch(e){console.log("保存データなし");}
 }
 window.partialSave=async function(){
-  if(!currentUser){showToast("担当者を選択してください");return;}if(!myShift){showToast("シフトを選択してください");return;}
-  try{const ref=doc(db,"todo_boards",todayKey),snap=await getDoc(ref),existing=snap.exists()?(snap.data().done||{}):{};myChecked.forEach(id=>{existing[id]=currentUser;});await setDoc(ref,{done:existing,updatedAt:serverTimestamp()});await autoSave();showToast(`💾 途中保存しました（${myChecked.size}件完了）`);}catch(e){showToast("保存エラー: "+e.message);}
+  if(!currentUser){showToast("担当者を選択してください");return;}
+  try{
+    if(myShift){const ref=doc(db,"todo_boards",todayKey),snap=await getDoc(ref),existing=snap.exists()?(snap.data().done||{}):{};myChecked.forEach(id=>{existing[id]=currentUser;});await setDoc(ref,{done:existing,updatedAt:serverTimestamp()});}
+    await autoSave();showToast(`💾 途中保存しました`);
+  }catch(e){showToast("保存エラー: "+e.message);}
 };
 window.fullSend=async function(){
   if(!currentUser){showToast("担当者を選択してください");return;}if(!myShift){showToast("シフトを選択してください");return;}
@@ -555,8 +567,8 @@ function initRooms(){
 function restoreRoomData(){
   ROOMS.forEach(r=>{
     const rd=roomData[r];if(!rd)return;
-    if(rd.name){const el=document.getElementById(`rname-${r}`);if(el)el.value=rd.name;}
-    if(rd.conv){const el=document.getElementById(`rconv-${r}`);if(el)el.value=rd.conv;}
+    if(rd.name!==undefined){const el=document.getElementById(`rname-${r}`);if(el)el.value=rd.name;}
+    if(rd.conv!==undefined){const el=document.getElementById(`rconv-${r}`);if(el)el.value=rd.conv;}
     if(rd.age){const el=document.getElementById(`rage-${r}-${rd.age}`);if(el){el.closest(".pill-group").querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));el.classList.add("active");}}
     if(rd.type){const el=document.getElementById(`rtype-${r}-${rd.type}`);if(el){el.closest(".pill-group").querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));el.classList.add("active");}}
     if(rd.sat){const el=document.getElementById(`rsat-${r}-${rd.sat}`);if(el){el.closest(".pill-group").querySelectorAll(".pill").forEach(p=>p.classList.remove("active","sat-active","na-active"));el.classList.add(rd.sat==="判断できない"?"na-active":"sat-active");}}
