@@ -114,7 +114,7 @@ window.doLogin = async function () {
       btn.disabled = false; btn.textContent = "ログイン";
       return;
     }
-    allReports = json.reports || [];
+    allReports = dedupeReports(json.reports || []);
     document.getElementById("loginWrap").style.display = "none";
     document.getElementById("dashWrap").style.display = "block";
     populateStaffFilter();
@@ -156,9 +156,44 @@ function workDateStr(r) {
   return String(v || "");
 }
 
+// 完了率：スプレッドシート側で "95%" という文字列が自動的に
+// パーセント数値（0.95など）に変換されているケースの両方に対応
 function rateNum(r) {
-  const n = parseInt(r['完了率']);
-  return isNaN(n) ? 0 : n;
+  const v = r['完了率'];
+  if (v === null || v === undefined || v === '') return 0;
+  if (typeof v === 'number') {
+    return Math.round(v <= 1 ? v * 100 : v);
+  }
+  const s = String(v).trim();
+  const n = parseFloat(s.replace('%', ''));
+  if (isNaN(n)) return 0;
+  return Math.round(!s.includes('%') && n <= 1 ? n * 100 : n);
+}
+function formatRate(r) { return rateNum(r) + '%'; }
+
+// 送信日時をDateとしてパース（Dateオブジェクト／"yyyy/MM/dd HH:mm:ss"文字列の両対応）
+function parseSentAt(r) {
+  const v = r['送信日時'];
+  if (v instanceof Date) return v;
+  const s = String(v || '').trim();
+  const m = s.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{1,2}):(\d{1,2})/);
+  if (m) return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+  const d = new Date(s);
+  return isNaN(d) ? new Date(0) : d;
+}
+
+// 同一スタッフ・同一勤務日・同一シフトの重複送信は、最新のものだけを残す
+// （最終送信は毎回その時点までの全データを送るため、最新＝最も完全な内容）
+function dedupeReports(list) {
+  const map = new Map();
+  list.forEach(r => {
+    const key = `${r['担当者']}|${workDateStr(r)}|${r['シフト']}`;
+    const existing = map.get(key);
+    if (!existing || parseSentAt(r) > parseSentAt(existing)) {
+      map.set(key, r);
+    }
+  });
+  return Array.from(map.values());
 }
 
 function render(reports) {
@@ -215,7 +250,7 @@ function render(reports) {
         <td>${r['担当者'] || ''}</td>
         <td><span class="tag">${r['シフト'] || '-'}</span></td>
         <td>${r['勤務開始'] || "-"}〜${r['勤務終了'] || "-"}</td>
-        <td>${r['チェック完了数']}/${r['チェック全体数']}（${r['完了率']}）</td>
+        <td>${r['チェック完了数']}/${r['チェック全体数']}（${formatRate(r)}）</td>
         <td class="conv-cell">${String(r['その他連絡事項'] || "-").replace(/\n/g, "<br>")}</td>
       </tr>`).join("")}
     </tbody></table>` : '<div class="empty">日報がありません</div>';
