@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOTONOI 管理者ダッシュボード</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--green:#2a6b55;--green-lt:#e8f5ee;--green-md:#c5e8d5;--green-dk:#1a4a3a;--orange:#e85d04;--amber:#f5a623;--bg:#f5f3ef;--white:#fff;--text:#1a1a1a;--text2:#555;--text3:#999;--border:#e0ddd8;--radius:10px;--radius-sm:6px;}
+body{font-family:'Noto Sans JP','Hiragino Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.login-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:36px 28px;width:320px;max-width:calc(100vw - 32px);text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.06);}
+.login-logo{font-size:20px;font-weight:700;color:var(--green);}
+.login-sub{font-size:12px;color:var(--text3);margin:4px 0 24px;}
+.login-box input{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;margin-bottom:12px;}
+.login-box button{width:100%;padding:11px;background:var(--green);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;}
+.login-box button:disabled{opacity:0.6;cursor:default;}
+.login-err{font-size:11px;color:#c0392b;margin-top:8px;display:none;}
+.topbar{background:var(--green);color:white;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.topbar b{font-size:14px;letter-spacing:0.04em;}
+.topbar span{opacity:0.7;font-size:11px;margin-left:8px;}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px;}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;}
+.filter-bar label{font-size:11px;color:var(--text3);}
+.filter-bar input,.filter-bar select{border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit;}
+.filter-bar button{padding:6px 14px;border-radius:99px;border:1px solid var(--green);background:var(--green);color:white;font-size:12px;cursor:pointer;}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px;}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
+.stat-n{font-size:22px;font-weight:600;color:var(--green);}
+.stat-l{font-size:10px;color:var(--text3);margin-top:2px;}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;overflow-x:auto;}
+.card h2{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px;}
+th{background:var(--bg);color:var(--text3);font-size:10px;font-weight:600;padding:8px 10px;text-align:left;white-space:nowrap;}
+td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+tr:hover td{background:var(--green-lt);}
+.rate-bar-bg{width:70px;height:6px;background:var(--bg);border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px;}
+.rate-bar-fill{height:100%;background:var(--green);}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;background:var(--green-lt);color:var(--green);}
+.conv-cell{max-width:260px;white-space:pre-wrap;font-size:11px;color:var(--text);}
+.loading{text-align:center;padding:30px;color:var(--text3);font-size:13px;}
+.empty{color:var(--text3);font-size:12px;padding:16px 0;text-align:center;}
+</style>
+</head>
+<body>
+
+<div id="loginWrap" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">TOTONOI</div>
+    <div class="login-sub">管理者ダッシュボード</div>
+    <input type="password" id="loginPass" placeholder="管理者パスワード" onkeydown="if(event.key==='Enter')doLogin()">
+    <button id="loginBtn" onclick="doLogin()">ログイン</button>
+    <div class="login-err" id="loginErr">パスワードが違います</div>
+  </div>
+</div>
+
+<div id="dashWrap" style="display:none;">
+  <div class="topbar"><div><b>TOTONOI</b><span>管理者ダッシュボード</span></div></div>
+  <div class="wrap">
+
+    <div class="filter-bar">
+      <label>期間</label>
+      <input type="date" id="f-from">
+      〜
+      <input type="date" id="f-to">
+      <label>担当者</label>
+      <select id="f-staff"><option value="">全員</option></select>
+      <button onclick="applyFilter()">絞り込む</button>
+      <button onclick="resetFilter()" style="background:var(--white);color:var(--text2);border-color:var(--border);">リセット</button>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-n" id="st-count">-</div><div class="stat-l">日報件数</div></div>
+      <div class="stat"><div class="stat-n" id="st-avg">-</div><div class="stat-l">平均完了率</div></div>
+      <div class="stat"><div class="stat-n" id="st-staff">-</div><div class="stat-l">対象人数</div></div>
+    </div>
+
+    <div class="card">
+      <h2>担当者別 完了率サマリー</h2>
+      <div id="staff-table"><div class="loading">読み込み中...</div></div>
+    </div>
+
+    <div class="card">
+      <h2>お客様対応ログ（会話・満足度）</h2>
+      <div id="customer-table"><div class="loading">読み込み中...</div></div>
+    </div>
+
+    <div class="card">
+      <h2>日報一覧</h2>
+      <div id="report-table"><div class="loading">読み込み中...</div></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// 既存ポータルと同じGAS URL
+const GAS_URL = "https://script.google.com/macros/s/AKfycbx55qhEqhaXZPMKIuSEhjmTBqprKlJFENmfygkBa2uMOjZ7BzsYkY3QCmxW0UsrVJ-_/exec";
+
+let allReports = [];
+
+window.doLogin = async function () {
+  const pass = document.getElementById("loginPass").value;
+  const btn = document.getElementById("loginBtn");
+  const errEl = document.getElementById("loginErr");
+  errEl.style.display = "none";
+  btn.disabled = true; btn.textContent = "確認中...";
+  try {
+    const res = await fetch(`${GAS_URL}?pw=${encodeURIComponent(pass)}`);
+    const json = await res.json();
+    if (json.status !== "ok") {
+      errEl.style.display = "block";
+      btn.disabled = false; btn.textContent = "ログイン";
+      return;
+    }
+    allReports = json.reports || [];
+    document.getElementById("loginWrap").style.display = "none";
+    document.getElementById("dashWrap").style.display = "block";
+    populateStaffFilter();
+    render(allReports);
+  } catch (e) {
+    errEl.textContent = "通信エラー：" + e.message;
+    errEl.style.display = "block";
+    btn.disabled = false; btn.textContent = "ログイン";
+  }
+};
+
+function populateStaffFilter() {
+  const staffSet = [...new Set(allReports.map(r => r['担当者']).filter(Boolean))].sort();
+  const sel = document.getElementById("f-staff");
+  sel.innerHTML = '<option value="">全員</option>' + staffSet.map(s => `<option>${s}</option>`).join("");
+}
+
+window.applyFilter = function () {
+  const from = document.getElementById("f-from").value;
+  const to = document.getElementById("f-to").value;
+  const staff = document.getElementById("f-staff").value;
+  let filtered = allReports;
+  if (from) filtered = filtered.filter(r => workDateStr(r) >= from);
+  if (to) filtered = filtered.filter(r => workDateStr(r) <= to);
+  if (staff) filtered = filtered.filter(r => r['担当者'] === staff);
+  render(filtered);
+};
+
+window.resetFilter = function () {
+  document.getElementById("f-from").value = "";
+  document.getElementById("f-to").value = "";
+  document.getElementById("f-staff").value = "";
+  render(allReports);
+};
+
+function workDateStr(r) {
+  const v = r['勤務日'];
+  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  return String(v || "");
+}
+
+function rateNum(r) {
+  const n = parseInt(r['完了率']);
+  return isNaN(n) ? 0 : n;
+}
+
+function render(reports) {
+  document.getElementById("st-count").textContent = reports.length;
+  const avgRate = reports.length ? Math.round(reports.reduce((a, r) => a + rateNum(r), 0) / reports.length) : 0;
+  document.getElementById("st-avg").textContent = avgRate + "%";
+  const staffSet = new Set(reports.map(r => r['担当者']));
+  document.getElementById("st-staff").textContent = staffSet.size;
+
+  // 担当者別サマリー
+  const byStaff = {};
+  reports.forEach(r => {
+    const name = r['担当者'] || '(不明)';
+    if (!byStaff[name]) byStaff[name] = { count: 0, sum: 0 };
+    byStaff[name].count++;
+    byStaff[name].sum += rateNum(r);
+  });
+  const staffRows = Object.entries(byStaff)
+    .map(([name, d]) => ({ name, count: d.count, avg: Math.round(d.sum / d.count) }))
+    .sort((a, b) => b.avg - a.avg);
+
+  document.getElementById("staff-table").innerHTML = staffRows.length ? `
+    <table><thead><tr><th>担当者</th><th>日報件数</th><th>平均完了率</th></tr></thead><tbody>
+    ${staffRows.map(s => `
+      <tr>
+        <td>${s.name}</td>
+        <td>${s.count}件</td>
+        <td><span class="rate-bar-bg"><span class="rate-bar-fill" style="width:${s.avg}%"></span></span>${s.avg}%</td>
+      </tr>`).join("")}
+    </tbody></table>` : '<div class="empty">データがありません</div>';
+
+  // お客様対応ログ
+  const custRows = reports.filter(r => (r['会話・印象'] && String(r['会話・印象']).trim()) || (r['お客様棟'] && String(r['お客様棟']).trim()));
+  document.getElementById("customer-table").innerHTML = custRows.length ? `
+    <table><thead><tr><th>勤務日</th><th>担当者</th><th>棟</th><th>年代/属性</th><th>会話・印象</th><th>満足度</th></tr></thead><tbody>
+    ${custRows.map(r => `
+      <tr>
+        <td>${workDateStr(r)}</td>
+        <td>${r['担当者'] || ''}</td>
+        <td>${r['お客様棟'] || "-"}</td>
+        <td>${[r['年代'], r['属性']].filter(Boolean).join(" / ") || "-"}</td>
+        <td class="conv-cell">${String(r['会話・印象'] || "-").replace(/\n/g, "<br>")}</td>
+        <td>${r['推定満足度'] || "-"}</td>
+      </tr>`).join("")}
+    </tbody></table>` : '<div class="empty">対応ログがありません</div>';
+
+  // 日報一覧
+  const sorted = reports.slice().sort((a, b) => workDateStr(b).localeCompare(workDateStr(a)));
+  document.getElementById("report-table").innerHTML = sorted.length ? `
+    <table><thead><tr><th>勤務日</th><th>担当者</th><th>シフト</th><th>時間</th><th>完了率</th><th>連絡事項</th></tr></thead><tbody>
+    ${sorted.map(r => `
+      <tr>
+        <td>${workDateStr(r)}（${r['曜日'] || ''}）</td>
+        <td>${r['担当者'] || ''}</td>
+        <td><span class="tag">${r['シフト'] || '-'}</span></td>
+        <td>${r['勤務開始'] || "-"}〜${r['勤務終了'] || "-"}</td>
+        <td>${r['チェック完了数']}/${r['チェック全体数']}（${r['完了率']}）</td>
+        <td class="conv-cell">${String(r['その他連絡事項'] || "-").replace(/\n/g, "<br>")}</td>
+      </tr>`).join("")}
+    </tbody></table>` : '<div class="empty">日報がありません</div>';
+}
+</script>
+</body>
+</html>
