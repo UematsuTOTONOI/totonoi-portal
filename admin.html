@@ -87,6 +87,11 @@ tr:hover td{background:var(--green-lt);}
     </div>
 
     <div class="card">
+      <h2>通常業務以外の業務ログ（施設改善・任務タスクなど）</h2>
+      <div id="extra-table"><div class="loading">読み込み中...</div></div>
+    </div>
+
+    <div class="card">
       <h2>日報一覧</h2>
       <div id="report-table"><div class="loading">読み込み中...</div></div>
     </div>
@@ -239,6 +244,38 @@ function render(reports) {
         <td>${r['推定満足度'] || "-"}</td>
       </tr>`).join("")}
     </tbody></table>` : '<div class="empty">対応ログがありません</div>';
+
+  // 通常業務以外の業務ログ（施設改善・任務タスク・その他）
+  const extraRows = [];
+  reports.forEach(r => {
+    (r.extraTasks || []).forEach(x => {
+      if (x.type || x.content) {
+        extraRows.push({
+          date: workDateStr(r),
+          staff: r['担当者'] || '',
+          shift: r['シフト'] || '',
+          type: x.type,
+          content: x.content,
+          duration: x.duration,
+          reason: x.reason
+        });
+      }
+    });
+  });
+  extraRows.sort((a, b) => b.date.localeCompare(a.date));
+  document.getElementById("extra-table").innerHTML = extraRows.length ? `
+    <table><thead><tr><th>勤務日</th><th>担当者</th><th>シフト</th><th>種別</th><th>内容</th><th>所要時間</th><th>理由</th></tr></thead><tbody>
+    ${extraRows.map(x => `
+      <tr>
+        <td>${x.date}</td>
+        <td>${x.staff}</td>
+        <td><span class="tag">${x.shift || '-'}</span></td>
+        <td>${x.type || '-'}</td>
+        <td class="conv-cell">${String(x.content || '-').replace(/\n/g, "<br>")}</td>
+        <td>${x.duration || '-'}</td>
+        <td class="conv-cell">${String(x.reason || '-').replace(/\n/g, "<br>")}</td>
+      </tr>`).join("")}
+    </tbody></table>` : '<div class="empty">記録がありません</div>';
 
   // 日報一覧
   const sorted = reports.slice().sort((a, b) => workDateStr(b).localeCompare(workDateStr(a)));
