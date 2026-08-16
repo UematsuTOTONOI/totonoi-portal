@@ -26,10 +26,10 @@ body{font-family:'Noto Sans JP','Hiragino Sans',sans-serif;background:var(--bg);
 .filter-bar input,.filter-bar select{border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit;}
 .filter-bar button{padding:6px 14px;border-radius:99px;border:1px solid var(--green);background:var(--green);color:white;font-size:12px;cursor:pointer;}
 .filter-bar.staff-row{margin-bottom:16px;}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px;}
-.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
-.stat-n{font-size:22px;font-weight:600;color:var(--green);}
-.stat-l{font-size:10px;color:var(--text3);margin-top:2px;}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 6px;text-align:center;}
+.stat-n{font-size:20px;font-weight:600;color:var(--green);}
+.stat-l{font-size:9px;color:var(--text3);margin-top:2px;}
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;overflow-x:auto;}
 .card h2{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px;}
 table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px;}
@@ -38,7 +38,7 @@ td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text2);ver
 tr:hover td{background:var(--green-lt);}
 .rate-bar-bg{width:70px;height:6px;background:var(--bg);border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px;}
 .rate-bar-fill{height:100%;background:var(--green);}
-.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;background:var(--green-lt);color:var(--green);}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;background:var(--green-lt);color:var(--green);white-space:nowrap;}
 .conv-cell{max-width:260px;white-space:pre-wrap;font-size:11px;color:var(--text);}
 .loading{text-align:center;padding:30px;color:var(--text3);font-size:13px;}
 .empty{color:var(--text3);font-size:12px;padding:16px 0;text-align:center;}
@@ -56,7 +56,20 @@ tr:hover td{background:var(--green-lt);}
 .cal-cell.has-data:hover{background:var(--green-md);}
 .cal-cell.selected{background:var(--green)!important;border-color:var(--green)!important;color:white!important;}
 .cal-day{font-weight:700;font-size:18px;margin-bottom:2px;}
-.cal-stats{font-size:9px;line-height:1.5;text-align:center;}
+.cal-stats{font-size:9px;line-height:1.5;text-align:center;white-space:nowrap;}
+@media(max-width:640px){
+  .wrap{padding:14px 10px 40px;}
+  .filter-bar{padding:8px 10px;}
+  .stat-grid{gap:6px;margin-bottom:14px;}
+  .stat{padding:10px 4px;}
+  .stat-n{font-size:16px;}
+  .stat-l{font-size:8px;}
+  .card{padding:12px;}
+  .cal-cell{min-height:58px;padding:2px 1px;}
+  .cal-day{font-size:14px;}
+  .cal-stats{font-size:8px;}
+  table{min-width:520px;}
+}
 </style>
 </head>
 <body>
@@ -79,7 +92,7 @@ tr:hover td{background:var(--green-lt);}
       <label>日付</label>
       <input type="date" id="f-date" onchange="applyFilter()">
       <button onclick="applyFilter()">絞り込む</button>
-      <button onclick="resetFilter()" style="background:var(--white);color:var(--text2);border-color:var(--border);">TOPへ</button>
+      <button onclick="resetFilter()" style="background:var(--white);color:var(--text2);border-color:var(--border);">リセット</button>
     </div>
     <div class="filter-bar staff-row">
       <label>担当者</label>
