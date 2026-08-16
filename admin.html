@@ -41,6 +41,10 @@ tr:hover td{background:var(--green-lt);}
 .conv-cell{max-width:260px;white-space:pre-wrap;font-size:11px;color:var(--text);}
 .loading{text-align:center;padding:30px;color:var(--text3);font-size:13px;}
 .empty{color:var(--text3);font-size:12px;padding:16px 0;text-align:center;}
+.staff-row{cursor:pointer;}
+.staff-row.active td{background:var(--green-lt);}
+.staff-row td:first-child{font-weight:600;}
+.clear-staff-btn{font-size:10px;color:var(--text3);text-decoration:underline;cursor:pointer;margin-left:8px;}
 </style>
 </head>
 <body>
@@ -66,6 +70,8 @@ tr:hover td{background:var(--green-lt);}
       <input type="date" id="f-to">
       <label>担当者</label>
       <select id="f-staff"><option value="">全員</option></select>
+      <label>棟</label>
+      <select id="f-room"><option value="">全棟</option></select>
       <button onclick="applyFilter()">絞り込む</button>
       <button onclick="resetFilter()" style="background:var(--white);color:var(--text2);border-color:var(--border);">リセット</button>
     </div>
@@ -123,6 +129,7 @@ window.doLogin = async function () {
     document.getElementById("loginWrap").style.display = "none";
     document.getElementById("dashWrap").style.display = "block";
     populateStaffFilter();
+    populateRoomFilter();
     render(allReports);
   } catch (e) {
     errEl.textContent = "通信エラー：" + e.message;
@@ -137,22 +144,37 @@ function populateStaffFilter() {
   sel.innerHTML = '<option value="">全員</option>' + staffSet.map(s => `<option>${s}</option>`).join("");
 }
 
+function populateRoomFilter() {
+  const roomSet = new Set();
+  allReports.forEach(r => parseCustomers(r).forEach(c => roomSet.add(c.room)));
+  const sel = document.getElementById("f-room");
+  sel.innerHTML = '<option value="">全棟</option>' + [...roomSet].sort().map(r => `<option>${r}</option>`).join("");
+}
+
 window.applyFilter = function () {
   const from = document.getElementById("f-from").value;
   const to = document.getElementById("f-to").value;
   const staff = document.getElementById("f-staff").value;
+  const room = document.getElementById("f-room").value;
   let filtered = allReports;
   if (from) filtered = filtered.filter(r => workDateStr(r) >= from);
   if (to) filtered = filtered.filter(r => workDateStr(r) <= to);
   if (staff) filtered = filtered.filter(r => r['担当者'] === staff);
-  render(filtered);
+  render(filtered, { staff, room });
 };
 
 window.resetFilter = function () {
   document.getElementById("f-from").value = "";
   document.getElementById("f-to").value = "";
   document.getElementById("f-staff").value = "";
-  render(allReports);
+  document.getElementById("f-room").value = "";
+  render(allReports, {});
+};
+
+// 担当者別サマリーの行をクリックすると、その担当者だけに絞り込む
+window.selectStaff = function (name) {
+  document.getElementById("f-staff").value = name;
+  applyFilter();
 };
 
 function workDateStr(r) {
@@ -187,6 +209,30 @@ function parseSentAt(r) {
   return isNaN(d) ? new Date(0) : d;
 }
 
+// カンマ区切り／改行区切りの文字列を配列に分割する共通処理
+function splitComma(s) { return String(s || '').split(',').map(x => x.trim()).filter(x => x !== ''); }
+function splitLinesStr(s) { return String(s || '').split('\n').map(x => x.trim()).filter(x => x !== ''); }
+
+// 1件の日報に含まれる複数棟のお客様対応を、棟ごとの配列に分解する
+// （保存時に「お客様棟」はカンマ区切り、「会話・印象」は改行区切りで
+// 　それぞれ棟の数だけ連結されているため、同じ順番で対応させて分割する）
+function parseCustomers(r) {
+  const rooms = splitComma(r['お客様棟']);
+  const ages = splitComma(r['年代']);
+  const types = splitComma(r['属性']);
+  const convs = splitLinesStr(r['会話・印象']);
+  const sats = splitComma(r['推定満足度']);
+  return rooms.map((room, i) => ({
+    date: workDateStr(r),
+    staff: r['担当者'] || '',
+    room,
+    age: ages[i] || '',
+    type: types[i] || '',
+    conversation: convs[i] || '',
+    satisfaction: sats[i] || ''
+  }));
+}
+
 // 同一スタッフ・同一勤務日・同一シフトの重複送信は、最新のものだけを残す
 // （最終送信は毎回その時点までの全データを送るため、最新＝最も完全な内容）
 function dedupeReports(list) {
@@ -201,14 +247,15 @@ function dedupeReports(list) {
   return Array.from(map.values());
 }
 
-function render(reports) {
+function render(reports, activeFilter) {
+  activeFilter = activeFilter || {};
   document.getElementById("st-count").textContent = reports.length;
   const avgRate = reports.length ? Math.round(reports.reduce((a, r) => a + rateNum(r), 0) / reports.length) : 0;
   document.getElementById("st-avg").textContent = avgRate + "%";
   const staffSet = new Set(reports.map(r => r['担当者']));
   document.getElementById("st-staff").textContent = staffSet.size;
 
-  // 担当者別サマリー
+  // 担当者別サマリー（行クリックでその担当者に絞り込み）
   const byStaff = {};
   reports.forEach(r => {
     const name = r['担当者'] || '(不明)';
@@ -220,28 +267,32 @@ function render(reports) {
     .map(([name, d]) => ({ name, count: d.count, avg: Math.round(d.sum / d.count) }))
     .sort((a, b) => b.avg - a.avg);
 
-  document.getElementById("staff-table").innerHTML = staffRows.length ? `
+  document.getElementById("staff-table").innerHTML = (staffRows.length ? `
     <table><thead><tr><th>担当者</th><th>日報件数</th><th>平均完了率</th></tr></thead><tbody>
     ${staffRows.map(s => `
-      <tr>
+      <tr class="staff-row${activeFilter.staff === s.name ? ' active' : ''}" onclick="selectStaff('${s.name.replace(/'/g, "\\'")}')">
         <td>${s.name}</td>
         <td>${s.count}件</td>
         <td><span class="rate-bar-bg"><span class="rate-bar-fill" style="width:${s.avg}%"></span></span>${s.avg}%</td>
       </tr>`).join("")}
-    </tbody></table>` : '<div class="empty">データがありません</div>';
+    </tbody></table>` : '<div class="empty">データがありません</div>')
+    + (activeFilter.staff ? `<span class="clear-staff-btn" onclick="document.getElementById('f-staff').value='';applyFilter();">「${activeFilter.staff}」の絞り込みを解除</span>` : '');
 
-  // お客様対応ログ
-  const custRows = reports.filter(r => (r['会話・印象'] && String(r['会話・印象']).trim()) || (r['お客様棟'] && String(r['お客様棟']).trim()));
+  // お客様対応ログ（棟ごとに1行）
+  let custRows = [];
+  reports.forEach(r => { custRows = custRows.concat(parseCustomers(r)); });
+  if (activeFilter.room) custRows = custRows.filter(c => c.room === activeFilter.room);
+  custRows.sort((a, b) => b.date.localeCompare(a.date));
   document.getElementById("customer-table").innerHTML = custRows.length ? `
     <table><thead><tr><th>勤務日</th><th>担当者</th><th>棟</th><th>年代/属性</th><th>会話・印象</th><th>満足度</th></tr></thead><tbody>
-    ${custRows.map(r => `
+    ${custRows.map(c => `
       <tr>
-        <td>${workDateStr(r)}</td>
-        <td>${r['担当者'] || ''}</td>
-        <td>${r['お客様棟'] || "-"}</td>
-        <td>${[r['年代'], r['属性']].filter(Boolean).join(" / ") || "-"}</td>
-        <td class="conv-cell">${String(r['会話・印象'] || "-").replace(/\n/g, "<br>")}</td>
-        <td>${r['推定満足度'] || "-"}</td>
+        <td>${c.date}</td>
+        <td>${c.staff}</td>
+        <td><span class="tag">${c.room}</span></td>
+        <td>${[c.age, c.type].filter(Boolean).join(" / ") || "-"}</td>
+        <td class="conv-cell">${String(c.conversation || "-").replace(/\n/g, "<br>")}</td>
+        <td>${c.satisfaction || "-"}</td>
       </tr>`).join("")}
     </tbody></table>` : '<div class="empty">対応ログがありません</div>';
 
