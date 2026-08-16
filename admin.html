@@ -48,6 +48,17 @@ tr:hover td{background:var(--green-lt);}
 .day-chip{display:inline-block;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);font-size:11px;color:var(--text2);cursor:pointer;margin:0 6px 6px 0;}
 .day-chip.active{background:var(--green);color:white;border-color:var(--green);}
 .day-chip:hover{border-color:var(--green);}
+.cal-header{display:flex;align-items:center;justify-content:center;gap:16px;font-size:13px;font-weight:600;margin-bottom:10px;}
+.cal-nav{background:var(--bg);border:1px solid var(--border);border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:14px;color:var(--text2);}
+.cal-nav:hover{background:var(--green-lt);}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10px;color:var(--text3);margin-bottom:4px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-cell{aspect-ratio:1;border-radius:8px;border:1px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--text3);}
+.cal-cell.has-data{cursor:pointer;background:var(--green-lt);border-color:var(--green-md);color:var(--text);}
+.cal-cell.has-data:hover{background:var(--green-md);}
+.cal-cell.selected{background:var(--green)!important;border-color:var(--green)!important;color:white!important;}
+.cal-day{font-weight:600;}
+.cal-rate{font-size:9px;}
 </style>
 </head>
 <body>
@@ -194,10 +205,60 @@ window.clearDay = function () {
   applyFilter();
 };
 
+// カレンダーの表示中の年月（担当者選択中のみ使用）
+let calMonth = null;
+window.changeCalMonth = function (delta) {
+  if (!calMonth) return;
+  let m = calMonth.month + delta, y = calMonth.year;
+  if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; }
+  calMonth = { year: y, month: m };
+  applyFilter();
+};
+
+function buildCalendarHtml(byDate, selectedDate) {
+  const { year, month } = calMonth;
+  const firstDay = new Date(year, month, 1);
+  const startWeekday = firstDay.getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let cells = '';
+  for (let i = 0; i < startWeekday; i++) cells += `<div class="cal-cell"></div>`;
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const info = byDate[dateStr];
+    const hasData = !!info;
+    const isSelected = dateStr === selectedDate;
+    cells += `<div class="cal-cell${hasData ? ' has-data' : ''}${isSelected ? ' selected' : ''}"${hasData ? ` onclick="selectDay('${dateStr}')"` : ''}>
+      <div class="cal-day">${day}</div>
+      ${hasData ? `<div class="cal-rate">${info.avg}%</div>` : ''}
+    </div>`;
+  }
+  return `
+    <div class="cal-header">
+      <button class="cal-nav" onclick="changeCalMonth(-1)">‹</button>
+      <span>${year}年${month + 1}月</span>
+      <button class="cal-nav" onclick="changeCalMonth(1)">›</button>
+    </div>
+    <div class="cal-weekdays">${['日', '月', '火', '水', '木', '金', '土'].map(w => `<div>${w}</div>`).join('')}</div>
+    <div class="cal-grid">${cells}</div>`;
+}
+
+// スプレッドシートの日付セルは自動的にJSTのDateとして保存され、GAS側でJSON化される際に
+// UTC文字列（例: "2026-08-14T15:00:00.000Z"）に変換される。そのまま先頭10文字を取ると
+// 実際の勤務日から1日ズレることがあるため、+9時間してJSTに戻してから日付を取り出す。
 function workDateStr(r) {
   const v = r['勤務日'];
-  if (v instanceof Date) return v.toISOString().slice(0, 10);
-  return String(v || "");
+  let d;
+  if (v instanceof Date) {
+    d = v;
+  } else {
+    const s = String(v || '').trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s; // すでに日付のみの文字列ならそのまま
+    const parsed = new Date(s);
+    if (isNaN(parsed)) return s;
+    d = parsed;
+  }
+  const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+  return jst.toISOString().slice(0, 10);
 }
 
 // 完了率：スプレッドシート側で "95%" という文字列が自動的に
@@ -295,36 +356,47 @@ function render(reports, activeFilter) {
     </tbody></table>` : '<div class="empty">データがありません</div>')
     + (activeFilter.staff ? `<span class="clear-staff-btn" onclick="document.getElementById('f-staff').value='';applyFilter();">「${activeFilter.staff}」の絞り込みを解除</span>` : '');
 
-  // 個人詳細（担当者を選択している時だけ表示：完了率・通常業務以外の件数・日付チップ）
+  // 個人詳細（担当者を選択している時だけ表示：全期間の集計＋カレンダーで日を選択）
   const fromVal = document.getElementById("f-from").value;
   const toVal = document.getElementById("f-to").value;
   const extraCountOf = r => (r.extraTasks || []).filter(x => x.type || x.content).length;
   if (activeFilter.staff) {
+    const staffReports = allReports.filter(r => r['担当者'] === activeFilter.staff);
     const byDate = {};
-    reports.forEach(r => {
+    staffReports.forEach(r => {
       const d = workDateStr(r);
       if (!byDate[d]) byDate[d] = { count: 0, sum: 0, extra: 0 };
       byDate[d].count++;
       byDate[d].sum += rateNum(r);
       byDate[d].extra += extraCountOf(r);
     });
-    const totalExtra = reports.reduce((a, r) => a + extraCountOf(r), 0);
-    const dateChips = Object.entries(byDate)
-      .map(([d, v]) => ({ date: d, avg: Math.round(v.sum / v.count), extra: v.extra }))
-      .sort((a, b) => b.date.localeCompare(a.date));
+    Object.values(byDate).forEach(v => { v.avg = Math.round(v.sum / v.count); });
+    const totalExtra = staffReports.reduce((a, r) => a + extraCountOf(r), 0);
+    const staffAvg = staffReports.length ? Math.round(staffReports.reduce((a, r) => a + rateNum(r), 0) / staffReports.length) : 0;
+
+    if (!calMonth) {
+      const dates = Object.keys(byDate).sort();
+      const latest = dates.length ? dates[dates.length - 1] : workDateStr({ '勤務日': new Date().toISOString() });
+      const [y, m] = latest.split('-').map(Number);
+      calMonth = { year: y, month: m - 1 };
+    }
+
+    const selectedDate = (fromVal && fromVal === toVal) ? fromVal : null;
+
     document.getElementById("personal-detail").innerHTML = `
       <div class="card">
         <h2>${activeFilter.staff} さんの詳細</h2>
         <div class="stat-grid" style="margin-bottom:14px;">
-          <div class="stat"><div class="stat-n">${reports.length}</div><div class="stat-l">日報件数</div></div>
-          <div class="stat"><div class="stat-n">${avgRate}%</div><div class="stat-l">平均完了率</div></div>
-          <div class="stat"><div class="stat-n">${totalExtra}</div><div class="stat-l">通常業務以外 件数</div></div>
+          <div class="stat"><div class="stat-n">${staffReports.length}</div><div class="stat-l">日報件数（全期間）</div></div>
+          <div class="stat"><div class="stat-n">${staffAvg}%</div><div class="stat-l">平均完了率（全期間）</div></div>
+          <div class="stat"><div class="stat-n">${totalExtra}</div><div class="stat-l">通常業務以外 件数（全期間）</div></div>
         </div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">日付をクリックすると、その日の完了率・通常業務以外・お客様対応だけに絞り込みます</div>
-        <div>${dateChips.map(c => `<span class="day-chip${(fromVal === c.date && toVal === c.date) ? ' active' : ''}" onclick="selectDay('${c.date}')">${c.date}｜完了${c.avg}%｜業務外${c.extra}件</span>`).join("")}</div>
-        ${fromVal ? `<span class="clear-staff-btn" onclick="clearDay()">日付の絞り込みを解除</span>` : ''}
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">緑色の日は日報があります。日付をクリックすると、下の「お客様対応ログ」「通常業務以外」「日報一覧」がその日だけに絞り込まれます</div>
+        ${buildCalendarHtml(byDate, selectedDate)}
+        ${selectedDate ? `<div style="margin-top:10px;"><span class="clear-staff-btn" onclick="clearDay()">${selectedDate} の絞り込みを解除</span></div>` : ''}
       </div>`;
   } else {
+    calMonth = null;
     document.getElementById("personal-detail").innerHTML = '';
   }
 
