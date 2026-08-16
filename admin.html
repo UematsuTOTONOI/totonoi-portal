@@ -45,6 +45,9 @@ tr:hover td{background:var(--green-lt);}
 .staff-row.active td{background:var(--green-lt);}
 .staff-row td:first-child{font-weight:600;}
 .clear-staff-btn{font-size:10px;color:var(--text3);text-decoration:underline;cursor:pointer;margin-left:8px;}
+.day-chip{display:inline-block;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);font-size:11px;color:var(--text2);cursor:pointer;margin:0 6px 6px 0;}
+.day-chip.active{background:var(--green);color:white;border-color:var(--green);}
+.day-chip:hover{border-color:var(--green);}
 </style>
 </head>
 <body>
@@ -86,6 +89,8 @@ tr:hover td{background:var(--green-lt);}
       <h2>担当者別 完了率サマリー</h2>
       <div id="staff-table"><div class="loading">読み込み中...</div></div>
     </div>
+
+    <div id="personal-detail"></div>
 
     <div class="card">
       <h2>お客様対応ログ（会話・満足度）</h2>
@@ -174,6 +179,18 @@ window.resetFilter = function () {
 // 担当者別サマリーの行をクリックすると、その担当者だけに絞り込む
 window.selectStaff = function (name) {
   document.getElementById("f-staff").value = name;
+  applyFilter();
+};
+
+// 個人詳細カード内の日付チップをクリックすると、その日1日だけに絞り込む
+window.selectDay = function (date) {
+  document.getElementById("f-from").value = date;
+  document.getElementById("f-to").value = date;
+  applyFilter();
+};
+window.clearDay = function () {
+  document.getElementById("f-from").value = "";
+  document.getElementById("f-to").value = "";
   applyFilter();
 };
 
@@ -277,6 +294,39 @@ function render(reports, activeFilter) {
       </tr>`).join("")}
     </tbody></table>` : '<div class="empty">データがありません</div>')
     + (activeFilter.staff ? `<span class="clear-staff-btn" onclick="document.getElementById('f-staff').value='';applyFilter();">「${activeFilter.staff}」の絞り込みを解除</span>` : '');
+
+  // 個人詳細（担当者を選択している時だけ表示：完了率・通常業務以外の件数・日付チップ）
+  const fromVal = document.getElementById("f-from").value;
+  const toVal = document.getElementById("f-to").value;
+  const extraCountOf = r => (r.extraTasks || []).filter(x => x.type || x.content).length;
+  if (activeFilter.staff) {
+    const byDate = {};
+    reports.forEach(r => {
+      const d = workDateStr(r);
+      if (!byDate[d]) byDate[d] = { count: 0, sum: 0, extra: 0 };
+      byDate[d].count++;
+      byDate[d].sum += rateNum(r);
+      byDate[d].extra += extraCountOf(r);
+    });
+    const totalExtra = reports.reduce((a, r) => a + extraCountOf(r), 0);
+    const dateChips = Object.entries(byDate)
+      .map(([d, v]) => ({ date: d, avg: Math.round(v.sum / v.count), extra: v.extra }))
+      .sort((a, b) => b.date.localeCompare(a.date));
+    document.getElementById("personal-detail").innerHTML = `
+      <div class="card">
+        <h2>${activeFilter.staff} さんの詳細</h2>
+        <div class="stat-grid" style="margin-bottom:14px;">
+          <div class="stat"><div class="stat-n">${reports.length}</div><div class="stat-l">日報件数</div></div>
+          <div class="stat"><div class="stat-n">${avgRate}%</div><div class="stat-l">平均完了率</div></div>
+          <div class="stat"><div class="stat-n">${totalExtra}</div><div class="stat-l">通常業務以外 件数</div></div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">日付をクリックすると、その日の完了率・通常業務以外・お客様対応だけに絞り込みます</div>
+        <div>${dateChips.map(c => `<span class="day-chip${(fromVal === c.date && toVal === c.date) ? ' active' : ''}" onclick="selectDay('${c.date}')">${c.date}｜完了${c.avg}%｜業務外${c.extra}件</span>`).join("")}</div>
+        ${fromVal ? `<span class="clear-staff-btn" onclick="clearDay()">日付の絞り込みを解除</span>` : ''}
+      </div>`;
+  } else {
+    document.getElementById("personal-detail").innerHTML = '';
+  }
 
   // お客様対応ログ（棟ごとに1行）
   let custRows = [];
