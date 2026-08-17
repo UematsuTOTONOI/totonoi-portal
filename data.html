@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宿泊者データ集計 | TOTONOI富士山中湖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Noto+Serif+JP:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.3/chart.umd.min.js"></script>
+<style>
+  :root{
+    --gold: #b88931;
+    --gold-light: #d6ad61;
+    --ink: #23201b;
+    --ink-soft: #5c564a;
+    --paper: #faf7f0;
+    --paper-card: #ffffff;
+    --line: #e6ddc9;
+    --warn: #b5573a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'Noto Sans JP', sans-serif; -webkit-font-smoothing:antialiased;}
+  header.site{
+    padding:56px 6vw 40px; border-bottom:1px solid var(--line);
+    background: radial-gradient(1200px 200px at 10% -20%, rgba(184,137,49,0.10), transparent 60%), var(--paper);
+  }
+  .eyebrow{font-family:'Noto Serif JP', serif; letter-spacing:.28em; font-size:11px; color:var(--gold); text-transform:uppercase; margin:0 0 14px;}
+  h1{font-family:'Cormorant Garamond', 'Noto Serif JP', serif; font-weight:500; font-size:clamp(32px, 4.4vw, 54px); margin:0 0 8px;}
+  h1 em{font-style:italic; color:var(--gold);}
+  .sub{font-family:'Noto Serif JP', serif; color:var(--ink-soft); font-size:15px; max-width:58ch; line-height:1.9; margin:0;}
+  main{max-width:1180px; margin:0 auto; padding:48px 6vw 100px;}
+
+  .upload{
+    border:1px solid var(--line); background:var(--paper-card); border-radius:2px;
+    padding:36px 40px; display:flex; align-items:center; gap:28px; flex-wrap:wrap;
+    position:relative; overflow:hidden;
+  }
+  .upload::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(var(--gold), var(--gold-light));}
+  .upload .drop{
+    flex:1 1 320px; border:1px dashed #cbbf9c; border-radius:2px; padding:26px; text-align:center;
+    cursor:pointer; transition:border-color .2s, background .2s; font-family:'Noto Serif JP', serif; color:var(--ink-soft);
+  }
+  .upload .drop:hover, .upload .drop.drag{ border-color:var(--gold); background:#fbf6ea; }
+  .upload .drop strong{color:var(--ink); font-weight:600;}
+  .upload input[type=file]{display:none;}
+  .filename{font-size:12.5px; color:var(--gold); margin-top:8px;}
+  #status{font-size:13px; color:var(--ink-soft); min-width:200px;}
+  #status.err{color:var(--warn); font-weight:600;}
+  .hidden{display:none !important;}
+
+  .kpis{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:1px;
+    background:var(--line); border:1px solid var(--line); margin:48px 0 8px;
+  }
+  .kpi{background:var(--paper-card); padding:26px 20px;}
+  .kpi .label{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:10px;}
+  .kpi .value{font-family:'Cormorant Garamond', serif; font-size:32px; color:var(--ink); line-height:1;}
+  .kpi .value span.unit{font-family:'Noto Sans JP', sans-serif; font-size:13px; color:var(--ink-soft); margin-left:4px;}
+  .kpi .value.gold{color:var(--gold);}
+
+  section.block{margin-top:64px;}
+  .block h2{font-family:'Noto Serif JP', serif; font-weight:600; font-size:20px; margin:0 0 4px; display:flex; align-items:baseline; gap:10px;}
+  .block h2 .no{font-family:'Cormorant Garamond', serif; font-style:italic; color:var(--gold-light); font-size:16px;}
+  .block .note{font-size:12.5px; color:var(--ink-soft); margin:0 0 24px;}
+
+  .grid2{display:grid; grid-template-columns:1.2fr 1fr; gap:28px;}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:28px;}
+  @media (max-width:820px){ .grid2, .grid3{grid-template-columns:1fr;} }
+
+  .card{border:1px solid var(--line); background:var(--paper-card); padding:24px; border-radius:2px;}
+  .card h3{margin:0 0 18px; font-size:13px; letter-spacing:.06em; color:var(--ink-soft); font-weight:600; text-transform:uppercase;}
+  canvas{max-width:100%;}
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th,td{padding:9px 10px; text-align:right; border-bottom:1px solid var(--line);}
+  th:first-child, td:first-child{text-align:left;}
+  thead th{color:var(--ink-soft); font-weight:600; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; border-bottom:1px solid var(--ink);}
+  tbody tr:hover{background:#fbf6ea;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{font-variant-numeric:tabular-nums;}
+
+  .toggle{display:flex; gap:8px; margin-bottom:18px;}
+  .toggle button{
+    border:1px solid var(--line); background:var(--paper-card); color:var(--ink-soft);
+    font-size:12px; padding:7px 14px; border-radius:20px; cursor:pointer; font-family:'Noto Sans JP',sans-serif;
+  }
+  .toggle button.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
+
+  footer{text-align:center; padding:40px 6vw 60px; color:var(--ink-soft); font-size:12px; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <p class="eyebrow">Guest Data Report — 予約番 / ねっぱん形式</p>
+  <h1>宿泊者データ<em>集計</em></h1>
+  <p class="sub">予約番（ねっぱんサイトコントローラー）から書き出したCSVをアップロードすると、宿泊件数・売上・年代・都道府県・リピート状況を自動集計します。データはブラウザ内でのみ処理され、どこにも保存されません。</p>
+</header>
+
+<main>
+  <div class="upload">
+    <label class="drop" id="dropZone" for="fileInput">
+      <strong>CSVファイルを選択</strong>してください<br>
+      またはここにドラッグ＆ドロップ
+      <div class="filename" id="filenameLabel"></div>
+    </label>
+    <input type="file" id="fileInput" accept=".csv,text/csv">
+    <div id="status">予約番（ねっぱん）からダウンロードしたCSV（Shift-JIS）に対応しています。</div>
+  </div>
+
+  <div id="report" class="hidden">
+
+    <div class="kpis">
+      <div class="kpi"><div class="label">宿泊件数</div><div class="value" id="kpiCount">–<span class="unit">件</span></div></div>
+      <div class="kpi"><div class="label">合計泊数</div><div class="value" id="kpiNights">–<span class="unit">泊</span></div></div>
+      <div class="kpi"><div class="label">売上合計</div><div class="value gold" id="kpiRevenue">–<span class="unit">円</span></div></div>
+      <div class="kpi"><div class="label">平均年齢</div><div class="value" id="kpiAge">–<span class="unit">歳</span></div></div>
+      <div class="kpi"><div class="label">リピート率</div><div class="value" id="kpiRepeat">–<span class="unit">%</span></div></div>
+      <div class="kpi"><div class="label">インバウンド比率</div><div class="value" id="kpiInbound">–<span class="unit">%</span></div></div>
+    </div>
+
+    <section class="block">
+      <h2><span class="no">01</span>プラン（部屋タイプ）別</h2>
+      <p class="note">件数・売上・平均客単価の内訳</p>
+      <div class="grid2">
+        <div class="card"><h3>件数と売上</h3><canvas id="chartPlan" height="220"></canvas></div>
+        <div class="card"><h3>明細</h3><table id="tablePlan"><thead><tr><th>部屋タイプ</th><th>件数</th><th>売上</th><th>客単価</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2><span class="no">02</span>年代別</h2>
+      <p class="note">予約者の年齢（列「年齢」）をもとに10歳刻みで集計</p>
+      <div class="grid2">
+        <div class="card"><h3>年代別件数</h3><canvas id="chartAge" height="220"></canvas></div>
+        <div class="card"><h3>明細</h3><table id="tableAge"><thead><tr><th>年代</th><th>件数</th><th>構成比</th><th>売上</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2><span class="no">03</span>都道府県別 集客</h2>
+      <p class="note">「都道府県」列を使用。空欄／海外は国・地域別に集計（インバウンド）</p>
+      <div class="grid2">
+        <div class="card"><h3>上位10地域</h3><canvas id="chartPref" height="240"></canvas></div>
+        <div class="card"><h3>インバウンド内訳</h3><table id="tableInbound"><thead><tr><th>国・地域</th><th>件数</th><th>売上</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2><span class="no">04</span>リピート状況</h2>
+      <p class="note">「過去の宿泊」列の回答をもとに判定</p>
+      <div class="grid3">
+        <div class="card"><h3>初めて / リピート</h3><canvas id="chartRepeat" height="200"></canvas></div>
+        <div class="card" style="display:flex;flex-direction:column;justify-content:center;"><h3>サマリー</h3><table id="tableRepeat"><tbody></tbody></table></div>
+        <div class="card"><h3>部屋タイプ別リピート件数</h3><table id="tableRepeatPlan"><thead><tr><th>部屋タイプ</th><th>リピート</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2><span class="no">05</span>売上内訳</h2>
+      <p class="note">宿泊料金／食事料金／プログラム料金／オプション料金の構成比</p>
+      <div class="grid2">
+        <div class="card"><h3>カテゴリ別売上</h3><canvas id="chartRevBreak" height="220"></canvas></div>
+        <div class="card"><h3>明細</h3><table id="tableRevBreak"><thead><tr><th>カテゴリ</th><th>売上</th><th>構成比</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2><span class="no">06</span>予約経路</h2>
+      <p class="note">「予約方法」「販売チャネル」列より</p>
+      <div class="grid2">
+        <div class="card"><h3>予約方法</h3><canvas id="chartMethod" height="200"></canvas></div>
+        <div class="card"><h3>販売チャネル（流入経路）</h3><canvas id="chartChannel" height="200"></canvas></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2><span class="no">07</span>月別推移</h2>
+      <p class="note">チェックイン日ベース</p>
+      <div class="card"><canvas id="chartMonth" height="180"></canvas></div>
+    </section>
+
+  </div>
+</main>
+
+<footer>TOTONOI富士山中湖 — 宿泊者データ集計ツール（ブラウザ内処理・データ非保存）</footer>
+
+<script>
+/* ============ 設定 ============ */
+const PREFS = ["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
+
+const COL = {
+  状態:0, 予約番号:1, チェックイン:3, チェックアウト:4, 泊数:11,
+  宿泊プラン:12, 部屋タイプ:17, 男性:20, 女性:21,
+  宿泊料金合計:31, 食事料金合計:32, プログラム料金合計:33, オプション料金合計:34,
+  予約料金合計:50, 年齢:55, 都道府県:58,
+  過去の宿泊:74, 予約方法:16, 販売チャネル:82
+};
+
+const GOLD_SCALE = ["#b88931","#d6ad61","#e3c78a","#8a6a24","#f1e0bb","#6f5518","#c9a24d","#a37a2c"];
+let charts = {};
+
+/* ============ ファイル処理 ============ */
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+const statusEl = document.getElementById('status');
+const filenameLabel = document.getElementById('filenameLabel');
+
+fileInput.addEventListener('change', e => { if(e.target.files[0]) handleFile(e.target.files[0]); });
+['dragover','dragenter'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('drag'); }));
+['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('drag'); }));
+dropZone.addEventListener('drop', e => { if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+
+function handleFile(file){
+  filenameLabel.textContent = file.name;
+  statusEl.textContent = "読み込み中…";
+  statusEl.classList.remove('err');
+  const reader = new FileReader();
+  reader.onload = () => {
+    let text;
+    try{ text = new TextDecoder('shift-jis').decode(reader.result); }
+    catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
+    if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
+    parseAndRender(text);
+  };
+  reader.onerror = () => { statusEl.textContent = "ファイルの読み込みに失敗しました。"; statusEl.classList.add('err'); };
+  reader.readAsArrayBuffer(file);
+}
+
+function parseAndRender(text){
+  const result = Papa.parse(text.trim(), { skipEmptyLines: true });
+  const rows = result.data.slice(1);
+  if(rows.length === 0){
+    statusEl.textContent = "データが見つかりませんでした。CSVの形式をご確認ください。";
+    statusEl.classList.add('err');
+    return;
+  }
+  try{
+    const data = aggregate(rows);
+    render(data);
+    statusEl.textContent = `${data.reservationCount}件の予約を集計しました（${filenameLabel.textContent}）`;
+    document.getElementById('report').classList.remove('hidden');
+  }catch(e){
+    console.error(e);
+    statusEl.textContent = "集計中にエラーが発生しました。CSVの列構成が想定と異なる可能性があります（予約番/ねっぱんのCSV形式である必要があります）。";
+    statusEl.classList.add('err');
+  }
+}
+
+/* ============ 集計 ============ */
+function toNum(v){ const n = parseFloat(String(v).replace(/,/g,'')); return isNaN(n) ? 0 : n; }
+function ageBucket(a){ if(a==null) return "不明"; return `${Math.floor(a/10)*10}代`; }
+function guessCountry(pref, addr){
+  const known = ["Hong Kong","HongKong","Macao","Macau","China","Singapore","Taiwan","Korea","Denmark","USA","Australia","Thailand","France","Germany","UK"];
+  const s = (pref||"") + (addr||"");
+  for(const c of known){ if(s.includes(c)) return c === "HongKong" ? "Hong Kong" : c; }
+  return s.trim() ? "海外（その他）" : "不明";
+}
+
+function aggregate(rows){
+  // キャンセル済みを除外（状態列に「キャンセル」を含む場合）
+  const valid = rows.filter(r => !(r[COL.状態]||"").includes("キャンセル"));
+
+  const reservations = valid.map(r => {
+    const revenue = toNum(r[COL.予約料金合計]);
+    const pref = r[COL.都道府県] || "";
+    const isJapanPref = PREFS.includes(pref);
+    const region = isJapanPref ? pref : guessCountry(pref, r[COL.都道府県]);
+    const isInbound = !isJapanPref && region !== "不明";
+    const age = r[COL.年齢] && !isNaN(parseInt(r[COL.年齢])) ? parseInt(r[COL.年齢]) : null;
+    const past = r[COL.過去の宿泊] || "";
+    const isRepeat = past.includes("過去に宿泊");
+    const room = r[COL.部屋タイプ] || "不明";
+    let nights = toNum(r[COL.泊数]) || 1;
+
+    return {
+      id: r[COL.予約番号], checkin: r[COL.チェックイン], room, revenue, nights, age, region, isInbound, isRepeat,
+      lodging: toNum(r[COL.宿泊料金合計]), meal: toNum(r[COL.食事料金合計]),
+      program: toNum(r[COL.プログラム料金合計]), option: toNum(r[COL.オプション料金合計]),
+      method: r[COL.予約方法] || "不明", channel: (r[COL.販売チャネル]||"").trim() || "直接予約"
+    };
+  });
+
+  reservations.sort((a,b) => new Date(a.checkin) - new Date(b.checkin));
+
+  const planMap = {};
+  for(const r of reservations){
+    if(!planMap[r.room]) planMap[r.room] = { count:0, revenue:0 };
+    planMap[r.room].count++; planMap[r.room].revenue += r.revenue;
+  }
+
+  const ageMap = {};
+  for(const r of reservations){
+    const b = ageBucket(r.age);
+    if(!ageMap[b]) ageMap[b] = { count:0, revenue:0 };
+    ageMap[b].count++; ageMap[b].revenue += r.revenue;
+  }
+  const ages = reservations.filter(r=>r.age!=null).map(r=>r.age);
+  const avgAge = ages.length ? ages.reduce((s,a)=>s+a,0)/ages.length : null;
+
+  const regionMap = {};
+  for(const r of reservations){
+    if(!regionMap[r.region]) regionMap[r.region] = { count:0, revenue:0, inbound:r.isInbound };
+    regionMap[r.region].count++; regionMap[r.region].revenue += r.revenue;
+  }
+
+  const repeatCount = reservations.filter(r=>r.isRepeat).length;
+  const repeatPlanMap = {};
+  for(const r of reservations){ if(r.isRepeat) repeatPlanMap[r.room] = (repeatPlanMap[r.room]||0)+1; }
+
+  const inboundRes = reservations.filter(r=>r.isInbound);
+
+  const revBreak = { 宿泊:0, 食事:0, プログラム:0, オプション:0 };
+  for(const r of reservations){ revBreak.宿泊+=r.lodging; revBreak.食事+=r.meal; revBreak.プログラム+=r.program; revBreak.オプション+=r.option; }
+
+  const methodMap = {}; const channelMap = {};
+  for(const r of reservations){
+    methodMap[r.method] = (methodMap[r.method]||0)+1;
+    channelMap[r.channel] = (channelMap[r.channel]||0)+1;
+  }
+
+  const monthMap = {};
+  for(const r of reservations){
+    const d = new Date(r.checkin);
+    if(isNaN(d)) continue;
+    const key = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`;
+    if(!monthMap[key]) monthMap[key] = { count:0, revenue:0 };
+    monthMap[key].count++; monthMap[key].revenue += r.revenue;
+  }
+
+  const totalRevenue = reservations.reduce((s,r)=>s+r.revenue,0);
+  const totalNights = reservations.reduce((s,r)=>s+r.nights,0);
+
+  return {
+    reservationCount: reservations.length, totalRevenue, totalNights, avgAge,
+    repeatCount, repeatRate: reservations.length ? repeatCount/reservations.length*100 : 0,
+    inboundCount: inboundRes.length, inboundRate: reservations.length ? inboundRes.length/reservations.length*100 : 0,
+    planMap, ageMap, regionMap, repeatPlanMap, revBreak, methodMap, channelMap, monthMap
+  };
+}
+
+/* ============ 描画 ============ */
+function render(d){
+  document.getElementById('kpiCount').innerHTML = `${d.reservationCount}<span class="unit">件</span>`;
+  document.getElementById('kpiNights').innerHTML = `${d.totalNights}<span class="unit">泊</span>`;
+  document.getElementById('kpiRevenue').innerHTML = `¥${Math.round(d.totalRevenue).toLocaleString()}`;
+  document.getElementById('kpiAge').innerHTML = d.avgAge!=null ? `${d.avgAge.toFixed(1)}<span class="unit">歳</span>` : '–';
+  document.getElementById('kpiRepeat').innerHTML = `${d.repeatRate.toFixed(1)}<span class="unit">%</span>`;
+  document.getElementById('kpiInbound').innerHTML = `${d.inboundRate.toFixed(1)}<span class="unit">%</span>`;
+
+  renderPlan(d); renderAge(d); renderRegion(d); renderRepeat(d); renderRevBreak(d); renderChannels(d); renderMonth(d);
+}
+function destroy(key){ if(charts[key]) charts[key].destroy(); }
+
+function renderPlan(d){
+  const entries = Object.entries(d.planMap).sort((a,b)=>b[1].revenue-a[1].revenue);
+  destroy('plan');
+  charts.plan = new Chart(document.getElementById('chartPlan'), {
+    type:'bar',
+    data:{ labels: entries.map(e=>e[0].length>16?e[0].slice(0,16)+'…':e[0]),
+      datasets:[
+        { label:'件数', data: entries.map(e=>e[1].count), backgroundColor:'#e3c78a', yAxisID:'y1' },
+        { label:'売上(円)', data: entries.map(e=>e[1].revenue), backgroundColor:'#b88931', yAxisID:'y2' },
+      ]},
+    options:{ responsive:true, scales:{
+      y1:{ position:'left', title:{display:true,text:'件数'} },
+      y2:{ position:'right', title:{display:true,text:'売上(円)'}, grid:{drawOnChartArea:false} }
+    }}
+  });
+  document.querySelector('#tablePlan tbody').innerHTML = entries.map(([name,v])=>
+    `<tr><td>${name}</td><td class="num">${v.count}件</td><td class="num">¥${Math.round(v.revenue).toLocaleString()}</td><td class="num">¥${Math.round(v.revenue/v.count).toLocaleString()}</td></tr>`
+  ).join('');
+}
+
+function renderAge(d){
+  const order = ["10代","20代","30代","40代","50代","60代","70代","不明"];
+  const entries = order.filter(k=>d.ageMap[k]).map(k=>[k,d.ageMap[k]]);
+  const total = entries.reduce((s,e)=>s+e[1].count,0);
+  destroy('age');
+  charts.age = new Chart(document.getElementById('chartAge'), {
+    type:'bar',
+    data:{ labels: entries.map(e=>e[0]), datasets:[{ label:'件数', data: entries.map(e=>e[1].count), backgroundColor: entries.map((_,i)=>GOLD_SCALE[i%GOLD_SCALE.length]) }] },
+    options:{ plugins:{legend:{display:false}} }
+  });
+  document.querySelector('#tableAge tbody').innerHTML = entries.map(([name,v])=>
+    `<tr><td>${name}</td><td class="num">${v.count}件</td><td class="num">${total?((v.count/total)*100).toFixed(1):'0.0'}%</td><td class="num">¥${Math.round(v.revenue).toLocaleString()}</td></tr>`
+  ).join('');
+}
+
+function renderRegion(d){
+  const entries = Object.entries(d.regionMap).filter(([k,v])=>!v.inbound && k!=="不明").sort((a,b)=>b[1].count-a[1].count);
+  const top = entries.slice(0,10);
+  const restCount = entries.slice(10).reduce((s,e)=>s+e[1].count,0);
+  const labels = top.map(e=>e[0]); const counts = top.map(e=>e[1].count);
+  if(restCount>0){ labels.push('その他'); counts.push(restCount); }
+  destroy('pref');
+  charts.pref = new Chart(document.getElementById('chartPref'), {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'件数', data:counts, backgroundColor: labels.map((_,i)=>GOLD_SCALE[i%GOLD_SCALE.length]) }] },
+    options:{ indexAxis:'y', responsive:true, plugins:{legend:{display:false}} }
+  });
+  const inboundEntries = Object.entries(d.regionMap).filter(([k,v])=>v.inbound).sort((a,b)=>b[1].count-a[1].count);
+  document.querySelector('#tableInbound tbody').innerHTML = inboundEntries.length
+    ? inboundEntries.map(([name,v])=>`<tr><td>${name}</td><td class="num">${v.count}件</td><td class="num">¥${Math.round(v.revenue).toLocaleString()}</td></tr>`).join('')
+    : `<tr><td colspan="3" style="text-align:center;color:var(--ink-soft);">該当データなし</td></tr>`;
+}
+
+function renderRepeat(d){
+  destroy('repeat');
+  const first = d.reservationCount - d.repeatCount;
+  charts.repeat = new Chart(document.getElementById('chartRepeat'), {
+    type:'doughnut',
+    data:{ labels:['初めて','リピート'], datasets:[{ data:[first, d.repeatCount], backgroundColor:['#e3c78a','#b88931'] }] },
+    options:{ plugins:{legend:{position:'bottom'}} }
+  });
+  document.querySelector('#tableRepeat tbody').innerHTML = `
+    <tr><td>総件数</td><td class="num">${d.reservationCount}件</td></tr>
+    <tr><td>リピート件数</td><td class="num">${d.repeatCount}件</td></tr>
+    <tr><td>リピート率</td><td class="num">${d.repeatRate.toFixed(1)}%</td></tr>
+  `;
+  const rp = Object.entries(d.repeatPlanMap).sort((a,b)=>b[1]-a[1]);
+  document.querySelector('#tableRepeatPlan tbody').innerHTML = rp.length
+    ? rp.map(([name,c])=>`<tr><td>${name.length>18?name.slice(0,18)+'…':name}</td><td class="num">${c}件</td></tr>`).join('')
+    : `<tr><td colspan="2" style="text-align:center;color:var(--ink-soft);">リピートなし</td></tr>`;
+}
+
+function renderRevBreak(d){
+  const entries = Object.entries(d.revBreak).filter(([k,v])=>v>0);
+  const total = entries.reduce((s,e)=>s+e[1],0);
+  destroy('revbreak');
+  charts.revbreak = new Chart(document.getElementById('chartRevBreak'), {
+    type:'pie',
+    data:{ labels: entries.map(e=>e[0]), datasets:[{ data: entries.map(e=>e[1]), backgroundColor: entries.map((_,i)=>GOLD_SCALE[i%GOLD_SCALE.length]) }] },
+    options:{ plugins:{legend:{position:'right'}} }
+  });
+  document.querySelector('#tableRevBreak tbody').innerHTML = entries.map(([name,v])=>
+    `<tr><td>${name}</td><td class="num">¥${Math.round(v).toLocaleString()}</td><td class="num">${total?((v/total)*100).toFixed(1):'0.0'}%</td></tr>`
+  ).join('');
+}
+
+function renderChannels(d){
+  destroy('method'); destroy('channel');
+  const me = Object.entries(d.methodMap).sort((a,b)=>b[1]-a[1]);
+  charts.method = new Chart(document.getElementById('chartMethod'), {
+    type:'doughnut',
+    data:{ labels: me.map(e=>e[0]), datasets:[{ data: me.map(e=>e[1]), backgroundColor: me.map((_,i)=>GOLD_SCALE[i%GOLD_SCALE.length]) }] },
+    options:{ plugins:{legend:{position:'bottom'}} }
+  });
+  const ce = Object.entries(d.channelMap).sort((a,b)=>b[1]-a[1]);
+  charts.channel = new Chart(document.getElementById('chartChannel'), {
+    type:'doughnut',
+    data:{ labels: ce.map(e=>e[0]), datasets:[{ data: ce.map(e=>e[1]), backgroundColor: ce.map((_,i)=>GOLD_SCALE[i%GOLD_SCALE.length]) }] },
+    options:{ plugins:{legend:{position:'bottom'}} }
+  });
+}
+
+function renderMonth(d){
+  const entries = Object.entries(d.monthMap).sort((a,b)=> a[0] < b[0] ? -1 : 1);
+  destroy('month');
+  charts.month = new Chart(document.getElementById('chartMonth'), {
+    type:'bar',
+    data:{ labels: entries.map(e=>e[0]),
+      datasets:[
+        { label:'件数', data: entries.map(e=>e[1].count), backgroundColor:'#e3c78a', yAxisID:'y1' },
+        { label:'売上(円)', type:'line', data: entries.map(e=>e[1].revenue), borderColor:'#b88931', backgroundColor:'#b88931', yAxisID:'y2', tension:.3 },
+      ]},
+    options:{ responsive:true, scales:{
+      y1:{ position:'left', title:{display:true,text:'件数'} },
+      y2:{ position:'right', title:{display:true,text:'売上(円)'}, grid:{drawOnChartArea:false} }
+    }}
+  });
+}
+</script>
+</body>
+</html>
