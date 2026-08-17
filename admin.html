@@ -51,7 +51,7 @@ tr:hover td{background:var(--green-lt);}
 .cal-nav:hover{background:var(--green-lt);}
 .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10px;color:var(--text3);margin-bottom:4px;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
-.cal-cell{min-height:72px;border-radius:8px;border:1px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--text3);padding:4px 2px;}
+.cal-cell{min-height:82px;border-radius:8px;border:1px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--text3);padding:4px 2px;}
 .cal-cell.has-data{cursor:pointer;background:var(--green-lt);border-color:var(--green-md);color:var(--text);}
 .cal-cell.has-data:hover{background:var(--green-md);}
 .cal-cell.selected{background:var(--green)!important;border-color:var(--green)!important;color:white!important;}
@@ -65,7 +65,7 @@ tr:hover td{background:var(--green-lt);}
   .stat-n{font-size:16px;}
   .stat-l{font-size:8px;}
   .card{padding:12px;}
-  .cal-cell{min-height:58px;padding:2px 1px;}
+  .cal-cell{min-height:66px;padding:2px 1px;}
   .cal-day{font-size:14px;}
   .cal-stats{font-size:8px;}
   table{min-width:520px;}
@@ -235,7 +235,7 @@ function buildCalendarHtml(byDate, selectedDate) {
     const isSelected = dateStr === selectedDate;
     cells += `<div class="cal-cell${hasData ? ' has-data' : ''}${isSelected ? ' selected' : ''}"${hasData ? ` onclick="selectDay('${dateStr}')"` : ''}>
       <div class="cal-day">${day}</div>
-      ${hasData ? `<div class="cal-stats">✓${info.avg}%<br>💬${info.talk}・🔧${info.extra}</div>` : ''}
+      ${hasData ? `<div class="cal-stats">✓${info.avg}%<br>💬${info.talk}<br>🔧${info.extra}</div>` : ''}
     </div>`;
   }
   return `
