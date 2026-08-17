@@ -119,10 +119,36 @@ License: MIT
 <header class="site">
   <p class="eyebrow">Guest Data Report — 予約番 / ねっぱん形式</p>
   <h1>宿泊者データ<em>集計</em></h1>
-  <p class="sub">予約番（ねっぱんサイトコントローラー）から書き出したCSVをアップロードすると、宿泊件数・売上・年代・都道府県・リピート状況を自動集計します。データはブラウザ内でのみ処理され、どこにも保存されません。</p>
+  <p class="sub">予約番（ねっぱんサイトコントローラー）から書き出したCSVをアップロードすると、これまでの累積データに統合して自動集計します。氏名・電話番号・メールアドレス・住所などの個人情報は保存されません。</p>
 </header>
 
 <main>
+  <div class="upload" id="settingsPanel" style="margin-bottom:20px;">
+    <div class="drop" style="flex:1 1 100%; cursor:default; text-align:left; border-style:solid;">
+      <strong>GitHub連携設定</strong>（データの保存・読込に使用。トークンはこの端末のブラウザにのみ保存されます）
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; align-items:flex-end;">
+        <div style="flex:1 1 160px;">
+          <label style="font-size:11px; color:var(--ink-soft); display:block; margin-bottom:4px;">Owner</label>
+          <input id="cfgOwner" type="text" style="width:100%; padding:8px; border:1px solid var(--line); font-family:inherit;">
+        </div>
+        <div style="flex:1 1 160px;">
+          <label style="font-size:11px; color:var(--ink-soft); display:block; margin-bottom:4px;">Repo</label>
+          <input id="cfgRepo" type="text" style="width:100%; padding:8px; border:1px solid var(--line); font-family:inherit;">
+        </div>
+        <div style="flex:1 1 200px;">
+          <label style="font-size:11px; color:var(--ink-soft); display:block; margin-bottom:4px;">データファイル名</label>
+          <input id="cfgPath" type="text" style="width:100%; padding:8px; border:1px solid var(--line); font-family:inherit;">
+        </div>
+        <div style="flex:2 1 260px;">
+          <label style="font-size:11px; color:var(--ink-soft); display:block; margin-bottom:4px;">Personal Access Token</label>
+          <input id="cfgToken" type="password" placeholder="ghp_... または github_pat_..." style="width:100%; padding:8px; border:1px solid var(--line); font-family:inherit;">
+        </div>
+        <button id="cfgSaveBtn" style="padding:9px 20px; background:var(--ink); color:#fff; border:none; border-radius:20px; cursor:pointer; font-family:inherit; font-size:13px;">保存して接続</button>
+      </div>
+      <div id="cfgStatus" style="font-size:12.5px; color:var(--ink-soft); margin-top:10px;">未接続。トークンを入力して「保存して接続」を押してください。</div>
+    </div>
+  </div>
+
   <div class="upload">
     <label class="drop" id="dropZone" for="fileInput">
       <strong>CSVファイルを選択</strong>してください<br>
@@ -216,7 +242,7 @@ const PREFS = ["北海道","青森県","岩手県","宮城県","秋田県","山�
 
 const COL = {
   状態:0, 予約番号:1, チェックイン:3, チェックアウト:4, 泊数:11,
-  宿泊プラン:12, 部屋タイプ:17, 男性:20, 女性:21,
+  宿泊プラン:12, 部屋タイプ:17,
   宿泊料金合計:31, 食事料金合計:32, プログラム料金合計:33, オプション料金合計:34,
   予約料金合計:50, 年齢:55, 都道府県:58,
   過去の宿泊:74, 予約方法:16, 販売チャネル:82
@@ -224,6 +250,121 @@ const COL = {
 
 const GOLD_SCALE = ["#b88931","#d6ad61","#e3c78a","#8a6a24","#f1e0bb","#6f5518","#c9a24d","#a37a2c"];
 let charts = {};
+let dataset = [];      // 現在メモリ上にある累積データ（個人情報を含まないレコードの配列）
+let currentSha = null; // GitHub上の既存ファイルのSHA（更新時に必要）
+
+/* ============ GitHub連携設定 ============ */
+const cfgOwner = document.getElementById('cfgOwner');
+const cfgRepo = document.getElementById('cfgRepo');
+const cfgPath = document.getElementById('cfgPath');
+const cfgToken = document.getElementById('cfgToken');
+const cfgStatus = document.getElementById('cfgStatus');
+
+function loadConfig(){
+  cfgOwner.value = localStorage.getItem('totonoi_gh_owner') || 'UematsuTOTONOI';
+  cfgRepo.value = localStorage.getItem('totonoi_gh_repo') || 'totonoi-portal';
+  cfgPath.value = localStorage.getItem('totonoi_gh_path') || 'reservation-data.json';
+  cfgToken.value = localStorage.getItem('totonoi_gh_token') || '';
+}
+function saveConfig(){
+  localStorage.setItem('totonoi_gh_owner', cfgOwner.value.trim());
+  localStorage.setItem('totonoi_gh_repo', cfgRepo.value.trim());
+  localStorage.setItem('totonoi_gh_path', cfgPath.value.trim());
+  localStorage.setItem('totonoi_gh_token', cfgToken.value.trim());
+}
+function ghConfig(){
+  return { owner: cfgOwner.value.trim(), repo: cfgRepo.value.trim(), path: cfgPath.value.trim(), token: cfgToken.value.trim() };
+}
+
+document.getElementById('cfgSaveBtn').addEventListener('click', async () => {
+  saveConfig();
+  await connectAndLoad();
+});
+
+async function connectAndLoad(){
+  const cfg = ghConfig();
+  if(!cfg.owner || !cfg.repo || !cfg.path || !cfg.token){
+    cfgStatus.textContent = "Owner・Repo・ファイル名・トークンをすべて入力してください。";
+    cfgStatus.style.color = 'var(--warn)';
+    return;
+  }
+  cfgStatus.textContent = "接続中…";
+  cfgStatus.style.color = 'var(--ink-soft)';
+  try{
+    const existing = await githubGetFile(cfg);
+    if(existing === null){
+      dataset = [];
+      currentSha = null;
+      cfgStatus.textContent = `接続成功。まだデータファイルがないため、CSVを最初にアップロードすると新規作成されます。`;
+    }else{
+      dataset = existing.records || [];
+      currentSha = existing.sha;
+      cfgStatus.textContent = `接続成功。累積 ${dataset.length}件を読み込みました（最終更新: ${existing.lastUpdated || '不明'}）`;
+    }
+    cfgStatus.style.color = 'var(--good, #6b8f6a)';
+    if(dataset.length){
+      render(aggregate(dataset));
+      document.getElementById('report').classList.remove('hidden');
+      statusEl.textContent = `累積データ ${dataset.length}件を表示中です。CSVをアップロードすると更新されます。`;
+    }
+  }catch(e){
+    console.error(e);
+    cfgStatus.textContent = "接続に失敗しました： " + (e && e.message ? e.message : e);
+    cfgStatus.style.color = 'var(--warn)';
+  }
+}
+
+/* ============ GitHub API ============ */
+function utf8ToBase64(str){
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  bytes.forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
+function base64ToUtf8(b64){
+  const binary = atob(b64.replace(/\n/g, ''));
+  const bytes = new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
+async function githubGetFile(cfg){
+  const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(cfg.path)}`;
+  const res = await fetch(url, {
+    headers: { 'Authorization': `Bearer ${cfg.token}`, 'Accept': 'application/vnd.github+json' }
+  });
+  if(res.status === 404) return null;
+  if(!res.ok){
+    const body = await res.text().catch(()=> '');
+    throw new Error(`GitHub API エラー (${res.status}): ${body.slice(0,200)}`);
+  }
+  const json = await res.json();
+  const text = base64ToUtf8(json.content);
+  const parsed = JSON.parse(text);
+  return { records: parsed.records || [], lastUpdated: parsed.lastUpdated, sha: json.sha };
+}
+
+async function githubSaveFile(cfg, records, sha){
+  const payload = { records, lastUpdated: new Date().toISOString() };
+  const content = utf8ToBase64(JSON.stringify(payload, null, 2));
+  const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(cfg.path)}`;
+  const body = {
+    message: `宿泊者データ更新（${records.length}件） ${new Date().toISOString().slice(0,10)}`,
+    content
+  };
+  if(sha) body.sha = sha;
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${cfg.token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if(!res.ok){
+    const errBody = await res.text().catch(()=> '');
+    throw new Error(`GitHub保存エラー (${res.status}): ${errBody.slice(0,200)}`);
+  }
+  const json = await res.json();
+  return json.content.sha;
+}
 
 /* ============ ファイル処理 ============ */
 const fileInput = document.getElementById('fileInput');
@@ -246,13 +387,19 @@ function handleFile(file){
     try{ text = new TextDecoder('shift-jis').decode(reader.result); }
     catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
     if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
-    parseAndRender(text);
+    parseAndSync(text);
   };
   reader.onerror = () => { statusEl.textContent = "ファイルの読み込みに失敗しました。"; statusEl.classList.add('err'); };
   reader.readAsArrayBuffer(file);
 }
 
-function parseAndRender(text){
+async function parseAndSync(text){
+  const cfg = ghConfig();
+  if(!cfg.token){
+    statusEl.textContent = "先にGitHub連携設定（トークン）を入力・保存してください。";
+    statusEl.classList.add('err');
+    return;
+  }
   const result = Papa.parse(text.trim(), { skipEmptyLines: true });
   const rows = result.data.slice(1);
   if(rows.length === 0){
@@ -261,20 +408,34 @@ function parseAndRender(text){
     return;
   }
   try{
-    const data = aggregate(rows);
+    const newRecords = extractRecords(rows);
+
+    statusEl.textContent = "既存データを確認中…";
+    const existing = await githubGetFile(cfg);
+    const existingRecords = existing ? existing.records : [];
+    const sha = existing ? existing.sha : null;
+
+    const merged = mergeRecords(existingRecords, newRecords);
+
+    statusEl.textContent = "GitHubへ保存中…";
+    const newSha = await githubSaveFile(cfg, merged, sha);
+    currentSha = newSha;
+    dataset = merged;
+
+    const data = aggregate(dataset);
     render(data);
-    statusEl.textContent = `${data.reservationCount}件の予約を集計しました（${filenameLabel.textContent}）`;
     document.getElementById('report').classList.remove('hidden');
+    statusEl.textContent = `保存しました。今回のCSV: ${newRecords.length}件 / 累積データ: ${dataset.length}件（${filenameLabel.textContent}）`;
+    statusEl.classList.remove('err');
   }catch(e){
     console.error(e);
-    statusEl.textContent = "集計中にエラーが発生しました： " + (e && e.message ? e.message : e) + "（CSVの列構成が想定と異なる可能性があります）";
+    statusEl.textContent = "処理中にエラーが発生しました： " + (e && e.message ? e.message : e);
     statusEl.classList.add('err');
   }
 }
 
-/* ============ 集計 ============ */
+/* ============ CSV → 匿名化レコード抽出 ============ */
 function toNum(v){ const n = parseFloat(String(v).replace(/,/g,'')); return isNaN(n) ? 0 : n; }
-function ageBucket(a){ if(a==null) return "不明"; return `${Math.floor(a/10)*10}代`; }
 function guessCountry(pref, addr){
   const known = ["Hong Kong","HongKong","Macao","Macau","China","Singapore","Taiwan","Korea","Denmark","USA","Australia","Thailand","France","Germany","UK"];
   const s = (pref||"") + (addr||"");
@@ -282,31 +443,42 @@ function guessCountry(pref, addr){
   return s.trim() ? "海外（その他）" : "不明";
 }
 
-function aggregate(rows){
-  // キャンセル済みを除外（状態列に「キャンセル」を含む場合）
+function extractRecords(rows){
   const valid = rows.filter(r => !(r[COL.状態]||"").includes("キャンセル"));
-
-  const reservations = valid.map(r => {
+  return valid.map(r => {
     const revenue = toNum(r[COL.予約料金合計]);
     const pref = r[COL.都道府県] || "";
     const isJapanPref = PREFS.includes(pref);
-    const region = isJapanPref ? pref : guessCountry(pref, r[COL.都道府県]);
+    const region = isJapanPref ? pref : guessCountry(pref, pref);
     const isInbound = !isJapanPref && region !== "不明";
     const age = r[COL.年齢] && !isNaN(parseInt(r[COL.年齢])) ? parseInt(r[COL.年齢]) : null;
     const past = r[COL.過去の宿泊] || "";
     const isRepeat = past.includes("過去に宿泊");
     const room = r[COL.部屋タイプ] || "不明";
-    let nights = toNum(r[COL.泊数]) || 1;
-
+    const nights = toNum(r[COL.泊数]) || 1;
+    // 個人情報（氏名・電話・メール・住所詳細）は一切含めない
     return {
-      id: r[COL.予約番号], checkin: r[COL.チェックイン], room, revenue, nights, age, region, isInbound, isRepeat,
+      id: r[COL.予約番号], checkin: r[COL.チェックイン], checkout: r[COL.チェックアウト],
+      room, revenue, nights, age, region, isInbound, isRepeat,
       lodging: toNum(r[COL.宿泊料金合計]), meal: toNum(r[COL.食事料金合計]),
       program: toNum(r[COL.プログラム料金合計]), option: toNum(r[COL.オプション料金合計]),
       method: r[COL.予約方法] || "不明", channel: (r[COL.販売チャネル]||"").trim() || "直接予約"
     };
   });
+}
 
-  reservations.sort((a,b) => new Date(a.checkin) - new Date(b.checkin));
+function mergeRecords(existing, incoming){
+  const map = new Map();
+  for(const r of existing) map.set(String(r.id), r);
+  for(const r of incoming) map.set(String(r.id), r); // 同じ予約番号は上書き（最新化）
+  return Array.from(map.values());
+}
+
+function ageBucket(a){ if(a==null) return "不明"; return `${Math.floor(a/10)*10}代`; }
+
+/* ============ 集計（累積データセット全体を対象） ============ */
+function aggregate(records){
+  const reservations = records.slice().sort((a,b) => new Date(a.checkin) - new Date(b.checkin));
 
   const planMap = {};
   for(const r of reservations){
@@ -495,6 +667,10 @@ function renderMonth(d){
     }}
   });
 }
+
+/* ============ 初期化 ============ */
+loadConfig();
+if(cfgToken.value){ connectAndLoad(); }
 </script>
 </body>
 </html>
