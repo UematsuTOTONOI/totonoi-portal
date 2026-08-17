@@ -92,7 +92,7 @@ tr:hover td{background:var(--green-lt);}
       <label>日付</label>
       <input type="date" id="f-date" onchange="applyFilter()">
       <button onclick="applyFilter()">絞り込む</button>
-      <button onclick="resetFilter()" style="background:var(--white);color:var(--text2);border-color:var(--border);">リセット</button>
+      <button onclick="resetFilter()" style="background:var(--white);color:var(--text2);border-color:var(--border);">TOPへ</button>
     </div>
     <div class="filter-bar staff-row">
       <label>担当者</label>
@@ -172,10 +172,12 @@ window.doLogin = async function () {
   }
 };
 
+// 担当者の表示順・対象を固定（テスト用の名前などは表示しない）
+const STAFF_ORDER = ['梶原', '保乃圭', '阿部', '稜奈', '璃胡', '里吉'];
+
 function populateStaffFilter() {
-  const staffSet = [...new Set(allReports.map(r => r['担当者']).filter(Boolean))].sort();
   const sel = document.getElementById("f-staff");
-  sel.innerHTML = '<option value="">全員</option>' + staffSet.map(s => `<option>${s}</option>`).join("");
+  sel.innerHTML = '<option value="">全員</option>' + STAFF_ORDER.map(s => `<option>${s}</option>`).join("");
 }
 
 window.applyFilter = function () {
@@ -233,7 +235,7 @@ function buildCalendarHtml(byDate, selectedDate) {
     const isSelected = dateStr === selectedDate;
     cells += `<div class="cal-cell${hasData ? ' has-data' : ''}${isSelected ? ' selected' : ''}"${hasData ? ` onclick="selectDay('${dateStr}')"` : ''}>
       <div class="cal-day">${day}</div>
-      ${hasData ? `<div class="cal-stats">完了率:${info.avg}%<br>喋った:${info.talk}件<br>業務外:${info.extra}件</div>` : ''}
+      ${hasData ? `<div class="cal-stats">✓${info.avg}%<br>💬${info.talk}・🔧${info.extra}</div>` : ''}
     </div>`;
   }
   return `
@@ -279,6 +281,12 @@ function rateNum(r) {
   return Math.round(!s.includes('%') && n <= 1 ? n * 100 : n);
 }
 function formatRate(r) { return rateNum(r) + '%'; }
+
+// シフト表示名：「中番（現場）」は「現場」だけで表示する（他はそのまま）
+function formatShift(s) {
+  if (s === '中番（現場）') return '現場';
+  return s || '-';
+}
 
 // 送信日時をDateとしてパース（Dateオブジェクト／"yyyy/MM/dd HH:mm:ss"文字列の両対応）
 function parseSentAt(r) {
@@ -448,7 +456,7 @@ function render(reports, activeFilter) {
       <tr>
         <td>${x.date}</td>
         <td>${x.staff}</td>
-        <td><span class="tag">${x.shift || '-'}</span></td>
+        <td><span class="tag">${formatShift(x.shift)}</span></td>
         <td>${x.type || '-'}</td>
         <td class="conv-cell">${String(x.content || '-').replace(/\n/g, "<br>")}</td>
         <td>${x.duration || '-'}</td>
@@ -464,7 +472,7 @@ function render(reports, activeFilter) {
       <tr>
         <td>${workDateStr(r)}（${r['曜日'] || ''}）</td>
         <td>${r['担当者'] || ''}</td>
-        <td><span class="tag">${r['シフト'] || '-'}</span></td>
+        <td><span class="tag">${formatShift(r['シフト'])}</span></td>
         <td>${r['チェック完了数']}/${r['チェック全体数']}（${formatRate(r)}）</td>
         <td class="conv-cell">${String(r['その他連絡事項'] || "-").replace(/\n/g, "<br>")}</td>
       </tr>`).join("")}
