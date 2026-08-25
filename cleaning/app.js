@@ -86,7 +86,9 @@ function classifyMonthlyWeek1(lastDone, today){
 }
 function classify(item, today){
   if(item.ruleType==="manual") return {status:"manual", due:null};
-  var lastDone = item.lastDone ? parseISO(item.lastDone) : null;
+  // Only a 完了 (complete) record clears a cycle — a 一部完了 (partial) record must
+  // keep the item showing as due/overdue so it doesn't silently vanish from view.
+  var lastDone = item.lastCompleteDone ? parseISO(item.lastCompleteDone) : null;
   switch(item.ruleType){
     case "oddMonth": return classifyMonthWindow([1,3,5,7,9,11], lastDone, today);
     case "evenMonth": return classifyMonthWindow([2,4,6,8,10,12], lastDone, today);
@@ -149,6 +151,7 @@ function mergedItem(id){
   return {
     id: id, group: base.group, name: base.name, steps: base.steps, refCount: base.refCount,
     lastDone: s.lastDone || null,
+    lastCompleteDone: s.lastCompleteDone || null,
     history: s.history || [],
     freqText: (s.override && s.override.freqText) || base.freqText,
     ruleType: (s.override && s.override.ruleType) || base.ruleType,
@@ -157,11 +160,20 @@ function mergedItem(id){
   };
 }
 function allMerged(){ return DATA.map(function(d){ return mergedItem(d.id); }); }
+/**
+ * s.lastDone tracks the most recent record of any kind (for "前回" display).
+ * s.lastCompleteDone tracks only 完了 records — classify() uses this one, since
+ * a 一部完了 record should not make an item look like its cycle is finished.
+ */
 function recomputeLastDone(s){
-  if(!s.history || !s.history.length){ s.lastDone = null; return; }
-  var max = null;
-  s.history.forEach(function(h){ if(!max || h.date>max) max = h.date; });
+  if(!s.history || !s.history.length){ s.lastDone = null; s.lastCompleteDone = null; return; }
+  var max = null, maxComplete = null;
+  s.history.forEach(function(h){
+    if(!max || h.date>max) max = h.date;
+    if(completionOf(h)==="complete" && (!maxComplete || h.date>maxComplete)) maxComplete = h.date;
+  });
   s.lastDone = max;
+  s.lastCompleteDone = maxComplete;
 }
 /** date -> [{itemId,itemName,person,memo,status,histIndex}], newest history entries last-in per item preserved by index */
 function recordsByDate(){
@@ -399,9 +411,11 @@ function renderCalendar(today){
   );
 }
 
-/** Compact "this month's outstanding items" list shown above the calendar grid:
- *  item name + the dates already logged this browsed month (colored by 一部完了/完了).
- *  Tapping a row opens that item's full record history. */
+/** Compact "this month's outstanding items" list shown above the calendar grid.
+ *  Split into two tiers so a long roster doesn't read as one monotonous wall:
+ *  - items with at least one record this browsed month ("進行中") shown first, with their dates
+ *  - items with zero records this month ("未着手") tucked into a collapsed chip cloud
+ *  Tapping any row/chip opens that item's full record history. */
 function renderMonthlyTargets(today){
   var order = {overdue:0, due:1, unlogged:2};
   var items = allMerged().map(function(it){ return {it:it, ds:displayStatus(it, today)}; })
@@ -413,23 +427,41 @@ function renderMonthlyTargets(today){
   if(!items.length){
     return '<div class="target-empty">今月、対応が必要な項目はありません。</div>';
   }
-  var rows = items.map(function(x){
-    var it = x.it;
-    var monthHist = it.history.filter(function(h){
+  var started = [], notStarted = [];
+  items.forEach(function(x){
+    var monthHist = x.it.history.filter(function(h){
       var d = parseISO(h.date);
       return d && d.getFullYear()===calYear && d.getMonth()===calMonth;
     }).slice().sort(function(a,b){ return a.date<b.date?-1:(a.date>b.date?1:0); });
-    var datesHtml = monthHist.length
-      ? monthHist.map(function(h){ return '<span class="target-date '+completionOf(h)+'">'+esc(fmtMD(h.date))+'</span>'; }).join("")
-      : '<span class="target-date-empty">今月まだ記録なし</span>';
-    return (
-      '<button type="button" class="target-row" data-item="'+it.id+'">'+
-        '<span class="target-name">'+esc(GROUP_LABEL[it.group])+' '+esc(shortName(it))+'</span>'+
-        '<span class="target-dates">'+datesHtml+'</span>'+
-      '</button>'
-    );
-  }).join("");
-  return '<div class="target-list">'+rows+'</div>';
+    x.monthHist = monthHist;
+    (monthHist.length ? started : notStarted).push(x);
+  });
+  var html = "";
+  if(started.length){
+    html += '<div class="target-sub">今月記録あり（'+started.length+'件）</div>';
+    html += '<div class="target-list">'+started.map(function(x){
+      var datesHtml = x.monthHist.map(function(h){
+        return '<span class="target-date '+completionOf(h)+'">'+esc(fmtMD(h.date))+'</span>';
+      }).join("");
+      return (
+        '<button type="button" class="target-row" data-item="'+x.it.id+'">'+
+          '<span class="target-name">'+esc(GROUP_LABEL[x.it.group])+' '+esc(shortName(x.it))+'</span>'+
+          '<span class="target-dates">'+datesHtml+'</span>'+
+        '</button>'
+      );
+    }).join("")+'</div>';
+  }
+  if(notStarted.length){
+    html += '<details class="target-more"'+(started.length ? '' : ' open')+'>'+
+      '<summary>今月まだ未着手（'+notStarted.length+'件）</summary>'+
+      '<div class="target-chips">'+notStarted.map(function(x){
+        return '<button type="button" class="target-chip" data-item="'+x.it.id+'">'+
+          esc(GROUP_LABEL[x.it.group])+' '+esc(shortName(x.it))+'</button>';
+      }).join("")+
+      '</div>'+
+    '</details>';
+  }
+  return html;
 }
 function renderCalendarTab(today){
   return (
@@ -556,7 +588,7 @@ function wireRoot(){
   root.querySelectorAll('.cal-cell[data-date]').forEach(function(btn){
     btn.addEventListener('click', function(){ openDay(btn.getAttribute('data-date')); });
   });
-  root.querySelectorAll('.target-row[data-item]').forEach(function(btn){
+  root.querySelectorAll('.target-row[data-item], .target-chip[data-item]').forEach(function(btn){
     btn.addEventListener('click', function(){ openItemHistory(btn.getAttribute('data-item')); });
   });
   var prev = root.querySelector('#cal-prev'), next = root.querySelector('#cal-next');
