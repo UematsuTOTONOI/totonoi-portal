@@ -18,7 +18,13 @@
           "person": "植松",
           "memo": "テスト"
         }
-      ]
+      ],
+      "override": {
+        "freqText": "奇数月",
+        "ruleType": "oddMonth",
+        "ruleParams": null,
+        "note": ""
+      }
     }
   }
 }
