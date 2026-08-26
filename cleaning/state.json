@@ -21,15 +21,9 @@
       ]
     },
     "b1": {
-      "lastDone": "2026-08-05",
-      "history": [
-        {
-          "date": "2026-08-05",
-          "person": "植松",
-          "memo": "テスト",
-          "status": "partial"
-        }
-      ]
+      "lastDone": null,
+      "history": [],
+      "lastCompleteDone": null
     },
     "a1": {
       "lastDone": null,
