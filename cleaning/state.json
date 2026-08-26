@@ -32,15 +32,9 @@
       ]
     },
     "a1": {
-      "lastDone": "2026-08-05",
-      "history": [
-        {
-          "date": "2026-08-05",
-          "person": "植松",
-          "status": "complete"
-        }
-      ],
-      "lastCompleteDone": "2026-08-05"
+      "lastDone": null,
+      "history": [],
+      "lastCompleteDone": null
     }
   }
 }
