@@ -238,27 +238,40 @@ License: MIT
 
     <!-- ============ 稼働率比較（部屋別） ============ -->
     <div class="report-page" id="page-occupancy">
-      <div class="approx-note">稼働率＝該当タイプの宿泊泊数の合計 ÷（部屋数 × 日数）。部屋数は スタンダード2棟／コネクト2棟／ドッグドーム2棟／ドッグコテージ1棟（計7棟）と仮定しています。異なる場合は教えてください。</div>
-      <section class="block">
-        <h2><span class="no">01</span>稼働率比較（部屋別・月次）</h2>
-        <div class="card"><canvas id="chartOccupancy" height="240"></canvas></div>
-      </section>
-      <section class="block">
-        <h2><span class="no">02</span>明細</h2>
-        <div class="card"><div class="tablewrap"><table id="tableOccupancy"><thead><tr><th>部屋タイプ</th><th>月</th><th>泊数</th><th>稼働率</th></tr></thead><tbody></tbody></table></div></div>
-      </section>
+      <div class="approx-note">
+        稼働率＝該当タイプの宿泊泊数の合計 ÷（部屋数 × 日数）。会計年度は7月始まり（1年目＝〜23年6月）。<br>
+        2025年12月より「ドッグB」がスタンダードへ用途変更（CSV上の表記は引き続き「ドッグB」）のため、部屋数は<br>
+        〜2025年11月：スタンダード2棟／コネクト2棟／ドッグドーム2棟／ドッグコテージ1棟<br>
+        2025年12月〜：スタンダード3棟／コネクト2棟／ドッグドーム1棟（旧ドッグCのみ）／ドッグコテージ1棟　として計算しています。
+      </div>
+      <div class="card accent" id="occupancyUpload" style="margin-bottom:24px;">
+        <h3>稼働率データの取り込み</h3>
+        <p class="small" style="margin-bottom:14px;">「会計年度別 全体比較データ」（売上比較ページ）と同じ明細CSVをここでもアップロードしてください。</p>
+        <div class="row" style="align-items:center;">
+          <div class="field wide"><label>CSVファイル</label><input type="file" id="occCsvFile" accept=".csv,text/csv"></div>
+          <div style="align-self:flex-end;"><button type="button" class="primary" id="occCsvImportBtn">読み込む</button></div>
+        </div>
+        <div id="occCsvStatus" class="small" style="margin-top:8px;"></div>
+      </div>
+      <div id="occupancyContainer"></div>
     </div>
 
     <!-- ============ 喫食率 ============ -->
     <div class="report-page" id="page-meal">
-      <div class="approx-note">現在のデータには「食事の有無」を示す項目が含まれていないため、便宜的に「食事料金が発生している予約の割合」を喫食率として表示しています。より正確な喫食率を出すには、予約データに朝食・夕食ごとの注文有無を記録する必要があります。</div>
-      <section class="block">
-        <h2><span class="no">01</span>喫食率（食事料金の発生率）</h2>
-        <div class="grid2">
-          <div class="card"><h3>部屋タイプ別</h3><canvas id="chartMealRoom" height="220"></canvas></div>
-          <div class="card"><h3>月別</h3><canvas id="chartMealMonth" height="220"></canvas></div>
+      <div class="approx-note">
+        喫食率＝明細（科目名称・L列）から「大人向け食事」の注文有無を判定した割合。会計年度は7月始まり（稼働率と同じ基準）。<br>
+        「（夕食/朝食[大人]）…夕食無し／朝食なし」のみの場合は「食事なし」。子供向け食事のみの注文（大人が夕食無し／朝食なしの場合）は集計対象外とし、喫食率にはカウントしません。大人向け食事の明細が一切ない予約は判定不能として分母から除外しています。
+      </div>
+      <div class="card accent" id="mealUpload" style="margin-bottom:24px;">
+        <h3>喫食率データの取り込み</h3>
+        <p class="small" style="margin-bottom:14px;">「売上比較」「稼働率比較」と同じ明細CSVをここでもアップロードしてください。</p>
+        <div class="row" style="align-items:center;">
+          <div class="field wide"><label>CSVファイル</label><input type="file" id="mealCsvFile" accept=".csv,text/csv"></div>
+          <div style="align-self:flex-end;"><button type="button" class="primary" id="mealCsvImportBtn">読み込む</button></div>
         </div>
-      </section>
+        <div id="mealCsvStatus" class="small" style="margin-top:8px;"></div>
+      </div>
+      <div id="mealContainer"></div>
     </div>
 
     <!-- ============ オプション（売上内訳） ============ -->
@@ -674,7 +687,7 @@ function render(d){
   document.getElementById('kpiRepeat').innerHTML = `${d.repeatRate.toFixed(1)}<span class="unit">%</span>`;
   document.getElementById('kpiInbound').innerHTML = `${d.inboundRate.toFixed(1)}<span class="unit">%</span>`;
 
-  renderPlan(d); renderRevByMonth(d); renderOccupancy(d); renderMealRate(d);
+  renderPlan(d); renderRevByMonth(d);
   renderAge(d); renderRegion(d); renderRepeat(d); renderRevBreak(d); renderChannels(d); renderMonth(d);
 }
 function destroy(key){ if(charts[key]) charts[key].destroy(); }
@@ -712,67 +725,6 @@ function renderRevByMonth(d){
 }
 
 /* ---- 稼働率比較（部屋別・月次） ---- */
-function renderOccupancy(d){
-  const cats = Object.keys(d.categoryMonthMap);
-  const allMonths = new Set();
-  cats.forEach(cat => Object.keys(d.categoryMonthMap[cat]).forEach(m => allMonths.add(m)));
-  const months = Array.from(allMonths).sort();
-
-  const occByCatMonth = {};
-  const tableRows = [];
-  cats.forEach(cat => {
-    occByCatMonth[cat] = {};
-    months.forEach(m => {
-      const cell = d.categoryMonthMap[cat][m];
-      const roomCount = ROOM_CATEGORY_COUNT[cat] || 1;
-      let rate = 0;
-      if(cell){
-        const [y, mo] = m.split('/').map(Number);
-        const capacity = roomCount * daysInMonth(y, mo);
-        rate = capacity ? (cell.nights / capacity) * 100 : 0;
-      }
-      occByCatMonth[cat][m] = rate;
-      if(cell) tableRows.push({ cat, month:m, nights:cell.nights, rate });
-    });
-  });
-
-  destroy('occupancy');
-  charts.occupancy = new Chart(document.getElementById('chartOccupancy'), {
-    type:'line',
-    data:{
-      labels: months,
-      datasets: cats.map((cat,i) => ({
-        label: cat, data: months.map(m => occByCatMonth[cat][m]),
-        borderColor: GOLD_SCALE[i%GOLD_SCALE.length], backgroundColor: GOLD_SCALE[i%GOLD_SCALE.length], tension:.25
-      }))
-    },
-    options:{ responsive:true, plugins:{legend:{position:'bottom'}}, scales:{ y:{ title:{display:true,text:'稼働率(%)'}, max:100 } } }
-  });
-
-  document.querySelector('#tableOccupancy tbody').innerHTML = tableRows
-    .sort((a,b) => a.month < b.month ? -1 : (a.month > b.month ? 1 : a.cat.localeCompare(b.cat)))
-    .map(r => `<tr><td>${r.cat}</td><td>${r.month}</td><td class="num">${r.nights}泊</td><td class="num">${r.rate.toFixed(1)}%</td></tr>`)
-    .join('') || `<tr><td colspan="4" style="text-align:center;color:var(--ink-soft);">データがありません</td></tr>`;
-}
-
-/* ---- 喫食率（近似値） ---- */
-function renderMealRate(d){
-  const catEntries = Object.entries(d.mealOverallByCategory).sort((a,b)=>b[1].rate-a[1].rate);
-  destroy('mealRoom');
-  charts.mealRoom = new Chart(document.getElementById('chartMealRoom'), {
-    type:'bar',
-    data:{ labels: catEntries.map(e=>e[0]), datasets:[{ label:'喫食率(%)', data: catEntries.map(e=>e[1].rate), backgroundColor: catEntries.map((_,i)=>GOLD_SCALE[i%GOLD_SCALE.length]) }] },
-    options:{ plugins:{legend:{display:false}}, scales:{ y:{ max:100, title:{display:true,text:'%'} } } }
-  });
-
-  const monthEntries = Object.entries(d.mealByMonth).sort((a,b)=> a[0]<b[0]?-1:1);
-  destroy('mealMonth');
-  charts.mealMonth = new Chart(document.getElementById('chartMealMonth'), {
-    type:'line',
-    data:{ labels: monthEntries.map(e=>e[0]), datasets:[{ label:'喫食率(%)', data: monthEntries.map(e=> e[1].count ? e[1].mealCount/e[1].count*100 : 0), borderColor:'#b88931', backgroundColor:'#b88931', tension:.3 }] },
-    options:{ plugins:{legend:{display:false}}, scales:{ y:{ max:100, title:{display:true,text:'%'} } } }
-  });
-}
 
 function renderPlan(d){
   const entries = Object.entries(d.planMap).sort((a,b)=>b[1].revenue-a[1].revenue);
@@ -1038,6 +990,312 @@ document.getElementById('salesCsvImportBtn').addEventListener('click', () => {
     document.getElementById('fiscalByRoomSection').style.display = '';
 
     statusEl.textContent = `${records.length}件の予約から会計年度別データを再構築しました（${file.name}）`;
+    statusEl.style.color = 'var(--good)';
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+/* ============ 指示書②：稼働率比較（部屋別・会計年度別・折れ線グラフ） ============ */
+const RECLASSIFY_DATE = new Date('2025-12-01');
+const FISCAL_MONTH_ORDER_JULY = [7,8,9,10,11,12,1,2,3,4,5,6];
+
+function categorizeRoomAt(room, dateStr){
+  const s = String(room||'');
+  if(s.indexOf('ドッグB') !== -1){
+    const d = new Date(dateStr);
+    if(!isNaN(d) && d >= RECLASSIFY_DATE) return 'スタンダード';
+    return 'ドッグドーム';
+  }
+  return categorizeRoom(room);
+}
+function roomCountAt(category, dateStr){
+  const d = new Date(dateStr);
+  const after = !isNaN(d) && d >= RECLASSIFY_DATE;
+  const table = after
+    ? { 'スタンダード':3, 'コネクト':2, 'ドッグドーム':1, 'ドッグコテージ':1 }
+    : { 'スタンダード':2, 'コネクト':2, 'ドッグドーム':2, 'ドッグコテージ':1 };
+  return table[category] || 1;
+}
+function fiscalYearStartJuly(dateStr){
+  const d = new Date(dateStr);
+  if(isNaN(d)) return null;
+  const y = d.getFullYear(), m = d.getMonth()+1;
+  return m >= 7 ? y : y - 1;
+}
+function fiscalYearLabelJuly(fyStart){
+  const idx = fyStart - 2022 + 1;
+  const endYY = String((fyStart+1) % 100).padStart(2,'0');
+  return `${idx}年目（〜${endYY}年6月）`;
+}
+
+function parseOccupancyCsv(text){
+  const OCC_COL = { id:0, room:16, nights:5, period:4, status:17 };
+  const result = Papa.parse(text.trim(), { skipEmptyLines: true });
+  const rows = result.data.slice(1).filter(r => r.length > 1 && r[OCC_COL.id]);
+  const seen = new Set();
+  const records = [];
+  for(const r of rows){
+    const id = r[OCC_COL.id];
+    if(seen.has(id)) continue;
+    seen.add(id);
+    if(String(r[OCC_COL.status]||'').includes('キャンセル')) continue;
+    const checkin = extractCheckinFromPeriod(r[OCC_COL.period]);
+    if(!checkin) continue;
+    const room = r[OCC_COL.room] || '不明';
+    const nights = toNum(r[OCC_COL.nights]) || 1;
+    records.push({ id, room, nights, checkin });
+  }
+  return records;
+}
+
+function buildOccupancyMap(records, categoryFilterFn){
+  // { fiscalYearLabel: { 'M月': { nights, year, month } } }
+  const map = {};
+  for(const r of records){
+    const cat = categorizeRoomAt(r.room, r.checkin);
+    if(categoryFilterFn && !categoryFilterFn(cat)) continue;
+    const d = new Date(r.checkin);
+    const fy = fiscalYearStartJuly(r.checkin);
+    if(fy == null) continue;
+    const label = fiscalYearLabelJuly(fy);
+    const monthLabel = `${d.getMonth()+1}月`;
+    if(!map[label]) map[label] = {};
+    if(!map[label][monthLabel]) map[label][monthLabel] = { nights:0, year:d.getFullYear(), month:d.getMonth()+1 };
+    map[label][monthLabel].nights += r.nights;
+  }
+  return map;
+}
+
+function occupancyRateMap(nightsMap, category){
+  // nightsMap: { fyLabel: { 'M月': {nights, year, month} } } → { fyLabel: { 'M月': rate } }
+  const rateMap = {};
+  for(const [fyLabel, months] of Object.entries(nightsMap)){
+    rateMap[fyLabel] = {};
+    for(const [monthLabel, cell] of Object.entries(months)){
+      const roomCount = category === '全体' ? 7 : roomCountAt(category, `${cell.year}-${String(cell.month).padStart(2,'0')}-01`);
+      const capacity = roomCount * daysInMonth(cell.year, cell.month);
+      rateMap[fyLabel][monthLabel] = capacity ? (cell.nights / capacity) * 100 : 0;
+    }
+  }
+  return rateMap;
+}
+
+function renderOccupancyChartAndTable(canvasId, tableId, rateMap, chartKey, yLabel){
+  yLabel = yLabel || '稼働率(%)';
+  const monthLabels = FISCAL_MONTH_ORDER_JULY.map(m => `${m}月`);
+  const yearLabels = Object.keys(rateMap).sort();
+
+  destroy(chartKey);
+  charts[chartKey] = new Chart(document.getElementById(canvasId), {
+    type:'line',
+    data:{
+      labels: monthLabels,
+      datasets: yearLabels.map((yl,i) => ({
+        label: yl,
+        data: monthLabels.map(ml => rateMap[yl][ml] != null ? rateMap[yl][ml] : null),
+        borderColor: GOLD_SCALE[i % GOLD_SCALE.length], backgroundColor: GOLD_SCALE[i % GOLD_SCALE.length],
+        spanGaps: false, tension:.25
+      }))
+    },
+    options:{ responsive:true, plugins:{legend:{position:'bottom'}}, scales:{ y:{ title:{display:true,text:yLabel}, max:100 } } }
+  });
+
+  const tbl = document.getElementById(tableId);
+  const thead = '<thead><tr><th></th>' + monthLabels.map(m=>`<th>${m}</th>`).join('') + '</tr></thead>';
+  const tbody = '<tbody>' + yearLabels.map(yl => {
+    const cells = monthLabels.map(ml => {
+      const v = rateMap[yl][ml];
+      return `<td>${v!=null ? v.toFixed(1)+'%' : ''}</td>`;
+    }).join('');
+    return `<tr><td>${yl}</td>${cells}</tr>`;
+  }).join('') + '</tbody>';
+  tbl.className = 'fiscal-table';
+  tbl.innerHTML = thead + tbody;
+}
+
+document.getElementById('occCsvImportBtn').addEventListener('click', () => {
+  const fileInput = document.getElementById('occCsvFile');
+  const statusEl = document.getElementById('occCsvStatus');
+  const file = fileInput.files[0];
+  if(!file){
+    statusEl.textContent = 'CSVファイルを選択してください。';
+    statusEl.style.color = 'var(--warn)';
+    return;
+  }
+  statusEl.textContent = '読み込み中…';
+  statusEl.style.color = 'var(--ink-soft)';
+  const reader = new FileReader();
+  reader.onload = () => {
+    let text;
+    try{ text = new TextDecoder('shift-jis').decode(reader.result); }
+    catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
+    if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
+
+    let records;
+    try{
+      records = parseOccupancyCsv(text);
+    }catch(e){
+      statusEl.textContent = 'CSVの解析に失敗しました： ' + (e.message||e);
+      statusEl.style.color = 'var(--warn)';
+      return;
+    }
+    if(records.length === 0){
+      statusEl.textContent = '予約データが見つかりませんでした。';
+      statusEl.style.color = 'var(--warn)';
+      return;
+    }
+
+    const container = document.getElementById('occupancyContainer');
+    container.innerHTML = '';
+    const blocks = [
+      { key:'全体', filter:null },
+      { key:'スタンダード', filter:c=>c==='スタンダード' },
+      { key:'コネクト', filter:c=>c==='コネクト' },
+      { key:'ドッグドーム', filter:c=>c==='ドッグドーム' },
+      { key:'ドッグコテージ', filter:c=>c==='ドッグコテージ' },
+    ];
+    blocks.forEach((b, idx) => {
+      const canvasId = `chartOcc${idx}`, tableId = `tableOcc${idx}`;
+      const wrap = document.createElement('section');
+      wrap.className = 'block';
+      wrap.innerHTML = `<h2><span class="no">${String(idx+1).padStart(2,'0')}</span>${b.key}（稼働率）</h2>
+        <div class="card"><canvas id="${canvasId}" height="240"></canvas></div>
+        <div class="card"><div class="tablewrap"><table id="${tableId}"></table></div></div>`;
+      container.appendChild(wrap);
+      const nightsMap = buildOccupancyMap(records, b.filter);
+      const rateMap = occupancyRateMap(nightsMap, b.key);
+      renderOccupancyChartAndTable(canvasId, tableId, rateMap, 'occ'+idx);
+    });
+
+    statusEl.textContent = `${records.length}件の予約から稼働率を再構築しました（${file.name}）`;
+    statusEl.style.color = 'var(--good)';
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+/* ============ 指示書③：喫食率（部屋別・会計年度別・折れ線グラフ） ============ */
+const MEAL_COL = { id:0, room:16, item:11, period:4, status:17 };
+
+function isNashiItem(text){
+  return /夕食無し/.test(text) || /朝食なし/.test(text);
+}
+function ateMealForReservation(items){
+  const adultMealItems = items.filter(t => /\[大人\]/.test(t) && (/夕食/.test(t) || /朝食/.test(t)));
+  if(adultMealItems.length === 0) return null; // 判定不能（分母から除外）
+  return adultMealItems.some(t => !isNashiItem(t));
+}
+
+function parseMealCsv(text){
+  const result = Papa.parse(text.trim(), { skipEmptyLines: true });
+  const rows = result.data.slice(1).filter(r => r.length > 1 && r[MEAL_COL.id]);
+  const byId = new Map();
+  const order = [];
+  for(const r of rows){
+    const id = r[MEAL_COL.id];
+    if(!byId.has(id)){ byId.set(id, []); order.push(id); }
+    byId.get(id).push(r);
+  }
+  const records = [];
+  for(const id of order){
+    const lines = byId.get(id);
+    const first = lines[0];
+    if(String(first[MEAL_COL.status]||'').includes('キャンセル')) continue;
+    const checkin = extractCheckinFromPeriod(first[MEAL_COL.period]);
+    if(!checkin) continue;
+    const room = first[MEAL_COL.room] || '不明';
+    const items = lines.map(l => l[MEAL_COL.item] || '');
+    const ate = ateMealForReservation(items);
+    if(ate === null) continue; // 判定不能は除外
+    records.push({ id, room, checkin, ate });
+  }
+  return records;
+}
+
+function buildMealMap(records, categoryFilterFn){
+  // { fiscalYearLabel: { 'M月': { count, ateCount } } }
+  const map = {};
+  for(const r of records){
+    const cat = categorizeRoomAt(r.room, r.checkin);
+    if(categoryFilterFn && !categoryFilterFn(cat)) continue;
+    const d = new Date(r.checkin);
+    const fy = fiscalYearStartJuly(r.checkin);
+    if(fy == null) continue;
+    const label = fiscalYearLabelJuly(fy);
+    const monthLabel = `${d.getMonth()+1}月`;
+    if(!map[label]) map[label] = {};
+    if(!map[label][monthLabel]) map[label][monthLabel] = { count:0, ateCount:0 };
+    map[label][monthLabel].count++;
+    if(r.ate) map[label][monthLabel].ateCount++;
+  }
+  return map;
+}
+
+function mealRateMap(countMap){
+  const rateMap = {};
+  for(const [fyLabel, months] of Object.entries(countMap)){
+    rateMap[fyLabel] = {};
+    for(const [monthLabel, cell] of Object.entries(months)){
+      rateMap[fyLabel][monthLabel] = cell.count ? (cell.ateCount / cell.count) * 100 : null;
+    }
+  }
+  return rateMap;
+}
+
+document.getElementById('mealCsvImportBtn').addEventListener('click', () => {
+  const fileInput = document.getElementById('mealCsvFile');
+  const statusEl = document.getElementById('mealCsvStatus');
+  const file = fileInput.files[0];
+  if(!file){
+    statusEl.textContent = 'CSVファイルを選択してください。';
+    statusEl.style.color = 'var(--warn)';
+    return;
+  }
+  statusEl.textContent = '読み込み中…';
+  statusEl.style.color = 'var(--ink-soft)';
+  const reader = new FileReader();
+  reader.onload = () => {
+    let text;
+    try{ text = new TextDecoder('shift-jis').decode(reader.result); }
+    catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
+    if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
+
+    let records;
+    try{
+      records = parseMealCsv(text);
+    }catch(e){
+      statusEl.textContent = 'CSVの解析に失敗しました： ' + (e.message||e);
+      statusEl.style.color = 'var(--warn)';
+      return;
+    }
+    if(records.length === 0){
+      statusEl.textContent = '判定可能な予約データが見つかりませんでした。';
+      statusEl.style.color = 'var(--warn)';
+      return;
+    }
+
+    const container = document.getElementById('mealContainer');
+    container.innerHTML = '';
+    const blocks = [
+      { key:'全体', filter:null },
+      { key:'スタンダード', filter:c=>c==='スタンダード' },
+      { key:'コネクト', filter:c=>c==='コネクト' },
+      { key:'ドッグドーム', filter:c=>c==='ドッグドーム' },
+      { key:'ドッグコテージ', filter:c=>c==='ドッグコテージ' },
+    ];
+    blocks.forEach((b, idx) => {
+      const canvasId = `chartMeal${idx}`, tableId = `tableMeal${idx}`;
+      const wrap = document.createElement('section');
+      wrap.className = 'block';
+      wrap.innerHTML = `<h2><span class="no">${String(idx+1).padStart(2,'0')}</span>喫食率データ比較（${b.key}）</h2>
+        <div class="card"><canvas id="${canvasId}" height="240"></canvas></div>
+        <div class="card"><div class="tablewrap"><table id="${tableId}"></table></div></div>`;
+      container.appendChild(wrap);
+      const countMap = buildMealMap(records, b.filter);
+      const rateMap = mealRateMap(countMap);
+      renderOccupancyChartAndTable(canvasId, tableId, rateMap, 'meal'+idx, '喫食率(%)');
+    });
+
+    statusEl.textContent = `${records.length}件の予約（判定可能分）から喫食率を再構築しました（${file.name}）`;
     statusEl.style.color = 'var(--good)';
   };
   reader.readAsArrayBuffer(file);
