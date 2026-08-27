@@ -32975,7 +32975,43 @@
       "option": 1100,
       "method": "ポータル手入力",
       "channel": "直接予約"
+    },
+    {
+      "id": "予約番",
+      "checkin": "秋田勝巳",
+      "checkout": "2026/08/31 ～ 2026/09/01",
+      "room": "予約",
+      "revenue": 0,
+      "nights": 1,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false,
+      "lodging": 2026,
+      "meal": 10,
+      "program": 1,
+      "option": 0,
+      "method": "ドッグコテージG",
+      "channel": "直接予約"
+    },
+    {
+      "id": "電話予約",
+      "checkin": "中村崇俊",
+      "checkout": "2026/08/28 ～ 2026/08/31",
+      "room": "予約",
+      "revenue": 0,
+      "nights": 1,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false,
+      "lodging": 2026,
+      "meal": 10,
+      "program": 1,
+      "option": 0,
+      "method": "スタンダードA",
+      "channel": "直接予約"
     }
   ],
-  "lastUpdated": "2026-08-27T06:15:40.044Z"
+  "lastUpdated": "2026-08-27T08:50:49.960Z"
 }
