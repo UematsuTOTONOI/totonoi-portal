@@ -111,6 +111,20 @@ License: MIT
   }
   .toggle button.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
 
+  .page-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; border-bottom:1px solid var(--line); padding-bottom:0; }
+  .page-nav .nav-tab{
+    font-family:'Noto Serif JP', serif; font-size:13px; color:var(--ink-soft);
+    background:none; border:none; border-bottom:2px solid transparent;
+    padding:10px 16px; cursor:pointer; transition:color .15s, border-color .15s;
+  }
+  .page-nav .nav-tab:hover{ color:var(--ink); }
+  .page-nav .nav-tab.active{ color:var(--gold); border-bottom-color:var(--gold); font-weight:600; }
+  .report-page{ display:none; }
+  .report-page.active{ display:block; }
+  .approx-note{
+    font-size:11.5px; color:var(--ink-soft); background:#fbf6ea; border:1px solid var(--line);
+    padding:10px 14px; border-radius:2px; margin-bottom:24px;
+  }
   footer{text-align:center; padding:40px 6vw 60px; color:var(--ink-soft); font-size:12px; border-top:1px solid var(--line);}
 </style>
 </head>
@@ -123,6 +137,14 @@ License: MIT
 </header>
 
 <main>
+  <nav class="page-nav" id="pageNav">
+    <button class="nav-tab active" data-page="home">売上比較（部屋別）</button>
+    <button class="nav-tab" data-page="occupancy">稼働率比較（部屋別）</button>
+    <button class="nav-tab" data-page="meal">喫食率</button>
+    <button class="nav-tab" data-page="option">オプション</button>
+    <button class="nav-tab" data-page="other">その他</button>
+  </nav>
+
   <div class="upload" id="settingsPanel" style="margin-bottom:20px;">
     <div class="drop" style="flex:1 1 100%; cursor:default; text-align:left; border-style:solid;">
       <strong>GitHub連携設定</strong>（データの保存・読込に使用。トークンはこの端末のブラウザにのみ保存されます）
@@ -170,66 +192,100 @@ License: MIT
       <div class="kpi"><div class="label">インバウンド比率</div><div class="value" id="kpiInbound">–<span class="unit">%</span></div></div>
     </div>
 
-    <section class="block">
-      <h2><span class="no">01</span>プラン（部屋タイプ）別</h2>
-      <p class="note">件数・売上・平均客単価の内訳</p>
-      <div class="grid2">
-        <div class="card"><h3>件数と売上</h3><canvas id="chartPlan" height="220"></canvas></div>
-        <div class="card"><h3>明細</h3><table id="tablePlan"><thead><tr><th>部屋タイプ</th><th>件数</th><th>売上</th><th>客単価</th></tr></thead><tbody></tbody></table></div>
-      </div>
-    </section>
+    <!-- ============ ホーム：売上比較（部屋別） ============ -->
+    <div class="report-page active" id="page-home">
+      <section class="block">
+        <h2><span class="no">01</span>売上比較（部屋別）</h2>
+        <p class="note">部屋タイプ（スタンダード／コネクト／ドッグドーム／ドッグコテージ）ごとの件数・売上・客単価</p>
+        <div class="grid2">
+          <div class="card"><h3>件数と売上</h3><canvas id="chartPlan" height="220"></canvas></div>
+          <div class="card"><h3>明細</h3><table id="tablePlan"><thead><tr><th>部屋タイプ</th><th>件数</th><th>売上</th><th>客単価</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </section>
+      <section class="block">
+        <h2><span class="no">02</span>部屋タイプ別 月次売上推移</h2>
+        <p class="note">チェックイン月ベース</p>
+        <div class="card"><canvas id="chartRevByMonth" height="220"></canvas></div>
+      </section>
+    </div>
 
-    <section class="block">
-      <h2><span class="no">02</span>年代別</h2>
-      <p class="note">予約者の年齢（列「年齢」）をもとに10歳刻みで集計</p>
-      <div class="grid2">
-        <div class="card"><h3>年代別件数</h3><canvas id="chartAge" height="220"></canvas></div>
-        <div class="card"><h3>明細</h3><table id="tableAge"><thead><tr><th>年代</th><th>件数</th><th>構成比</th><th>売上</th></tr></thead><tbody></tbody></table></div>
-      </div>
-    </section>
+    <!-- ============ 稼働率比較（部屋別） ============ -->
+    <div class="report-page" id="page-occupancy">
+      <div class="approx-note">稼働率＝該当タイプの宿泊泊数の合計 ÷（部屋数 × 日数）。部屋数は スタンダード2棟／コネクト2棟／ドッグドーム2棟／ドッグコテージ1棟（計7棟）と仮定しています。異なる場合は教えてください。</div>
+      <section class="block">
+        <h2><span class="no">01</span>稼働率比較（部屋別・月次）</h2>
+        <div class="card"><canvas id="chartOccupancy" height="240"></canvas></div>
+      </section>
+      <section class="block">
+        <h2><span class="no">02</span>明細</h2>
+        <div class="card"><div class="tablewrap"><table id="tableOccupancy"><thead><tr><th>部屋タイプ</th><th>月</th><th>泊数</th><th>稼働率</th></tr></thead><tbody></tbody></table></div></div>
+      </section>
+    </div>
 
-    <section class="block">
-      <h2><span class="no">03</span>都道府県別 集客</h2>
-      <p class="note">「都道府県」列を使用。空欄／海外は国・地域別に集計（インバウンド）</p>
-      <div class="grid2">
-        <div class="card"><h3>上位10地域</h3><canvas id="chartPref" height="240"></canvas></div>
-        <div class="card"><h3>インバウンド内訳</h3><table id="tableInbound"><thead><tr><th>国・地域</th><th>件数</th><th>売上</th></tr></thead><tbody></tbody></table></div>
-      </div>
-    </section>
+    <!-- ============ 喫食率 ============ -->
+    <div class="report-page" id="page-meal">
+      <div class="approx-note">現在のデータには「食事の有無」を示す項目が含まれていないため、便宜的に「食事料金が発生している予約の割合」を喫食率として表示しています。より正確な喫食率を出すには、予約データに朝食・夕食ごとの注文有無を記録する必要があります。</div>
+      <section class="block">
+        <h2><span class="no">01</span>喫食率（食事料金の発生率）</h2>
+        <div class="grid2">
+          <div class="card"><h3>部屋タイプ別</h3><canvas id="chartMealRoom" height="220"></canvas></div>
+          <div class="card"><h3>月別</h3><canvas id="chartMealMonth" height="220"></canvas></div>
+        </div>
+      </section>
+    </div>
 
-    <section class="block">
-      <h2><span class="no">04</span>リピート状況</h2>
-      <p class="note">「過去の宿泊」列の回答をもとに判定</p>
-      <div class="grid3">
-        <div class="card"><h3>初めて / リピート</h3><canvas id="chartRepeat" height="200"></canvas></div>
-        <div class="card" style="display:flex;flex-direction:column;justify-content:center;"><h3>サマリー</h3><table id="tableRepeat"><tbody></tbody></table></div>
-        <div class="card"><h3>部屋タイプ別リピート件数</h3><table id="tableRepeatPlan"><thead><tr><th>部屋タイプ</th><th>リピート</th></tr></thead><tbody></tbody></table></div>
-      </div>
-    </section>
+    <!-- ============ オプション（売上内訳） ============ -->
+    <div class="report-page" id="page-option">
+      <div class="approx-note">現在のデータには商品単位（BBQ・サウナ・薪など）の内訳が含まれていないため、宿泊／食事／プログラム／オプションの4区分での売上内訳を表示しています。</div>
+      <section class="block">
+        <h2><span class="no">01</span>売上内訳</h2>
+        <div class="grid2">
+          <div class="card"><h3>カテゴリ別売上</h3><canvas id="chartRevBreak" height="240"></canvas></div>
+          <div class="card"><h3>明細</h3><table id="tableRevBreak"><thead><tr><th>カテゴリ</th><th>売上</th><th>構成比</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </section>
+    </div>
 
-    <section class="block">
-      <h2><span class="no">05</span>売上内訳</h2>
-      <p class="note">宿泊料金／食事料金／プログラム料金／オプション料金の構成比</p>
-      <div class="grid2">
-        <div class="card"><h3>カテゴリ別売上</h3><canvas id="chartRevBreak" height="220"></canvas></div>
-        <div class="card"><h3>明細</h3><table id="tableRevBreak"><thead><tr><th>カテゴリ</th><th>売上</th><th>構成比</th></tr></thead><tbody></tbody></table></div>
-      </div>
-    </section>
+    <!-- ============ その他 ============ -->
+    <div class="report-page" id="page-other">
+      <section class="block">
+        <h2><span class="no">01</span>年代別</h2>
+        <div class="grid2">
+          <div class="card"><h3>年代別件数</h3><canvas id="chartAge" height="220"></canvas></div>
+          <div class="card"><h3>明細</h3><table id="tableAge"><thead><tr><th>年代</th><th>件数</th><th>構成比</th><th>売上</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </section>
 
-    <section class="block">
-      <h2><span class="no">06</span>予約経路</h2>
-      <p class="note">「予約方法」「販売チャネル」列より</p>
-      <div class="grid2">
-        <div class="card"><h3>予約方法</h3><canvas id="chartMethod" height="200"></canvas></div>
-        <div class="card"><h3>販売チャネル（流入経路）</h3><canvas id="chartChannel" height="200"></canvas></div>
-      </div>
-    </section>
+      <section class="block">
+        <h2><span class="no">02</span>都道府県別 集客</h2>
+        <div class="grid2">
+          <div class="card"><h3>上位10地域</h3><canvas id="chartPref" height="240"></canvas></div>
+          <div class="card"><h3>インバウンド内訳</h3><table id="tableInbound"><thead><tr><th>国・地域</th><th>件数</th><th>売上</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </section>
 
-    <section class="block">
-      <h2><span class="no">07</span>月別推移</h2>
-      <p class="note">チェックイン日ベース</p>
-      <div class="card"><canvas id="chartMonth" height="180"></canvas></div>
-    </section>
+      <section class="block">
+        <h2><span class="no">03</span>リピート状況</h2>
+        <div class="grid3">
+          <div class="card"><h3>初めて / リピート</h3><canvas id="chartRepeat" height="200"></canvas></div>
+          <div class="card" style="display:flex;flex-direction:column;justify-content:center;"><h3>サマリー</h3><table id="tableRepeat"><tbody></tbody></table></div>
+          <div class="card"><h3>部屋タイプ別リピート件数</h3><table id="tableRepeatPlan"><thead><tr><th>部屋タイプ</th><th>リピート</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2><span class="no">04</span>予約経路</h2>
+        <div class="grid2">
+          <div class="card"><h3>予約方法</h3><canvas id="chartMethod" height="200"></canvas></div>
+          <div class="card"><h3>販売チャネル（流入経路）</h3><canvas id="chartChannel" height="200"></canvas></div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2><span class="no">05</span>月別推移（全体）</h2>
+        <div class="card"><canvas id="chartMonth" height="180"></canvas></div>
+      </section>
+    </div>
 
   </div>
 </main>
@@ -435,6 +491,17 @@ async function parseAndSync(text){
 }
 
 /* ============ CSV → 匿名化レコード抽出 ============ */
+const ROOM_CATEGORY_COUNT = { "スタンダード":2, "コネクト":2, "ドッグドーム":2, "ドッグコテージ":1 };
+function categorizeRoom(room){
+  const s = String(room||'');
+  if(s.indexOf('コテージ') !== -1) return 'ドッグコテージ';
+  if(s.indexOf('ドッグ') !== -1) return 'ドッグドーム';
+  if(s.indexOf('コネクト') !== -1) return 'コネクト';
+  if(s.indexOf('スタンダード') !== -1) return 'スタンダード';
+  return 'その他';
+}
+function daysInMonth(year, month){ return new Date(year, month, 0).getDate(); }
+
 function toNum(v){ const n = parseFloat(String(v).replace(/,/g,'')); return isNaN(n) ? 0 : n; }
 function guessCountry(pref, addr){
   const known = ["Hong Kong","HongKong","Macao","Macau","China","Singapore","Taiwan","Korea","Denmark","USA","Australia","Thailand","France","Germany","UK"];
@@ -480,10 +547,27 @@ function ageBucket(a){ if(a==null) return "不明"; return `${Math.floor(a/10)*1
 function aggregate(records){
   const reservations = records.slice().sort((a,b) => new Date(a.checkin) - new Date(b.checkin));
 
+  // 部屋タイプ（カテゴリ）別
   const planMap = {};
   for(const r of reservations){
-    if(!planMap[r.room]) planMap[r.room] = { count:0, revenue:0 };
-    planMap[r.room].count++; planMap[r.room].revenue += r.revenue;
+    const cat = categorizeRoom(r.room);
+    if(!planMap[cat]) planMap[cat] = { count:0, revenue:0 };
+    planMap[cat].count++; planMap[cat].revenue += r.revenue;
+  }
+
+  // カテゴリ×月別（売上・稼働率・喫食率の元データ）
+  const categoryMonthMap = {}; // { category: { 'YYYY/MM': {count, revenue, nights, mealCount} } }
+  for(const r of reservations){
+    const cat = categorizeRoom(r.room);
+    const d = new Date(r.checkin);
+    if(isNaN(d)) continue;
+    const y = d.getFullYear(), m = d.getMonth()+1;
+    const key = `${y}/${String(m).padStart(2,'0')}`;
+    if(!categoryMonthMap[cat]) categoryMonthMap[cat] = {};
+    if(!categoryMonthMap[cat][key]) categoryMonthMap[cat][key] = { count:0, revenue:0, nights:0, mealCount:0, year:y, month:m };
+    const cell = categoryMonthMap[cat][key];
+    cell.count++; cell.revenue += r.revenue; cell.nights += r.nights;
+    if(r.meal > 0) cell.mealCount++;
   }
 
   const ageMap = {};
@@ -503,7 +587,7 @@ function aggregate(records){
 
   const repeatCount = reservations.filter(r=>r.isRepeat).length;
   const repeatPlanMap = {};
-  for(const r of reservations){ if(r.isRepeat) repeatPlanMap[r.room] = (repeatPlanMap[r.room]||0)+1; }
+  for(const r of reservations){ if(r.isRepeat){ const cat = categorizeRoom(r.room); repeatPlanMap[cat] = (repeatPlanMap[cat]||0)+1; } }
 
   const inboundRes = reservations.filter(r=>r.isInbound);
 
@@ -525,6 +609,23 @@ function aggregate(records){
     monthMap[key].count++; monthMap[key].revenue += r.revenue;
   }
 
+  // 喫食率（食事料金>0の割合。月別・全体別）
+  const mealOverallByCategory = {};
+  for(const [cat, months] of Object.entries(categoryMonthMap)){
+    let count=0, mealCount=0;
+    for(const cell of Object.values(months)){ count+=cell.count; mealCount+=cell.mealCount; }
+    mealOverallByCategory[cat] = { count, mealCount, rate: count ? mealCount/count*100 : 0 };
+  }
+  const mealByMonth = {};
+  for(const r of reservations){
+    const d = new Date(r.checkin);
+    if(isNaN(d)) continue;
+    const key = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`;
+    if(!mealByMonth[key]) mealByMonth[key] = { count:0, mealCount:0 };
+    mealByMonth[key].count++;
+    if(r.meal > 0) mealByMonth[key].mealCount++;
+  }
+
   const totalRevenue = reservations.reduce((s,r)=>s+r.revenue,0);
   const totalNights = reservations.reduce((s,r)=>s+r.nights,0);
 
@@ -532,7 +633,8 @@ function aggregate(records){
     reservationCount: reservations.length, totalRevenue, totalNights, avgAge,
     repeatCount, repeatRate: reservations.length ? repeatCount/reservations.length*100 : 0,
     inboundCount: inboundRes.length, inboundRate: reservations.length ? inboundRes.length/reservations.length*100 : 0,
-    planMap, ageMap, regionMap, repeatPlanMap, revBreak, methodMap, channelMap, monthMap
+    planMap, ageMap, regionMap, repeatPlanMap, revBreak, methodMap, channelMap, monthMap,
+    categoryMonthMap, mealOverallByCategory, mealByMonth
   };
 }
 
@@ -545,16 +647,112 @@ function render(d){
   document.getElementById('kpiRepeat').innerHTML = `${d.repeatRate.toFixed(1)}<span class="unit">%</span>`;
   document.getElementById('kpiInbound').innerHTML = `${d.inboundRate.toFixed(1)}<span class="unit">%</span>`;
 
-  renderPlan(d); renderAge(d); renderRegion(d); renderRepeat(d); renderRevBreak(d); renderChannels(d); renderMonth(d);
+  renderPlan(d); renderRevByMonth(d); renderOccupancy(d); renderMealRate(d);
+  renderAge(d); renderRegion(d); renderRepeat(d); renderRevBreak(d); renderChannels(d); renderMonth(d);
 }
 function destroy(key){ if(charts[key]) charts[key].destroy(); }
+
+/* ---- ナビゲーション ---- */
+document.querySelectorAll('#pageNav .nav-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#pageNav .nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.report-page').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-' + btn.dataset.page).classList.add('active');
+  });
+});
+
+/* ---- 部屋タイプ別 月次売上推移 ---- */
+function renderRevByMonth(d){
+  const cats = Object.keys(d.categoryMonthMap);
+  const allMonths = new Set();
+  cats.forEach(cat => Object.keys(d.categoryMonthMap[cat]).forEach(m => allMonths.add(m)));
+  const months = Array.from(allMonths).sort();
+  destroy('revByMonth');
+  charts.revByMonth = new Chart(document.getElementById('chartRevByMonth'), {
+    type:'line',
+    data:{
+      labels: months,
+      datasets: cats.map((cat,i) => ({
+        label: cat,
+        data: months.map(m => (d.categoryMonthMap[cat][m]||{revenue:0}).revenue),
+        borderColor: GOLD_SCALE[i%GOLD_SCALE.length], backgroundColor: GOLD_SCALE[i%GOLD_SCALE.length],
+        tension:.25
+      }))
+    },
+    options:{ responsive:true, plugins:{legend:{position:'bottom'}}, scales:{ y:{ title:{display:true,text:'売上(円)'} } } }
+  });
+}
+
+/* ---- 稼働率比較（部屋別・月次） ---- */
+function renderOccupancy(d){
+  const cats = Object.keys(d.categoryMonthMap);
+  const allMonths = new Set();
+  cats.forEach(cat => Object.keys(d.categoryMonthMap[cat]).forEach(m => allMonths.add(m)));
+  const months = Array.from(allMonths).sort();
+
+  const occByCatMonth = {};
+  const tableRows = [];
+  cats.forEach(cat => {
+    occByCatMonth[cat] = {};
+    months.forEach(m => {
+      const cell = d.categoryMonthMap[cat][m];
+      const roomCount = ROOM_CATEGORY_COUNT[cat] || 1;
+      let rate = 0;
+      if(cell){
+        const [y, mo] = m.split('/').map(Number);
+        const capacity = roomCount * daysInMonth(y, mo);
+        rate = capacity ? (cell.nights / capacity) * 100 : 0;
+      }
+      occByCatMonth[cat][m] = rate;
+      if(cell) tableRows.push({ cat, month:m, nights:cell.nights, rate });
+    });
+  });
+
+  destroy('occupancy');
+  charts.occupancy = new Chart(document.getElementById('chartOccupancy'), {
+    type:'line',
+    data:{
+      labels: months,
+      datasets: cats.map((cat,i) => ({
+        label: cat, data: months.map(m => occByCatMonth[cat][m]),
+        borderColor: GOLD_SCALE[i%GOLD_SCALE.length], backgroundColor: GOLD_SCALE[i%GOLD_SCALE.length], tension:.25
+      }))
+    },
+    options:{ responsive:true, plugins:{legend:{position:'bottom'}}, scales:{ y:{ title:{display:true,text:'稼働率(%)'}, max:100 } } }
+  });
+
+  document.querySelector('#tableOccupancy tbody').innerHTML = tableRows
+    .sort((a,b) => a.month < b.month ? -1 : (a.month > b.month ? 1 : a.cat.localeCompare(b.cat)))
+    .map(r => `<tr><td>${r.cat}</td><td>${r.month}</td><td class="num">${r.nights}泊</td><td class="num">${r.rate.toFixed(1)}%</td></tr>`)
+    .join('') || `<tr><td colspan="4" style="text-align:center;color:var(--ink-soft);">データがありません</td></tr>`;
+}
+
+/* ---- 喫食率（近似値） ---- */
+function renderMealRate(d){
+  const catEntries = Object.entries(d.mealOverallByCategory).sort((a,b)=>b[1].rate-a[1].rate);
+  destroy('mealRoom');
+  charts.mealRoom = new Chart(document.getElementById('chartMealRoom'), {
+    type:'bar',
+    data:{ labels: catEntries.map(e=>e[0]), datasets:[{ label:'喫食率(%)', data: catEntries.map(e=>e[1].rate), backgroundColor: catEntries.map((_,i)=>GOLD_SCALE[i%GOLD_SCALE.length]) }] },
+    options:{ plugins:{legend:{display:false}}, scales:{ y:{ max:100, title:{display:true,text:'%'} } } }
+  });
+
+  const monthEntries = Object.entries(d.mealByMonth).sort((a,b)=> a[0]<b[0]?-1:1);
+  destroy('mealMonth');
+  charts.mealMonth = new Chart(document.getElementById('chartMealMonth'), {
+    type:'line',
+    data:{ labels: monthEntries.map(e=>e[0]), datasets:[{ label:'喫食率(%)', data: monthEntries.map(e=> e[1].count ? e[1].mealCount/e[1].count*100 : 0), borderColor:'#b88931', backgroundColor:'#b88931', tension:.3 }] },
+    options:{ plugins:{legend:{display:false}}, scales:{ y:{ max:100, title:{display:true,text:'%'} } } }
+  });
+}
 
 function renderPlan(d){
   const entries = Object.entries(d.planMap).sort((a,b)=>b[1].revenue-a[1].revenue);
   destroy('plan');
   charts.plan = new Chart(document.getElementById('chartPlan'), {
     type:'bar',
-    data:{ labels: entries.map(e=>e[0].length>16?e[0].slice(0,16)+'…':e[0]),
+    data:{ labels: entries.map(e=>e[0]),
       datasets:[
         { label:'件数', data: entries.map(e=>e[1].count), backgroundColor:'#e3c78a', yAxisID:'y1' },
         { label:'売上(円)', data: entries.map(e=>e[1].revenue), backgroundColor:'#b88931', yAxisID:'y2' },
@@ -617,7 +815,7 @@ function renderRepeat(d){
   `;
   const rp = Object.entries(d.repeatPlanMap).sort((a,b)=>b[1]-a[1]);
   document.querySelector('#tableRepeatPlan tbody').innerHTML = rp.length
-    ? rp.map(([name,c])=>`<tr><td>${name.length>18?name.slice(0,18)+'…':name}</td><td class="num">${c}件</td></tr>`).join('')
+    ? rp.map(([name,c])=>`<tr><td>${name}</td><td class="num">${c}件</td></tr>`).join('')
     : `<tr><td colspan="2" style="text-align:center;color:var(--ink-soft);">リピートなし</td></tr>`;
 }
 
