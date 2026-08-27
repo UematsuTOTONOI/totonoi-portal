@@ -125,6 +125,11 @@ License: MIT
     font-size:11.5px; color:var(--ink-soft); background:#fbf6ea; border:1px solid var(--line);
     padding:10px 14px; border-radius:2px; margin-bottom:24px;
   }
+  .fiscal-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .fiscal-table th, .fiscal-table td{ padding:7px 9px; text-align:right; border:1px solid var(--line); white-space:nowrap; }
+  .fiscal-table th:first-child, .fiscal-table td:first-child{ text-align:left; background:#fbf6ea; font-weight:600; }
+  .fiscal-table thead th{ background:var(--ink); color:#fff; font-weight:600; }
+
   footer{text-align:center; padding:40px 6vw 60px; color:var(--ink-soft); font-size:12px; border-top:1px solid var(--line);}
 </style>
 </head>
@@ -194,8 +199,30 @@ License: MIT
 
     <!-- ============ ホーム：売上比較（部屋別） ============ -->
     <div class="report-page active" id="page-home">
+      <div class="card accent" id="salesCompareUpload" style="margin-bottom:28px;">
+        <h3>会計年度別 全体比較データ</h3>
+        <p class="small" style="margin-bottom:14px;">サイトコントローラーの詳細CSV（予約番号・部屋・売上合計額などを含む明細形式）をアップロードすると、会計年度別（3月始まり）の月次売上比較を全体／部屋タイプ別に再構築します。</p>
+        <div class="row" style="align-items:center;">
+          <div class="field wide"><label>CSVファイル</label><input type="file" id="salesCsvFile" accept=".csv,text/csv"></div>
+          <div style="align-self:flex-end;"><button type="button" class="primary" id="salesCsvImportBtn">読み込む</button></div>
+        </div>
+        <div id="salesCsvStatus" class="small" style="margin-top:8px;"></div>
+      </div>
+
+      <section class="block" id="fiscalOverallSection" style="display:none;">
+        <h2><span class="no">01</span>全体比較（会計年度別・月次売上）</h2>
+        <p class="note">会計年度は3月始まり（初年度はオープン月の7月〜2月）</p>
+        <div class="card"><canvas id="chartFiscalOverall" height="260"></canvas></div>
+        <div class="card"><div class="tablewrap"><table id="tableFiscalOverall"></table></div></div>
+      </section>
+
+      <section class="block" id="fiscalByRoomSection" style="display:none;">
+        <h2><span class="no">02</span>部屋タイプ別 全体比較</h2>
+        <div id="fiscalByRoomContainer"></div>
+      </section>
+
       <section class="block">
-        <h2><span class="no">01</span>売上比較（部屋別）</h2>
+        <h2><span class="no">03</span>売上比較（部屋別サマリー）</h2>
         <p class="note">部屋タイプ（スタンダード／コネクト／ドッグドーム／ドッグコテージ）ごとの件数・売上・客単価</p>
         <div class="grid2">
           <div class="card"><h3>件数と売上</h3><canvas id="chartPlan" height="220"></canvas></div>
@@ -203,7 +230,7 @@ License: MIT
         </div>
       </section>
       <section class="block">
-        <h2><span class="no">02</span>部屋タイプ別 月次売上推移</h2>
+        <h2><span class="no">04</span>部屋タイプ別 月次売上推移（累積データ）</h2>
         <p class="note">チェックイン月ベース</p>
         <div class="card"><canvas id="chartRevByMonth" height="220"></canvas></div>
       </section>
@@ -869,6 +896,152 @@ function renderMonth(d){
 /* ============ 初期化 ============ */
 loadConfig();
 if(cfgToken.value){ connectAndLoad(); }
+
+/* ============ 指示書①：会計年度別 全体比較（詳細CSVから再構築） ============ */
+const FISCAL_MONTH_ORDER = [3,4,5,6,7,8,9,10,11,12,1,2];
+const SALES_COL = { id:0, room:16, revenue:36, period:4, status:17 };
+
+function fiscalYearStart(dateStr){
+  const d = new Date(dateStr);
+  if(isNaN(d)) return null;
+  const y = d.getFullYear(), m = d.getMonth()+1;
+  return m >= 3 ? y : y - 1;
+}
+function fiscalYearLabel(fyStart){
+  const idx = fyStart - 2022 + 1;
+  return `${idx}年目（${fyStart}年度）`;
+}
+function extractCheckinFromPeriod(periodStr){
+  // 例: "2026/08/01 ～ 2026/08/02" → 先頭の日付
+  const m = String(periodStr||'').match(/(\d{4}\/\d{1,2}\/\d{1,2})/);
+  return m ? m[1] : '';
+}
+
+function parseSalesComparisonCsv(text){
+  const result = Papa.parse(text.trim(), { skipEmptyLines: true });
+  const rows = result.data.slice(1).filter(r => r.length > 1 && r[SALES_COL.id]);
+  // 予約番号ごとに最初の1行だけを採用（部屋・売上合計額は予約単位で全行共通のため）
+  const seen = new Set();
+  const records = [];
+  for(const r of rows){
+    const id = r[SALES_COL.id];
+    if(seen.has(id)) continue;
+    seen.add(id);
+    if(String(r[SALES_COL.status]||'').includes('キャンセル')) continue;
+    const checkin = extractCheckinFromPeriod(r[SALES_COL.period]);
+    const room = r[SALES_COL.room] || '不明';
+    const revenue = toNum(r[SALES_COL.revenue]);
+    const fy = fiscalYearStart(checkin);
+    if(fy == null) continue;
+    records.push({ id, room, revenue, checkin, fiscalYearStart: fy });
+  }
+  return records;
+}
+
+function buildFiscalMonthMap(records, roomFilterFn){
+  // { fiscalYearLabel: { 'M月': revenue } }
+  const map = {};
+  for(const r of records){
+    if(roomFilterFn && !roomFilterFn(r)) continue;
+    const label = fiscalYearLabel(r.fiscalYearStart);
+    const d = new Date(r.checkin);
+    const monthLabel = `${d.getMonth()+1}月`;
+    if(!map[label]) map[label] = {};
+    map[label][monthLabel] = (map[label][monthLabel] || 0) + r.revenue;
+  }
+  return map;
+}
+
+function renderFiscalChartAndTable(canvasId, tableId, fiscalMap, chartKey){
+  const monthLabels = FISCAL_MONTH_ORDER.map(m => `${m}月`);
+  const yearLabels = Object.keys(fiscalMap).sort();
+
+  destroy(chartKey);
+  charts[chartKey] = new Chart(document.getElementById(canvasId), {
+    type:'bar',
+    data:{
+      labels: monthLabels,
+      datasets: yearLabels.map((yl,i) => ({
+        label: yl,
+        data: monthLabels.map(ml => fiscalMap[yl][ml] || null),
+        backgroundColor: GOLD_SCALE[i % GOLD_SCALE.length]
+      }))
+    },
+    options:{ responsive:true, plugins:{legend:{position:'bottom'}}, scales:{ y:{ title:{display:true,text:'売上(円)'} } } }
+  });
+
+  const tbl = document.getElementById(tableId);
+  let thead = '<thead><tr><th></th>' + monthLabels.map(m=>`<th>${m}</th>`).join('') + '</tr></thead>';
+  let tbody = '<tbody>' + yearLabels.map(yl => {
+    const cells = monthLabels.map(ml => {
+      const v = fiscalMap[yl][ml];
+      return `<td>${v!=null ? Math.round(v).toLocaleString() : ''}</td>`;
+    }).join('');
+    return `<tr><td>${yl}</td>${cells}</tr>`;
+  }).join('') + '</tbody>';
+  tbl.className = 'fiscal-table';
+  tbl.innerHTML = thead + tbody;
+}
+
+document.getElementById('salesCsvImportBtn').addEventListener('click', () => {
+  const fileInput = document.getElementById('salesCsvFile');
+  const statusEl = document.getElementById('salesCsvStatus');
+  const file = fileInput.files[0];
+  if(!file){
+    statusEl.textContent = 'CSVファイルを選択してください。';
+    statusEl.style.color = 'var(--warn)';
+    return;
+  }
+  statusEl.textContent = '読み込み中…';
+  statusEl.style.color = 'var(--ink-soft)';
+  const reader = new FileReader();
+  reader.onload = () => {
+    let text;
+    try{ text = new TextDecoder('shift-jis').decode(reader.result); }
+    catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
+    if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
+
+    let records;
+    try{
+      records = parseSalesComparisonCsv(text);
+    }catch(e){
+      statusEl.textContent = 'CSVの解析に失敗しました： ' + (e.message||e);
+      statusEl.style.color = 'var(--warn)';
+      return;
+    }
+    if(records.length === 0){
+      statusEl.textContent = '予約データが見つかりませんでした。CSVの形式（部屋=Q列, 料金=AK列）をご確認ください。';
+      statusEl.style.color = 'var(--warn)';
+      return;
+    }
+
+    // 全体
+    const overallMap = buildFiscalMonthMap(records, null);
+    document.getElementById('fiscalOverallSection').style.display = '';
+    renderFiscalChartAndTable('chartFiscalOverall', 'tableFiscalOverall', overallMap, 'fiscalOverall');
+
+    // 部屋タイプ別
+    const roomContainer = document.getElementById('fiscalByRoomContainer');
+    roomContainer.innerHTML = '';
+    const categories = ['スタンダード','コネクト','ドッグドーム','ドッグコテージ'];
+    categories.forEach((cat, idx) => {
+      const canvasId = `chartFiscalRoom${idx}`;
+      const tableId = `tableFiscalRoom${idx}`;
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `<h3 style="margin:22px 0 10px;font-size:13px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;">${cat}</h3>
+        <div class="card"><canvas id="${canvasId}" height="220"></canvas></div>
+        <div class="card"><div class="tablewrap"><table id="${tableId}"></table></div></div>`;
+      roomContainer.appendChild(wrap);
+      const map = buildFiscalMonthMap(records, r => categorizeRoom(r.room) === cat);
+      renderFiscalChartAndTable(canvasId, tableId, map, 'fiscalRoom'+idx);
+    });
+    document.getElementById('fiscalByRoomSection').style.display = '';
+
+    statusEl.textContent = `${records.length}件の予約から会計年度別データを再構築しました（${file.name}）`;
+    statusEl.style.color = 'var(--good)';
+  };
+  reader.readAsArrayBuffer(file);
+});
 </script>
 </body>
 </html>
