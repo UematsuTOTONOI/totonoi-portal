@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>予約表作成 | TOTONOI富士山中湖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Noto+Serif+JP:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold: #b88931; --gold-light: #d6ad61; --ink: #23201b; --ink-soft: #5c564a;
+    --paper: #faf7f0; --paper-card: #ffffff; --line: #e6ddc9; --good:#6b8f6a; --warn: #b5573a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'Noto Sans JP', sans-serif; -webkit-font-smoothing:antialiased;}
+  header.site{ padding:48px 6vw 32px; border-bottom:1px solid var(--line);
+    background: radial-gradient(1200px 200px at 10% -20%, rgba(184,137,49,0.10), transparent 60%), var(--paper); }
+  .eyebrow{font-family:'Noto Serif JP', serif; letter-spacing:.28em; font-size:11px; color:var(--gold); text-transform:uppercase; margin:0 0 14px;}
+  h1{font-family:'Cormorant Garamond', 'Noto Serif JP', serif; font-weight:500; font-size:clamp(28px, 4vw, 46px); margin:0 0 8px;}
+  h1 em{font-style:italic; color:var(--gold);}
+  .sub{font-family:'Noto Serif JP', serif; color:var(--ink-soft); font-size:14px; max-width:60ch; line-height:1.8; margin:0;}
+  main{max-width:1100px; margin:0 auto; padding:40px 6vw 100px;}
+
+  .card{ border:1px solid var(--line); background:var(--paper-card); padding:28px; border-radius:2px; margin-bottom:28px; position:relative; overflow:hidden;}
+  .card.accent::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(var(--gold), var(--gold-light));}
+  .card h2{font-family:'Noto Serif JP', serif; font-weight:600; font-size:16px; margin:0 0 18px;}
+
+  .row{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:14px;}
+  .field{flex:1 1 160px; display:flex; flex-direction:column; gap:5px;}
+  .field.wide{flex:1 1 100%;}
+  .field label{font-size:11.5px; color:var(--ink-soft); letter-spacing:.03em;}
+  .field input, .field select, .field textarea{
+    padding:9px 10px; border:1px solid var(--line); background:var(--paper); font-family:inherit; font-size:13.5px; color:var(--ink); border-radius:2px;
+  }
+  .field textarea{resize:vertical; min-height:60px;}
+  .section-title{ font-size:12px; letter-spacing:.08em; color:var(--gold); text-transform:uppercase; margin:22px 0 10px; border-bottom:1px solid var(--line); padding-bottom:6px;}
+  .section-title:first-of-type{margin-top:0;}
+
+  .total-box{ display:flex; justify-content:flex-end; gap:22px; align-items:baseline; margin-top:6px; font-family:'Cormorant Garamond', serif;}
+  .total-box .label{font-size:13px; color:var(--ink-soft); font-family:'Noto Sans JP',sans-serif;}
+  .total-box .amount{font-size:28px; color:var(--gold);}
+
+  .actions{display:flex; gap:12px; justify-content:flex-end; margin-top:20px;}
+  button{ font-family:inherit; cursor:pointer; border-radius:20px; border:none; padding:11px 26px; font-size:13.5px; }
+  button.primary{ background:var(--ink); color:#fff; }
+  button.secondary{ background:transparent; color:var(--ink-soft); border:1px solid var(--line); }
+  button:disabled{opacity:.5; cursor:default;}
+
+  #formStatus{font-size:13px; margin-top:10px; min-height:18px;}
+  #formStatus.err{color:var(--warn); font-weight:600;}
+  #formStatus.ok{color:var(--good); font-weight:600;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th,td{padding:8px 9px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap;}
+  thead th{color:var(--ink-soft); font-weight:600; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; border-bottom:1px solid var(--ink);}
+  tbody tr:hover{background:#fbf6ea; cursor:pointer;}
+  .tablewrap{overflow-x:auto;}
+  .small{font-size:11.5px; color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <p class="eyebrow">Booking Entry</p>
+  <h1>予約表<em>作成</em></h1>
+  <p class="sub">ここで入力した予約は専用のGoogleスプレッドシートに保存され、氏名・電話番号などを除いた集計データが自動でdata.htmlに反映されます。既存の予約表・タイムテーブルシートと並行して運用します。</p>
+</header>
+
+<main>
+
+  <div class="card" id="settingsPanel">
+    <h2>API接続設定</h2>
+    <div class="row">
+      <div class="field wide">
+        <label>GAS Web App URL</label>
+        <input id="cfgUrl" type="text" placeholder="https://script.google.com/macros/s/.../exec">
+      </div>
+      <div class="field">
+        <label>合言葉（Shared Secret）</label>
+        <input id="cfgSecret" type="password">
+      </div>
+      <div style="align-self:flex-end;">
+        <button class="primary" id="cfgSaveBtn">保存して接続</button>
+      </div>
+    </div>
+    <div id="cfgStatus" class="small">未接続</div>
+  </div>
+
+  <div class="card accent">
+    <h2 id="formTitle">新規予約の入力</h2>
+    <form id="bookingForm">
+      <input type="hidden" id="f_id">
+
+      <div class="section-title">基本情報</div>
+      <div class="row">
+        <div class="field"><label>部屋</label>
+          <select id="f_room">
+            <option>スタンダードA</option><option>スタンダードD</option>
+            <option>ドッグB</option><option>ドッグC</option>
+            <option>コネクトE</option><option>コネクトF</option>
+            <option>ドッグコテージG</option>
+          </select>
+        </div>
+        <div class="field wide"><label>商品プラン</label><input id="f_plan" type="text" placeholder="例：【1泊2食付き】グルメグランピング"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>チェックイン日</label><input id="f_checkin" type="date"></div>
+        <div class="field"><label>チェックアウト日</label><input id="f_checkout" type="date"></div>
+        <div class="field"><label>決済方法</label>
+          <select id="f_payment"><option>クレジットカード</option><option>現払い</option><option>銀行振込</option></select>
+        </div>
+      </div>
+
+      <div class="section-title">お客様情報（個人情報・社内利用のみ）</div>
+      <div class="row">
+        <div class="field"><label>氏名</label><input id="f_name" type="text"></div>
+        <div class="field"><label>氏名カナ</label><input id="f_kana" type="text"></div>
+        <div class="field"><label>電話番号</label><input id="f_phone" type="text"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>年代</label>
+          <select id="f_age"><option>10代</option><option>20代</option><option selected>30代</option><option>40代</option><option>50代</option><option>60代</option><option>70代</option></select>
+        </div>
+        <div class="field"><label>都道府県・地域</label><input id="f_region" type="text" placeholder="例：東京都 / Hong Kong"></div>
+        <div class="field"><label>客層・リピート状況</label>
+          <select id="f_customerType"><option>新規</option><option>リピート</option></select>
+        </div>
+      </div>
+
+      <div class="section-title">人数・食事</div>
+      <div class="row">
+        <div class="field"><label>大人</label><input id="f_adults" type="number" min="0" value="2"></div>
+        <div class="field"><label>子供（寝具あり）</label><input id="f_kidsWithBed" type="number" min="0" value="0"></div>
+        <div class="field"><label>未就学児（寝具あり）</label><input id="f_infantsWithBed" type="number" min="0" value="0"></div>
+        <div class="field"><label>未就学児（寝具なし）</label><input id="f_infantsNoBed" type="number" min="0" value="0"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>夕食（大人）</label><input id="f_dinnerAdults" type="number" min="0" value="0"></div>
+        <div class="field"><label>夕食（子供）</label><input id="f_dinnerKids" type="number" min="0" value="0"></div>
+        <div class="field"><label>朝食（大人）</label><input id="f_breakfastAdults" type="number" min="0" value="0"></div>
+        <div class="field"><label>朝食（子供）</label><input id="f_breakfastKids" type="number" min="0" value="0"></div>
+      </div>
+
+      <div class="section-title">サウナ・オプション</div>
+      <div class="row">
+        <div class="field"><label>ASEMA予約</label>
+          <select id="f_saunaAsema"><option value="">なし</option><option>ASEMA 15:00</option><option>ASEMA 17:30</option><option>ASEMA 19:30</option></select>
+        </div>
+        <div class="field"><label>イグルー予約</label>
+          <select id="f_saunaIgloo"><option value="">なし</option><option>イグルー 15:30</option><option>イグルー 17:30</option><option>イグルー 19:30</option></select>
+        </div>
+        <div class="field"><label>グリル</label>
+          <select id="f_grill"><option value="">なし</option><option>ガスBBQグリル</option></select>
+        </div>
+        <div class="field"><label>薪</label>
+          <select id="f_firewood"><option value="">なし</option><option>薪×1</option><option>薪×2</option></select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field wide"><label>その他オプション（自由記述）</label><input id="f_options" type="text" placeholder="例：アニバーサリーケーキ4号"></div>
+      </div>
+
+      <div class="section-title">料金内訳</div>
+      <div class="row">
+        <div class="field"><label>宿泊料金</label><input id="f_lodgingFee" type="number" min="0" value="0"></div>
+        <div class="field"><label>食事料金</label><input id="f_mealFee" type="number" min="0" value="0"></div>
+        <div class="field"><label>サウナ・プログラム料金</label><input id="f_programFee" type="number" min="0" value="0"></div>
+        <div class="field"><label>オプション料金</label><input id="f_optionFee" type="number" min="0" value="0"></div>
+      </div>
+      <div class="total-box"><span class="label">合計金額</span><span class="amount" id="totalAmount">¥0</span></div>
+
+      <div class="section-title">備考</div>
+      <div class="row">
+        <div class="field wide"><textarea id="f_notes" placeholder="ペット情報、要望など"></textarea></div>
+      </div>
+
+      <div id="formStatus"></div>
+      <div class="actions">
+        <button type="button" class="secondary" id="resetBtn">クリア</button>
+        <button type="submit" class="primary" id="submitBtn">保存する</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>直近の予約一覧</h2>
+    <div class="row" style="margin-bottom:14px;">
+      <div class="field"><label>表示開始日</label><input id="listFrom" type="date"></div>
+      <div class="field"><label>表示終了日</label><input id="listTo" type="date"></div>
+      <div style="align-self:flex-end;"><button class="secondary" id="reloadListBtn">再読込</button></div>
+    </div>
+    <div class="tablewrap">
+      <table id="listTable">
+        <thead><tr><th>チェックイン</th><th>部屋</th><th>氏名</th><th>大人</th><th>プラン</th><th>合計金額</th></tr></thead>
+        <tbody><tr><td colspan="6" class="small">API接続設定を保存すると表示されます</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const FIELD_IDS = [
+  'room','plan','checkin','checkout','payment',
+  'name','kana','phone','age','region','customerType',
+  'adults','kidsWithBed','infantsWithBed','infantsNoBed',
+  'dinnerAdults','dinnerKids','breakfastAdults','breakfastKids',
+  'saunaAsema','saunaIgloo','grill','firewood','options',
+  'lodgingFee','mealFee','programFee','optionFee','notes'
+];
+
+const cfgUrl = document.getElementById('cfgUrl');
+const cfgSecret = document.getElementById('cfgSecret');
+const cfgStatus = document.getElementById('cfgStatus');
+
+function loadConfig(){
+  cfgUrl.value = localStorage.getItem('totonoi_gas_url') || '';
+  cfgSecret.value = localStorage.getItem('totonoi_gas_secret') || '';
+}
+function saveConfig(){
+  localStorage.setItem('totonoi_gas_url', cfgUrl.value.trim());
+  localStorage.setItem('totonoi_gas_secret', cfgSecret.value.trim());
+}
+
+document.getElementById('cfgSaveBtn').addEventListener('click', () => {
+  saveConfig();
+  cfgStatus.textContent = '保存しました。';
+  cfgStatus.style.color = 'var(--good)';
+  loadList();
+});
+
+function fieldEl(id){ return document.getElementById('f_' + id); }
+
+function collectRecord(){
+  const rec = {};
+  FIELD_IDS.forEach(id => {
+    const el = fieldEl(id);
+    if(!el) return;
+    if(el.type === 'number'){ rec[id === 'name' ? id : id] = toNum(el.value); }
+    else rec[id] = el.value;
+  });
+  // 名前を明示的にマッピング（フィールドIDとレコードキーの対応）
+  const mapped = {
+    id: document.getElementById('f_id').value || undefined,
+    room: fieldEl('room').value,
+    plan: fieldEl('plan').value,
+    checkin: fieldEl('checkin').value,
+    checkout: fieldEl('checkout').value,
+    paymentMethod: fieldEl('payment').value,
+    guestName: fieldEl('name').value,
+    guestNameKana: fieldEl('kana').value,
+    phone: fieldEl('phone').value,
+    ageGroup: fieldEl('age').value,
+    region: fieldEl('region').value,
+    customerType: fieldEl('customerType').value,
+    adults: toNum(fieldEl('adults').value),
+    kidsWithBed: toNum(fieldEl('kidsWithBed').value),
+    infantsWithBed: toNum(fieldEl('infantsWithBed').value),
+    infantsNoBed: toNum(fieldEl('infantsNoBed').value),
+    dinnerAdults: toNum(fieldEl('dinnerAdults').value),
+    dinnerKids: toNum(fieldEl('dinnerKids').value),
+    breakfastAdults: toNum(fieldEl('breakfastAdults').value),
+    breakfastKids: toNum(fieldEl('breakfastKids').value),
+    saunaAsema: fieldEl('saunaAsema').value,
+    saunaIgloo: fieldEl('saunaIgloo').value,
+    grill: fieldEl('grill').value,
+    firewood: fieldEl('firewood').value,
+    options: fieldEl('options').value,
+    lodgingFee: toNum(fieldEl('lodgingFee').value),
+    mealFee: toNum(fieldEl('mealFee').value),
+    programFee: toNum(fieldEl('programFee').value),
+    optionFee: toNum(fieldEl('optionFee').value),
+    notes: fieldEl('notes').value
+  };
+  return mapped;
+}
+function toNum(v){ const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+
+function updateTotal(){
+  const total = ['lodgingFee','mealFee','programFee','optionFee'].reduce((s,id)=>s+toNum(fieldEl(id).value),0);
+  document.getElementById('totalAmount').textContent = '¥' + total.toLocaleString();
+}
+['lodgingFee','mealFee','programFee','optionFee'].forEach(id => fieldEl(id).addEventListener('input', updateTotal));
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  document.getElementById('bookingForm').reset();
+  document.getElementById('f_id').value = '';
+  document.getElementById('formTitle').textContent = '新規予約の入力';
+  updateTotal();
+});
+
+document.getElementById('bookingForm').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const statusEl = document.getElementById('formStatus');
+  const url = cfgUrl.value.trim(), secret = cfgSecret.value.trim();
+  if(!url || !secret){
+    statusEl.textContent = '先にAPI接続設定を入力・保存してください。';
+    statusEl.className = 'err';
+    return;
+  }
+  const record = collectRecord();
+  if(!record.checkin || !record.room){
+    statusEl.textContent = 'チェックイン日と部屋は必須です。';
+    statusEl.className = 'err';
+    return;
+  }
+  statusEl.textContent = '保存中…';
+  statusEl.className = '';
+  try{
+    const res = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({ secret, record })
+    });
+    const json = await res.json();
+    if(!json.ok) throw new Error(json.error || '不明なエラー');
+    statusEl.textContent = `保存しました（予約ID: ${json.id} / GitHub連携: ${json.githubStatus}）`;
+    statusEl.className = 'ok';
+    document.getElementById('f_id').value = json.id;
+    document.getElementById('formTitle').textContent = `予約 ${json.id} を編集中`;
+    loadList();
+  }catch(e){
+    statusEl.textContent = '保存に失敗しました： ' + (e && e.message ? e.message : e);
+    statusEl.className = 'err';
+  }
+});
+
+async function loadList(){
+  const url = cfgUrl.value.trim(), secret = cfgSecret.value.trim();
+  const tbody = document.querySelector('#listTable tbody');
+  if(!url || !secret) return;
+  const from = document.getElementById('listFrom').value;
+  const to = document.getElementById('listTo').value;
+  tbody.innerHTML = `<tr><td colspan="6" class="small">読み込み中…</td></tr>`;
+  try{
+    const qs = new URLSearchParams({ secret });
+    if(from) qs.set('from', from);
+    if(to) qs.set('to', to);
+    const res = await fetch(url + '?' + qs.toString());
+    const json = await res.json();
+    if(!json.ok) throw new Error(json.error);
+    const records = (json.records || []).sort((a,b)=> a.checkin < b.checkin ? -1 : 1);
+    if(records.length === 0){
+      tbody.innerHTML = `<tr><td colspan="6" class="small">該当する予約はありません</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = records.map(r => {
+      const total = [r.lodgingFee,r.mealFee,r.programFee,r.optionFee].reduce((s,v)=>s+(parseFloat(v)||0),0);
+      return `<tr data-id="${r.id}"><td>${r.checkin||''}</td><td>${r.room||''}</td><td>${r.guestName||''}</td><td>${r.adults||0}</td><td>${(r.plan||'').slice(0,20)}</td><td>¥${total.toLocaleString()}</td></tr>`;
+    }).join('');
+    tbody.querySelectorAll('tr').forEach(tr => {
+      tr.addEventListener('click', () => loadIntoForm(records.find(r => r.id === tr.dataset.id)));
+    });
+  }catch(e){
+    tbody.innerHTML = `<tr><td colspan="6" class="small" style="color:var(--warn);">読み込みエラー： ${e.message||e}</td></tr>`;
+  }
+}
+
+function loadIntoForm(r){
+  if(!r) return;
+  document.getElementById('f_id').value = r.id;
+  document.getElementById('formTitle').textContent = `予約 ${r.id} を編集中`;
+  const map = {
+    room:'room', plan:'plan', checkin:'checkin', checkout:'checkout', paymentMethod:'payment',
+    guestName:'name', guestNameKana:'kana', phone:'phone', ageGroup:'age', region:'region', customerType:'customerType',
+    adults:'adults', kidsWithBed:'kidsWithBed', infantsWithBed:'infantsWithBed', infantsNoBed:'infantsNoBed',
+    dinnerAdults:'dinnerAdults', dinnerKids:'dinnerKids', breakfastAdults:'breakfastAdults', breakfastKids:'breakfastKids',
+    saunaAsema:'saunaAsema', saunaIgloo:'saunaIgloo', grill:'grill', firewood:'firewood', options:'options',
+    lodgingFee:'lodgingFee', mealFee:'mealFee', programFee:'programFee', optionFee:'optionFee', notes:'notes'
+  };
+  Object.entries(map).forEach(([recKey, fieldId]) => {
+    const el = fieldEl(fieldId);
+    if(el && r[recKey] !== undefined) el.value = r[recKey];
+  });
+  updateTotal();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('reloadListBtn').addEventListener('click', loadList);
+
+loadConfig();
+updateTotal();
+if(cfgUrl.value && cfgSecret.value) loadList();
+</script>
+</body>
+</html>
