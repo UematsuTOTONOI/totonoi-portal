@@ -6,7 +6,11 @@
       "checkin": "2026/08/01",
       "revenue": 76550,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7417",
@@ -14,7 +18,11 @@
       "checkin": "2026/08/01",
       "revenue": 56000,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7269",
@@ -22,7 +30,11 @@
       "checkin": "2026/08/01",
       "revenue": 99370,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7268",
@@ -30,7 +42,11 @@
       "checkin": "2026/08/01",
       "revenue": 110870,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7258",
@@ -38,7 +54,11 @@
       "checkin": "2026/08/01",
       "revenue": 127330,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7112",
@@ -46,7 +66,11 @@
       "checkin": "2026/08/01",
       "revenue": 104640,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7092",
@@ -54,7 +78,11 @@
       "checkin": "2026/08/01",
       "revenue": 126420,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7590",
@@ -62,7 +90,11 @@
       "checkin": "2026/08/02",
       "revenue": 70100,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7570",
@@ -70,7 +102,11 @@
       "checkin": "2026/08/02",
       "revenue": 70200,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7558",
@@ -78,7 +114,11 @@
       "checkin": "2026/08/02",
       "revenue": 75400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7475",
@@ -86,7 +126,11 @@
       "checkin": "2026/08/02",
       "revenue": 55950,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7136",
@@ -94,7 +138,11 @@
       "checkin": "2026/08/02",
       "revenue": 61920,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7045",
@@ -102,7 +150,11 @@
       "checkin": "2026/08/02",
       "revenue": 34840,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7033",
@@ -110,7 +162,11 @@
       "checkin": "2026/08/02",
       "revenue": 104720,
       "nights": 2,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7578",
@@ -118,7 +174,11 @@
       "checkin": "2026/08/03",
       "revenue": 189600,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7393",
@@ -126,7 +186,11 @@
       "checkin": "2026/08/03",
       "revenue": 50650,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7360",
@@ -134,7 +198,11 @@
       "checkin": "2026/08/03",
       "revenue": 52600,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7349",
@@ -142,7 +210,11 @@
       "checkin": "2026/08/03",
       "revenue": 131050,
       "nights": 2,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7335",
@@ -150,7 +222,11 @@
       "checkin": "2026/08/03",
       "revenue": 55400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7552",
@@ -158,7 +234,11 @@
       "checkin": "2026/08/04",
       "revenue": 90950,
       "nights": 2,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7546",
@@ -166,7 +246,11 @@
       "checkin": "2026/08/04",
       "revenue": 55950,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7496",
@@ -174,7 +258,11 @@
       "checkin": "2026/08/04",
       "revenue": 60850,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7341",
@@ -182,7 +270,11 @@
       "checkin": "2026/08/04",
       "revenue": 51250,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7005",
@@ -190,7 +282,11 @@
       "checkin": "2026/08/04",
       "revenue": 60060,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7484",
@@ -198,7 +294,11 @@
       "checkin": "2026/08/05",
       "revenue": 112250,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7450",
@@ -206,7 +306,11 @@
       "checkin": "2026/08/05",
       "revenue": 61400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7173",
@@ -214,7 +318,11 @@
       "checkin": "2026/08/05",
       "revenue": 87340,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "8841",
@@ -222,7 +330,11 @@
       "checkin": "2026/08/05",
       "revenue": 41360,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "8840",
@@ -230,7 +342,11 @@
       "checkin": "2026/08/05",
       "revenue": 47460,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "8839",
@@ -238,7 +354,11 @@
       "checkin": "2026/08/05",
       "revenue": 57640,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7642",
@@ -246,7 +366,11 @@
       "checkin": "2026/08/06",
       "revenue": 49800,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7626",
@@ -254,7 +378,11 @@
       "checkin": "2026/08/06",
       "revenue": 113400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7583",
@@ -262,7 +390,11 @@
       "checkin": "2026/08/06",
       "revenue": 99500,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7481",
@@ -270,7 +402,11 @@
       "checkin": "2026/08/06",
       "revenue": 70200,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "8846",
@@ -278,7 +414,11 @@
       "checkin": "2026/08/06",
       "revenue": 180430,
       "nights": 2,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "8803",
@@ -286,7 +426,11 @@
       "checkin": "2026/08/06",
       "revenue": 54660,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7576",
@@ -294,7 +438,11 @@
       "checkin": "2026/08/07",
       "revenue": 65800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7460",
@@ -302,7 +450,11 @@
       "checkin": "2026/08/07",
       "revenue": 57550,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7451",
@@ -310,7 +462,11 @@
       "checkin": "2026/08/07",
       "revenue": 64150,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7648",
@@ -318,7 +474,11 @@
       "checkin": "2026/08/08",
       "revenue": 61150,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7597",
@@ -326,7 +486,11 @@
       "checkin": "2026/08/08",
       "revenue": 103050,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7591",
@@ -334,7 +498,11 @@
       "checkin": "2026/08/08",
       "revenue": 129350,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7533",
@@ -342,7 +510,11 @@
       "checkin": "2026/08/08",
       "revenue": 110250,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7226",
@@ -350,7 +522,11 @@
       "checkin": "2026/08/08",
       "revenue": 171930,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7135",
@@ -358,7 +534,11 @@
       "checkin": "2026/08/08",
       "revenue": 57310,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7624",
@@ -366,7 +546,11 @@
       "checkin": "2026/08/09",
       "revenue": 91300,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7604",
@@ -374,7 +558,11 @@
       "checkin": "2026/08/09",
       "revenue": 114000,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "9026",
@@ -382,7 +570,11 @@
       "checkin": "2026/08/09",
       "revenue": 133700,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7231",
@@ -390,7 +582,11 @@
       "checkin": "2026/08/09",
       "revenue": 96790,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7225",
@@ -398,7 +594,11 @@
       "checkin": "2026/08/09",
       "revenue": 115070,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7162",
@@ -406,7 +606,11 @@
       "checkin": "2026/08/09",
       "revenue": 146120,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7059",
@@ -414,7 +618,11 @@
       "checkin": "2026/08/09",
       "revenue": 127320,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7566",
@@ -422,7 +630,11 @@
       "checkin": "2026/08/10",
       "revenue": 89800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7550",
@@ -430,7 +642,11 @@
       "checkin": "2026/08/10",
       "revenue": 146050,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7465",
@@ -438,7 +654,11 @@
       "checkin": "2026/08/10",
       "revenue": 160800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7445",
@@ -446,7 +666,11 @@
       "checkin": "2026/08/10",
       "revenue": 77650,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7366",
@@ -454,7 +678,11 @@
       "checkin": "2026/08/10",
       "revenue": 110300,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7328",
@@ -462,7 +690,11 @@
       "checkin": "2026/08/10",
       "revenue": 74000,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7223",
@@ -470,7 +702,11 @@
       "checkin": "2026/08/10",
       "revenue": 82050,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7527",
@@ -478,7 +714,11 @@
       "checkin": "2026/08/11",
       "revenue": 104300,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7518",
@@ -486,7 +726,11 @@
       "checkin": "2026/08/11",
       "revenue": 84800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7426",
@@ -494,7 +738,11 @@
       "checkin": "2026/08/11",
       "revenue": 97400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7387",
@@ -502,7 +750,11 @@
       "checkin": "2026/08/11",
       "revenue": 85400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7384",
@@ -510,7 +762,11 @@
       "checkin": "2026/08/11",
       "revenue": 139900,
       "nights": 2,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7352",
@@ -518,7 +774,11 @@
       "checkin": "2026/08/11",
       "revenue": 99150,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7210",
@@ -526,7 +786,11 @@
       "checkin": "2026/08/11",
       "revenue": 141220,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7521",
@@ -534,7 +798,11 @@
       "checkin": "2026/08/12",
       "revenue": 197800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7491",
@@ -542,7 +810,11 @@
       "checkin": "2026/08/12",
       "revenue": 79350,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7448",
@@ -550,7 +822,11 @@
       "checkin": "2026/08/12",
       "revenue": 92000,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7155",
@@ -558,7 +834,11 @@
       "checkin": "2026/08/12",
       "revenue": 108950,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7008",
@@ -566,7 +846,11 @@
       "checkin": "2026/08/12",
       "revenue": 143800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7007",
@@ -574,7 +858,11 @@
       "checkin": "2026/08/12",
       "revenue": 70510,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7594",
@@ -582,7 +870,11 @@
       "checkin": "2026/08/13",
       "revenue": 98600,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7437",
@@ -590,7 +882,11 @@
       "checkin": "2026/08/13",
       "revenue": 157000,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7430",
@@ -598,7 +894,11 @@
       "checkin": "2026/08/13",
       "revenue": 80400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7392",
@@ -606,7 +906,11 @@
       "checkin": "2026/08/13",
       "revenue": 75450,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7357",
@@ -614,7 +918,11 @@
       "checkin": "2026/08/13",
       "revenue": 92500,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7350",
@@ -622,7 +930,11 @@
       "checkin": "2026/08/13",
       "revenue": 73800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7290",
@@ -630,7 +942,11 @@
       "checkin": "2026/08/13",
       "revenue": 129400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7606",
@@ -638,7 +954,11 @@
       "checkin": "2026/08/14",
       "revenue": 87300,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7592",
@@ -646,7 +966,11 @@
       "checkin": "2026/08/14",
       "revenue": 92000,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7565",
@@ -654,7 +978,11 @@
       "checkin": "2026/08/14",
       "revenue": 164900,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7446",
@@ -662,7 +990,11 @@
       "checkin": "2026/08/14",
       "revenue": 88450,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7320",
@@ -670,7 +1002,11 @@
       "checkin": "2026/08/14",
       "revenue": 80800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "8911",
@@ -678,7 +1014,11 @@
       "checkin": "2026/08/14",
       "revenue": 184440,
       "nights": 2,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7181",
@@ -686,7 +1026,11 @@
       "checkin": "2026/08/14",
       "revenue": 104960,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7526",
@@ -694,7 +1038,11 @@
       "checkin": "2026/08/15",
       "revenue": 73850,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7511",
@@ -702,7 +1050,11 @@
       "checkin": "2026/08/15",
       "revenue": 68850,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7372",
@@ -710,7 +1062,11 @@
       "checkin": "2026/08/15",
       "revenue": 167100,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7346",
@@ -718,7 +1074,11 @@
       "checkin": "2026/08/15",
       "revenue": 86800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7187",
@@ -726,7 +1086,11 @@
       "checkin": "2026/08/15",
       "revenue": 84240,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7109",
@@ -734,7 +1098,11 @@
       "checkin": "2026/08/15",
       "revenue": 101570,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7639",
@@ -742,7 +1110,11 @@
       "checkin": "2026/08/16",
       "revenue": 63000,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7572",
@@ -750,7 +1122,11 @@
       "checkin": "2026/08/16",
       "revenue": 50350,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7449",
@@ -758,7 +1134,11 @@
       "checkin": "2026/08/16",
       "revenue": 117800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7382",
@@ -766,7 +1146,11 @@
       "checkin": "2026/08/16",
       "revenue": 123000,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7331",
@@ -774,7 +1158,11 @@
       "checkin": "2026/08/16",
       "revenue": 190500,
       "nights": 2,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7321",
@@ -782,15 +1170,23 @@
       "checkin": "2026/08/16",
       "revenue": 82450,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7122",
-      "room": "スタンダードD",
-      "checkin": "2025/09/13",
-      "revenue": 59140,
+      "room": "ドッグコテージG",
+      "checkin": "2026/08/16",
+      "revenue": 83720,
       "nights": 1,
-      "ate": null
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7632",
@@ -798,7 +1194,11 @@
       "checkin": "2026/08/17",
       "revenue": 49250,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7620",
@@ -806,7 +1206,11 @@
       "checkin": "2026/08/17",
       "revenue": 71300,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7564",
@@ -814,7 +1218,11 @@
       "checkin": "2026/08/17",
       "revenue": 83800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7476",
@@ -822,7 +1230,11 @@
       "checkin": "2026/08/17",
       "revenue": 75100,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7424",
@@ -830,7 +1242,11 @@
       "checkin": "2026/08/17",
       "revenue": 76450,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7378",
@@ -838,7 +1254,11 @@
       "checkin": "2026/08/17",
       "revenue": 52550,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7671",
@@ -846,7 +1266,11 @@
       "checkin": "2026/08/18",
       "revenue": 103800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7615",
@@ -854,7 +1278,11 @@
       "checkin": "2026/08/18",
       "revenue": 128700,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7567",
@@ -862,7 +1290,11 @@
       "checkin": "2026/08/18",
       "revenue": 176400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7562",
@@ -870,7 +1302,11 @@
       "checkin": "2026/08/18",
       "revenue": 109400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7364",
@@ -878,7 +1314,11 @@
       "checkin": "2026/08/18",
       "revenue": 64200,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7270",
@@ -886,7 +1326,11 @@
       "checkin": "2026/08/18",
       "revenue": 68690,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7694",
@@ -894,7 +1338,11 @@
       "checkin": "2026/08/19",
       "revenue": 48450,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7670",
@@ -902,7 +1350,11 @@
       "checkin": "2026/08/19",
       "revenue": 89350,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "9367",
@@ -910,7 +1362,11 @@
       "checkin": "2026/08/19",
       "revenue": 48200,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7587",
@@ -918,7 +1374,11 @@
       "checkin": "2026/08/19",
       "revenue": 155900,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7559",
@@ -926,7 +1386,11 @@
       "checkin": "2026/08/19",
       "revenue": 103200,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7539",
@@ -934,7 +1398,11 @@
       "checkin": "2026/08/19",
       "revenue": 128600,
       "nights": 2,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7688",
@@ -942,7 +1410,11 @@
       "checkin": "2026/08/20",
       "revenue": 48450,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7661",
@@ -950,7 +1422,11 @@
       "checkin": "2026/08/20",
       "revenue": 62200,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7644",
@@ -958,7 +1434,11 @@
       "checkin": "2026/08/20",
       "revenue": 67400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7515",
@@ -966,7 +1446,11 @@
       "checkin": "2026/08/20",
       "revenue": 53150,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7145",
@@ -974,7 +1458,11 @@
       "checkin": "2026/08/20",
       "revenue": 60150,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7616",
@@ -982,7 +1470,11 @@
       "checkin": "2026/08/21",
       "revenue": 83400,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7608",
@@ -990,7 +1482,11 @@
       "checkin": "2026/08/21",
       "revenue": 74500,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7574",
@@ -998,7 +1494,11 @@
       "checkin": "2026/08/21",
       "revenue": 210050,
       "nights": 2,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7541",
@@ -1006,7 +1506,11 @@
       "checkin": "2026/08/21",
       "revenue": 108600,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7253",
@@ -1014,7 +1518,11 @@
       "checkin": "2026/08/21",
       "revenue": 84260,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7700",
@@ -1022,7 +1530,11 @@
       "checkin": "2026/08/22",
       "revenue": 129350,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7689",
@@ -1030,7 +1542,11 @@
       "checkin": "2026/08/22",
       "revenue": 75750,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7640",
@@ -1038,7 +1554,11 @@
       "checkin": "2026/08/22",
       "revenue": 114000,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "9323",
@@ -1046,7 +1566,11 @@
       "checkin": "2026/08/22",
       "revenue": 91500,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7523",
@@ -1054,7 +1578,11 @@
       "checkin": "2026/08/22",
       "revenue": 171700,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7416",
@@ -1062,7 +1590,11 @@
       "checkin": "2026/08/22",
       "revenue": 171600,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "9391",
@@ -1070,7 +1602,11 @@
       "checkin": "2026/08/23",
       "revenue": 69600,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7602",
@@ -1078,7 +1614,11 @@
       "checkin": "2026/08/23",
       "revenue": 65200,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7528",
@@ -1086,7 +1626,11 @@
       "checkin": "2026/08/23",
       "revenue": 68800,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7479",
@@ -1094,7 +1638,11 @@
       "checkin": "2026/08/23",
       "revenue": 71850,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7219",
@@ -1102,7 +1650,11 @@
       "checkin": "2026/08/23",
       "revenue": 88440,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7118",
@@ -1110,7 +1662,11 @@
       "checkin": "2026/08/23",
       "revenue": 68260,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7116",
@@ -1118,7 +1674,11 @@
       "checkin": "2026/08/23",
       "revenue": 127320,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7665",
@@ -1126,7 +1686,11 @@
       "checkin": "2026/08/24",
       "revenue": 66550,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7593",
@@ -1134,7 +1698,11 @@
       "checkin": "2026/08/24",
       "revenue": 132500,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7362",
@@ -1142,7 +1710,11 @@
       "checkin": "2026/08/24",
       "revenue": 133500,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "9008",
@@ -1150,7 +1722,11 @@
       "checkin": "2026/08/24",
       "revenue": 157080,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "8868",
@@ -1158,7 +1734,11 @@
       "checkin": "2026/08/24",
       "revenue": 113520,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7085",
@@ -1166,7 +1746,11 @@
       "checkin": "2026/08/24",
       "revenue": 138980,
       "nights": 2,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7582",
@@ -1174,7 +1758,11 @@
       "checkin": "2026/08/25",
       "revenue": 101000,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "9226",
@@ -1182,7 +1770,11 @@
       "checkin": "2026/08/25",
       "revenue": 78000,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7456",
@@ -1190,7 +1782,11 @@
       "checkin": "2026/08/25",
       "revenue": 52200,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7455",
@@ -1198,7 +1794,11 @@
       "checkin": "2026/08/25",
       "revenue": 183300,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7691",
@@ -1206,7 +1806,11 @@
       "checkin": "2026/08/26",
       "revenue": 66900,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7712",
@@ -1214,15 +1818,23 @@
       "checkin": "2026/08/27",
       "revenue": 57600,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7649",
       "room": "スタンダードD",
       "checkin": "2026/08/27",
-      "revenue": 44450,
+      "revenue": 44650,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7599",
@@ -1230,7 +1842,11 @@
       "checkin": "2026/08/27",
       "revenue": 99500,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7651",
@@ -1238,7 +1854,11 @@
       "checkin": "2026/08/28",
       "revenue": 74600,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7610",
@@ -1246,15 +1866,23 @@
       "checkin": "2026/08/28",
       "revenue": 54600,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7358",
       "room": "スタンダードD",
       "checkin": "2026/08/28",
-      "revenue": 59250,
+      "revenue": 61250,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7090",
@@ -1262,7 +1890,11 @@
       "checkin": "2026/08/28",
       "revenue": 41000,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7079",
@@ -1270,7 +1902,11 @@
       "checkin": "2026/08/28",
       "revenue": 169840,
       "nights": 2,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7067",
@@ -1278,7 +1914,11 @@
       "checkin": "2026/08/28",
       "revenue": 65690,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "8448",
@@ -1286,23 +1926,35 @@
       "checkin": "2026/08/28",
       "revenue": 274560,
       "nights": 3,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7605",
       "room": "コネクトF",
       "checkin": "2026/08/29",
-      "revenue": 84800,
+      "revenue": 86000,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7163",
       "room": "スタンダードD",
       "checkin": "2026/08/29",
-      "revenue": 60960,
+      "revenue": 63460,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7088",
@@ -1310,7 +1962,11 @@
       "checkin": "2026/08/29",
       "revenue": 73200,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7069",
@@ -1902,11 +2558,15 @@
     },
     {
       "id": "7336",
-      "room": "ドッグコテージG",
-      "checkin": "2025/08/24",
-      "revenue": 49000,
+      "room": "ドッグB",
+      "checkin": "2026/07/25",
+      "revenue": 148700,
       "nights": 1,
-      "ate": null
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "5673",
@@ -25599,7 +26259,427 @@
       "region": "不明",
       "isInbound": false,
       "isRepeat": false
+    },
+    {
+      "id": "7197",
+      "room": "スタンダードA",
+      "checkin": "2026/07/23",
+      "revenue": 65560,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7023",
+      "room": "ドッグコテージG",
+      "checkin": "2026/07/23",
+      "revenue": 112440,
+      "nights": 2,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "6894",
+      "room": "スタンダードD",
+      "checkin": "2026/07/23",
+      "revenue": 41360,
+      "nights": 1,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7561",
+      "room": "ドッグB",
+      "checkin": "2026/07/24",
+      "revenue": 52050,
+      "nights": 1,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7398",
+      "room": "スタンダードA",
+      "checkin": "2026/07/24",
+      "revenue": 152200,
+      "nights": 2,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7119",
+      "room": "スタンダードD",
+      "checkin": "2026/07/24",
+      "revenue": 68060,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7485",
+      "room": "ドッグコテージG",
+      "checkin": "2026/07/25",
+      "revenue": 104400,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7414",
+      "room": "スタンダードD",
+      "checkin": "2026/07/25",
+      "revenue": 85400,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7329",
+      "room": "コネクトE",
+      "checkin": "2026/07/25",
+      "revenue": 98000,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7201",
+      "room": "コネクトF",
+      "checkin": "2026/07/25",
+      "revenue": 89860,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7166",
+      "room": "ドッグC",
+      "checkin": "2026/07/25",
+      "revenue": 87590,
+      "nights": 1,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7563",
+      "room": "コネクトE",
+      "checkin": "2026/07/26",
+      "revenue": 80400,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7415",
+      "room": "ドッグコテージG",
+      "checkin": "2026/07/26",
+      "revenue": 60850,
+      "nights": 1,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7402",
+      "room": "ドッグB",
+      "checkin": "2026/07/26",
+      "revenue": 62500,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7250",
+      "room": "ドッグC",
+      "checkin": "2026/07/26",
+      "revenue": 39570,
+      "nights": 1,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7236",
+      "room": "スタンダードA",
+      "checkin": "2026/07/26",
+      "revenue": 48010,
+      "nights": 1,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7195",
+      "room": "スタンダードD",
+      "checkin": "2026/07/26",
+      "revenue": 43010,
+      "nights": 1,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "6954",
+      "room": "コネクトF",
+      "checkin": "2026/07/26",
+      "revenue": 114400,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7555",
+      "room": "ドッグコテージG",
+      "checkin": "2026/07/27",
+      "revenue": 103450,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7486",
+      "room": "コネクトF",
+      "checkin": "2026/07/27",
+      "revenue": 76800,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7343",
+      "room": "スタンダードD",
+      "checkin": "2026/07/27",
+      "revenue": 65200,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7510",
+      "room": "スタンダードA",
+      "checkin": "2026/07/28",
+      "revenue": 65200,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7497",
+      "room": "コネクトE",
+      "checkin": "2026/07/28",
+      "revenue": 106600,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7174",
+      "room": "ドッグC",
+      "checkin": "2026/07/28",
+      "revenue": 99130,
+      "nights": 2,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "6901",
+      "room": "ドッグコテージG",
+      "checkin": "2026/07/28",
+      "revenue": 161640,
+      "nights": 2,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7513",
+      "room": "ドッグB",
+      "checkin": "2026/07/29",
+      "revenue": 70400,
+      "nights": 1,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7461",
+      "room": "スタンダードA",
+      "checkin": "2026/07/29",
+      "revenue": 58600,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7208",
+      "room": "スタンダードD",
+      "checkin": "2026/07/29",
+      "revenue": 59560,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7571",
+      "room": "ドッグC",
+      "checkin": "2026/07/30",
+      "revenue": 134300,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7514",
+      "room": "スタンダードA",
+      "checkin": "2026/07/30",
+      "revenue": 52450,
+      "nights": 1,
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7493",
+      "room": "ドッグコテージG",
+      "checkin": "2026/07/30",
+      "revenue": 178050,
+      "nights": 2,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7462",
+      "room": "ドッグB",
+      "checkin": "2026/07/31",
+      "revenue": 65800,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7278",
+      "room": "スタンダードA",
+      "checkin": "2026/07/31",
+      "revenue": 58410,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7271",
+      "room": "ドッグC",
+      "checkin": "2026/07/31",
+      "revenue": 104600,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
+    },
+    {
+      "id": "7030",
+      "room": "スタンダードD",
+      "checkin": "2026/07/31",
+      "revenue": 69260,
+      "nights": 1,
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     }
   ],
-  "lastUpdated": "2026-08-31T09:34:40.128Z"
+  "lastUpdated": "2026-08-31T09:34:48.074Z"
 }
