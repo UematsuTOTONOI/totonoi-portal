@@ -194,7 +194,7 @@ License: MIT
         <h3>会計年度別 全体比較データ</h3>
         <p class="small" style="margin-bottom:14px;">サイトコントローラーの詳細CSV（予約番号・部屋・売上合計額などを含む明細形式）をアップロードすると、会計年度別（3月始まり）の月次売上比較を全体／部屋タイプ別に再構築します。</p>
         <div class="row" style="align-items:center;">
-          <div class="field wide"><label>CSVファイル</label><input type="file" id="salesCsvFile" accept=".csv,text/csv"></div>
+          <div class="field wide"><label>CSVファイル</label><input type="file" id="salesCsvFile" accept=".csv,text/csv" multiple></div>
           <div style="align-self:flex-end;"><button type="button" class="primary" id="salesCsvImportBtn">読み込む</button></div>
         </div>
         <div id="salesCsvStatus" class="small" style="margin-top:8px;"></div>
@@ -225,7 +225,7 @@ License: MIT
         <h3>稼働率データの取り込み</h3>
         <p class="small" style="margin-bottom:14px;">「会計年度別 全体比較データ」（売上比較ページ）と同じ明細CSVをここでもアップロードしてください。</p>
         <div class="row" style="align-items:center;">
-          <div class="field wide"><label>CSVファイル</label><input type="file" id="occCsvFile" accept=".csv,text/csv"></div>
+          <div class="field wide"><label>CSVファイル</label><input type="file" id="occCsvFile" accept=".csv,text/csv" multiple></div>
           <div style="align-self:flex-end;"><button type="button" class="primary" id="occCsvImportBtn">読み込む</button></div>
         </div>
         <div id="occCsvStatus" class="small" style="margin-top:8px;"></div>
@@ -243,7 +243,7 @@ License: MIT
         <h3>喫食率データの取り込み</h3>
         <p class="small" style="margin-bottom:14px;">「売上比較」「稼働率比較」と同じ明細CSVをここでもアップロードしてください。</p>
         <div class="row" style="align-items:center;">
-          <div class="field wide"><label>CSVファイル</label><input type="file" id="mealCsvFile" accept=".csv,text/csv"></div>
+          <div class="field wide"><label>CSVファイル</label><input type="file" id="mealCsvFile" accept=".csv,text/csv" multiple></div>
           <div style="align-self:flex-end;"><button type="button" class="primary" id="mealCsvImportBtn">読み込む</button></div>
         </div>
         <div id="mealCsvStatus" class="small" style="margin-top:8px;"></div>
@@ -762,10 +762,11 @@ async function loadFiscalDataset(){
   }
 }
 
-async function saveFiscalDataset(merged){
-  const newSha = await githubSaveFile(fiscalGhConfig(), merged, fiscalSha);
+async function saveFiscalDataset(merged, sha){
+  const newSha = await githubSaveFile(fiscalGhConfig(), merged, sha);
   fiscalSha = newSha;
   fiscalDataset = merged;
+  return newSha;
 }
 
 function renderAllFiscalSections(records){
@@ -1020,77 +1021,131 @@ function renderMealFiscal(records){
 }
 
 /* ---- 共通アップロード処理（3つのボタン共通） ---- */
-function handleFiscalCsvUpload(file, statusEl){
-  statusEl.textContent = '読み込み中…';
-  statusEl.style.color = 'var(--ink-soft)';
-  const reader = new FileReader();
-  reader.onload = async () => {
+let fiscalUploadBusy = false;
+function setFiscalButtonsDisabled(disabled){
+  ['salesCsvImportBtn','occCsvImportBtn','mealCsvImportBtn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if(btn) btn.disabled = disabled;
+  });
+}
+
+function readFileAsText(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      let text;
+      try{ text = new TextDecoder('shift-jis').decode(reader.result); }
+      catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
+      if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
+      resolve(text);
+    };
+    reader.onerror = () => reject(new Error(`${file.name} の読み込みに失敗しました`));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function handleFiscalCsvUpload(files, statusEl){
+  if(fiscalUploadBusy){
+    statusEl.textContent = '他のCSVを保存処理中です。完了してからもう一度お試しください。';
+    statusEl.style.color = 'var(--warn)';
+    return;
+  }
+  if(!files || files.length === 0){
+    statusEl.textContent = 'CSVファイルを選択してください。';
+    statusEl.style.color = 'var(--warn)';
+    return;
+  }
+
+  // 1) 選択された全ファイルを解析（GitHubへはまだアクセスしない）
+  let incomingAll = [];
+  for(let i = 0; i < files.length; i++){
+    const file = files[i];
+    statusEl.textContent = `解析中… (${i+1}/${files.length}: ${file.name})`;
+    statusEl.style.color = 'var(--ink-soft)';
     let text;
-    try{ text = new TextDecoder('shift-jis').decode(reader.result); }
-    catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
-    if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
-
-    let incoming;
     try{
-      incoming = parseUnifiedFiscalCsv(text);
+      text = await readFileAsText(file);
     }catch(e){
-      statusEl.textContent = 'CSVの解析に失敗しました： ' + (e.message||e);
+      statusEl.textContent = `${file.name} の読み込みに失敗しました： ` + (e.message||e);
       statusEl.style.color = 'var(--warn)';
       return;
     }
-    if(incoming.length === 0){
-      statusEl.textContent = '予約データが見つかりませんでした。CSVの形式をご確認ください。';
-      statusEl.style.color = 'var(--warn)';
-      return;
-    }
-
-    const cfg = fiscalGhConfig();
-    if(!cfg.owner || !cfg.repo || !cfg.token){
-      // GitHub未接続でもその場での表示だけは行う
-      renderAllFiscalSections(incoming);
-      statusEl.textContent = `${incoming.length}件を表示しました（GitHub未接続のため保存はされていません。上部の「GitHub連携設定」を保存すると次回から自動読込されます）`;
-      statusEl.style.color = 'var(--warn)';
-      return;
-    }
-
-    statusEl.textContent = '既存データを確認中…';
+    let parsed;
     try{
+      parsed = parseUnifiedFiscalCsv(text);
+    }catch(e){
+      statusEl.textContent = `${file.name} の解析に失敗しました： ` + (e.message||e);
+      statusEl.style.color = 'var(--warn)';
+      return;
+    }
+    incomingAll = mergeFiscalRecords(incomingAll, parsed); // ファイル間で予約番号が重複していても上書きでOK
+  }
+
+  if(incomingAll.length === 0){
+    statusEl.textContent = '予約データが見つかりませんでした。CSVの形式をご確認ください。';
+    statusEl.style.color = 'var(--warn)';
+    return;
+  }
+
+  const cfg = fiscalGhConfig();
+  if(!cfg.owner || !cfg.repo || !cfg.token){
+    // GitHub未接続でもその場での表示だけは行う
+    renderAllFiscalSections(incomingAll);
+    statusEl.textContent = `${files.length}ファイル・${incomingAll.length}件を表示しました（GitHub未接続のため保存はされていません。上部の「GitHub連携設定」を保存すると次回から自動読込されます）`;
+    statusEl.style.color = 'var(--warn)';
+    return;
+  }
+
+  // 2) すべてのファイルの解析が終わってから、GitHubへは1回だけ読み書きする
+  fiscalUploadBusy = true;
+  setFiscalButtonsDisabled(true);
+  statusEl.textContent = '既存データを確認中…';
+  try{
+    let merged, sha, attempt = 0;
+    while(true){
+      attempt++;
       const existing = await githubGetFile(cfg);
       const existingRecords = existing ? existing.records : [];
-      fiscalSha = existing ? existing.sha : null;
-      const merged = mergeFiscalRecords(existingRecords, incoming);
+      sha = existing ? existing.sha : null;
+      merged = mergeFiscalRecords(existingRecords, incomingAll);
 
       statusEl.textContent = 'GitHubへ保存中…';
-      await saveFiscalDataset(merged);
-
-      renderAllFiscalSections(merged);
-      statusEl.textContent = `今回のCSV: ${incoming.length}件 / 累積: ${merged.length}件を保存しました（${file.name}）`;
-      statusEl.style.color = 'var(--good)';
-    }catch(e){
-      statusEl.textContent = '保存に失敗しました： ' + (e.message||e);
-      statusEl.style.color = 'var(--warn)';
+      try{
+        await saveFiscalDataset(merged, sha);
+        break; // 保存成功
+      }catch(saveErr){
+        const conflict = /409|422|sha/i.test(String(saveErr && saveErr.message));
+        if(conflict && attempt < 3){
+          statusEl.textContent = '他の保存と競合したため再試行しています…';
+          continue; // 最新のshaを取り直してもう一度
+        }
+        throw saveErr;
+      }
     }
-  };
-  reader.readAsArrayBuffer(file);
+
+    renderAllFiscalSections(merged);
+    statusEl.textContent = `${files.length}ファイル・今回のCSV: ${incomingAll.length}件 / 累積: ${merged.length}件を保存しました`;
+    statusEl.style.color = 'var(--good)';
+  }catch(e){
+    statusEl.textContent = '保存に失敗しました： ' + (e.message||e);
+    statusEl.style.color = 'var(--warn)';
+  }finally{
+    fiscalUploadBusy = false;
+    setFiscalButtonsDisabled(false);
+  }
 }
 
 document.getElementById('salesCsvImportBtn').addEventListener('click', () => {
-  const file = document.getElementById('salesCsvFile').files[0];
-  const statusEl = document.getElementById('salesCsvStatus');
-  if(!file){ statusEl.textContent = 'CSVファイルを選択してください。'; statusEl.style.color = 'var(--warn)'; return; }
-  handleFiscalCsvUpload(file, statusEl);
+  const files = document.getElementById('salesCsvFile').files;
+  handleFiscalCsvUpload(files, document.getElementById('salesCsvStatus'));
 });
 document.getElementById('occCsvImportBtn').addEventListener('click', () => {
-  const file = document.getElementById('occCsvFile').files[0];
-  const statusEl = document.getElementById('occCsvStatus');
-  if(!file){ statusEl.textContent = 'CSVファイルを選択してください。'; statusEl.style.color = 'var(--warn)'; return; }
-  handleFiscalCsvUpload(file, statusEl);
+  const files = document.getElementById('occCsvFile').files;
+  handleFiscalCsvUpload(files, document.getElementById('occCsvStatus'));
 });
 document.getElementById('mealCsvImportBtn').addEventListener('click', () => {
-  const file = document.getElementById('mealCsvFile').files[0];
-  const statusEl = document.getElementById('mealCsvStatus');
-  if(!file){ statusEl.textContent = 'CSVファイルを選択してください。'; statusEl.style.color = 'var(--warn)'; return; }
-  handleFiscalCsvUpload(file, statusEl);
+  const files = document.getElementById('mealCsvFile').files;
+  handleFiscalCsvUpload(files, document.getElementById('mealCsvStatus'));
 });
 </script>
 </body>
