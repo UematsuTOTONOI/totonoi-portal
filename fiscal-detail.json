@@ -1318,7 +1318,11 @@
       "checkin": "2026/08/29",
       "revenue": 62460,
       "nights": 1,
-      "ate": null
+      "ate": null,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7014",
@@ -1326,31 +1330,47 @@
       "checkin": "2026/08/29",
       "revenue": 80960,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7683",
       "room": "ドッグC",
       "checkin": "2026/08/30",
-      "revenue": 52000,
+      "revenue": 53200,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7394",
       "room": "ドッグB",
       "checkin": "2026/08/30",
-      "revenue": 69200,
+      "revenue": 70200,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7279",
       "room": "コネクトF",
       "checkin": "2026/08/30",
-      "revenue": 62260,
+      "revenue": 63460,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7272",
@@ -1358,15 +1378,23 @@
       "checkin": "2026/08/30",
       "revenue": 60140,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7239",
       "room": "コネクトE",
       "checkin": "2026/08/30",
-      "revenue": 44110,
+      "revenue": 44310,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7115",
@@ -1374,7 +1402,11 @@
       "checkin": "2026/08/30",
       "revenue": 39160,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7674",
@@ -1382,15 +1414,23 @@
       "checkin": "2026/08/31",
       "revenue": 64900,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7654",
       "room": "スタンダードD",
       "checkin": "2026/08/31",
-      "revenue": 68750,
+      "revenue": 69250,
       "nights": 1,
-      "ate": false
+      "ate": false,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "7380",
@@ -1398,7 +1438,11 @@
       "checkin": "2026/08/31",
       "revenue": 88500,
       "nights": 1,
-      "ate": true
+      "ate": true,
+      "age": null,
+      "region": "不明",
+      "isInbound": false,
+      "isRepeat": false
     },
     {
       "id": "5337",
@@ -25557,5 +25601,5 @@
       "isRepeat": false
     }
   ],
-  "lastUpdated": "2026-08-31T09:34:17.992Z"
+  "lastUpdated": "2026-08-31T09:34:40.128Z"
 }
