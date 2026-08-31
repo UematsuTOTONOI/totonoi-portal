@@ -2991,7 +2991,1607 @@
       "revenue": 61160,
       "nights": 1,
       "ate": true
+    },
+    {
+      "id": "5457",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/02",
+      "revenue": 78980,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5556",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/04",
+      "revenue": 81840,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5417",
+      "room": "スタンダードD",
+      "checkin": "2025/07/05",
+      "revenue": 70760,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5376",
+      "room": "コネクトE",
+      "checkin": "2025/07/05",
+      "revenue": 123670,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5302",
+      "room": "スタンダードA",
+      "checkin": "2025/07/05",
+      "revenue": 78320,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5301",
+      "room": "ドッグB",
+      "checkin": "2025/07/05",
+      "revenue": 191650,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5243",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/05",
+      "revenue": 104170,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5060",
+      "room": "コネクトF",
+      "checkin": "2025/07/05",
+      "revenue": 88250,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5588",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/06",
+      "revenue": 49610,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5572",
+      "room": "スタンダードA",
+      "checkin": "2025/07/06",
+      "revenue": 38860,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5452",
+      "room": "コネクトF",
+      "checkin": "2025/07/06",
+      "revenue": 74170,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5358",
+      "room": "スタンダードD",
+      "checkin": "2025/07/06",
+      "revenue": 86490,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "7021",
+      "room": "コネクトF",
+      "checkin": "2025/07/07",
+      "revenue": 0,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "5591",
+      "room": "スタンダードA",
+      "checkin": "2025/07/08",
+      "revenue": 58360,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5470",
+      "room": "コネクトF",
+      "checkin": "2025/07/08",
+      "revenue": 60640,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "6987",
+      "room": "スタンダードD",
+      "checkin": "2025/07/08",
+      "revenue": 30800,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "5281",
+      "room": "ドッグB",
+      "checkin": "2025/07/08",
+      "revenue": 75570,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5018",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/08",
+      "revenue": 67760,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5334",
+      "room": "スタンダードD",
+      "checkin": "2025/07/09",
+      "revenue": 58440,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5519",
+      "room": "スタンダードD",
+      "checkin": "2025/07/10",
+      "revenue": 58460,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5492",
+      "room": "スタンダードA",
+      "checkin": "2025/07/10",
+      "revenue": 47110,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5613",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/11",
+      "revenue": 89570,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5534",
+      "room": "スタンダードD",
+      "checkin": "2025/07/11",
+      "revenue": 58260,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5467",
+      "room": "コネクトE",
+      "checkin": "2025/07/11",
+      "revenue": 45410,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5445",
+      "room": "ドッグB",
+      "checkin": "2025/07/11",
+      "revenue": 63440,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5421",
+      "room": "スタンダードA",
+      "checkin": "2025/07/11",
+      "revenue": 60860,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "6936",
+      "room": "コネクトF",
+      "checkin": "2025/07/11",
+      "revenue": 0,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "5327",
+      "room": "ドッグC",
+      "checkin": "2025/07/11",
+      "revenue": 88000,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5410",
+      "room": "ドッグC",
+      "checkin": "2025/07/12",
+      "revenue": 94470,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5395",
+      "room": "ドッグB",
+      "checkin": "2025/07/12",
+      "revenue": 54010,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5394",
+      "room": "スタンダードA",
+      "checkin": "2025/07/12",
+      "revenue": 45760,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5389",
+      "room": "コネクトE",
+      "checkin": "2025/07/12",
+      "revenue": 93650,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5377",
+      "room": "コネクトF",
+      "checkin": "2025/07/12",
+      "revenue": 73980,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5341",
+      "room": "スタンダードD",
+      "checkin": "2025/07/12",
+      "revenue": 109590,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5323",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/12",
+      "revenue": 86240,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5635",
+      "room": "ドッグB",
+      "checkin": "2025/07/13",
+      "revenue": 76670,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5631",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/13",
+      "revenue": 52610,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5543",
+      "room": "ドッグC",
+      "checkin": "2025/07/13",
+      "revenue": 61260,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5491",
+      "room": "コネクトE",
+      "checkin": "2025/07/13",
+      "revenue": 109920,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5471",
+      "room": "コネクトF",
+      "checkin": "2025/07/13",
+      "revenue": 42910,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5450",
+      "room": "スタンダードA",
+      "checkin": "2025/07/13",
+      "revenue": 42710,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5446",
+      "room": "スタンダードD",
+      "checkin": "2025/07/13",
+      "revenue": 65060,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5573",
+      "room": "スタンダードD",
+      "checkin": "2025/07/14",
+      "revenue": 55860,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5521",
+      "room": "スタンダードA",
+      "checkin": "2025/07/14",
+      "revenue": 52860,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5440",
+      "room": "ドッグB",
+      "checkin": "2025/07/14",
+      "revenue": 101700,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5438",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/14",
+      "revenue": 52610,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5348",
+      "room": "ドッグC",
+      "checkin": "2025/07/14",
+      "revenue": 65260,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5546",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/15",
+      "revenue": 69760,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5444",
+      "room": "ドッグC",
+      "checkin": "2025/07/15",
+      "revenue": 62260,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5354",
+      "room": "スタンダードA",
+      "checkin": "2025/07/15",
+      "revenue": 60860,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5097",
+      "room": "スタンダードD",
+      "checkin": "2025/07/15",
+      "revenue": 66870,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5620",
+      "room": "ドッグC",
+      "checkin": "2025/07/17",
+      "revenue": 69580,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5511",
+      "room": "スタンダードA",
+      "checkin": "2025/07/17",
+      "revenue": 57760,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5487",
+      "room": "スタンダードD",
+      "checkin": "2025/07/17",
+      "revenue": 42710,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5298",
+      "room": "コネクトF",
+      "checkin": "2025/07/17",
+      "revenue": 167090,
+      "nights": 2,
+      "ate": false
+    },
+    {
+      "id": "5640",
+      "room": "ドッグC",
+      "checkin": "2025/07/18",
+      "revenue": 64660,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5617",
+      "room": "ドッグB",
+      "checkin": "2025/07/18",
+      "revenue": 51510,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5527",
+      "room": "スタンダードA",
+      "checkin": "2025/07/18",
+      "revenue": 60260,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5526",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/18",
+      "revenue": 143940,
+      "nights": 2,
+      "ate": true
+    },
+    {
+      "id": "5181",
+      "room": "スタンダードD",
+      "checkin": "2025/07/18",
+      "revenue": 43560,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5522",
+      "room": "コネクトF",
+      "checkin": "2025/07/19",
+      "revenue": 95370,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5520",
+      "room": "コネクトE",
+      "checkin": "2025/07/19",
+      "revenue": 69030,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5517",
+      "room": "スタンダードA",
+      "checkin": "2025/07/19",
+      "revenue": 65810,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5476",
+      "room": "スタンダードD",
+      "checkin": "2025/07/19",
+      "revenue": 84180,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5443",
+      "room": "ドッグB",
+      "checkin": "2025/07/19",
+      "revenue": 112750,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5374",
+      "room": "ドッグC",
+      "checkin": "2025/07/19",
+      "revenue": 137530,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5554",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/20",
+      "revenue": 94180,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5510",
+      "room": "ドッグC",
+      "checkin": "2025/07/20",
+      "revenue": 67760,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5495",
+      "room": "ドッグB",
+      "checkin": "2025/07/20",
+      "revenue": 146520,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5412",
+      "room": "コネクトF",
+      "checkin": "2025/07/20",
+      "revenue": 58960,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5352",
+      "room": "スタンダードA",
+      "checkin": "2025/07/20",
+      "revenue": 62810,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5320",
+      "room": "スタンダードD",
+      "checkin": "2025/07/20",
+      "revenue": 63910,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5059",
+      "room": "コネクトE",
+      "checkin": "2025/07/20",
+      "revenue": 155900,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5643",
+      "room": "ドッグB",
+      "checkin": "2025/07/21",
+      "revenue": 70360,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5642",
+      "room": "コネクトF",
+      "checkin": "2025/07/21",
+      "revenue": 80190,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5523",
+      "room": "スタンダードD",
+      "checkin": "2025/07/21",
+      "revenue": 65760,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5590",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/22",
+      "revenue": 94460,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5639",
+      "room": "ドッグB",
+      "checkin": "2025/07/23",
+      "revenue": 87040,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5607",
+      "room": "スタンダードA",
+      "checkin": "2025/07/23",
+      "revenue": 73980,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5371",
+      "room": "コネクトE",
+      "checkin": "2025/07/23",
+      "revenue": 138600,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5626",
+      "room": "コネクトF",
+      "checkin": "2025/07/24",
+      "revenue": 54010,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5601",
+      "room": "スタンダードD",
+      "checkin": "2025/07/24",
+      "revenue": 53410,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5598",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/24",
+      "revenue": 75960,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5528",
+      "room": "ドッグB",
+      "checkin": "2025/07/24",
+      "revenue": 119900,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5657",
+      "room": "ドッグC",
+      "checkin": "2025/07/25",
+      "revenue": 92190,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5541",
+      "room": "スタンダードA",
+      "checkin": "2025/07/25",
+      "revenue": 65760,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5515",
+      "room": "スタンダードD",
+      "checkin": "2025/07/25",
+      "revenue": 48760,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5509",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/25",
+      "revenue": 116490,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5458",
+      "room": "コネクトF",
+      "checkin": "2025/07/25",
+      "revenue": 126320,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5136",
+      "room": "コネクトE",
+      "checkin": "2025/07/25",
+      "revenue": 89250,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5518",
+      "room": "スタンダードA",
+      "checkin": "2025/07/26",
+      "revenue": 88280,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5514",
+      "room": "コネクトE",
+      "checkin": "2025/07/26",
+      "revenue": 125430,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5502",
+      "room": "スタンダードD",
+      "checkin": "2025/07/26",
+      "revenue": 116740,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5500",
+      "room": "コネクトF",
+      "checkin": "2025/07/26",
+      "revenue": 106950,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5368",
+      "room": "ドッグB",
+      "checkin": "2025/07/26",
+      "revenue": 114950,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5325",
+      "room": "ドッグC",
+      "checkin": "2025/07/26",
+      "revenue": 149820,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5260",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/26",
+      "revenue": 86970,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5709",
+      "room": "スタンダードA",
+      "checkin": "2025/07/27",
+      "revenue": 55910,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5555",
+      "room": "ドッグC",
+      "checkin": "2025/07/27",
+      "revenue": 112120,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5531",
+      "room": "コネクトE",
+      "checkin": "2025/07/27",
+      "revenue": 103740,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5530",
+      "room": "コネクトF",
+      "checkin": "2025/07/27",
+      "revenue": 118100,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5469",
+      "room": "スタンダードD",
+      "checkin": "2025/07/27",
+      "revenue": 70060,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5714",
+      "room": "コネクトF",
+      "checkin": "2025/07/28",
+      "revenue": 49610,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5615",
+      "room": "スタンダードA",
+      "checkin": "2025/07/28",
+      "revenue": 69960,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5370",
+      "room": "スタンダードD",
+      "checkin": "2025/07/28",
+      "revenue": 57010,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5736",
+      "room": "コネクトF",
+      "checkin": "2025/07/29",
+      "revenue": 52810,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5625",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/29",
+      "revenue": 126320,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5623",
+      "room": "ドッグB",
+      "checkin": "2025/07/29",
+      "revenue": 76340,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5538",
+      "room": "ドッグC",
+      "checkin": "2025/07/29",
+      "revenue": 87790,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5262",
+      "room": "スタンダードA",
+      "checkin": "2025/07/29",
+      "revenue": 71460,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "7029",
+      "room": "コネクトF",
+      "checkin": "2025/07/30",
+      "revenue": 0,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "7028",
+      "room": "コネクトE",
+      "checkin": "2025/07/30",
+      "revenue": 0,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "7027",
+      "room": "ドッグC",
+      "checkin": "2025/07/30",
+      "revenue": 0,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "7026",
+      "room": "ドッグB",
+      "checkin": "2025/07/30",
+      "revenue": 0,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "7025",
+      "room": "スタンダードD",
+      "checkin": "2025/07/30",
+      "revenue": 507400,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "5300",
+      "room": "ドッグコテージG",
+      "checkin": "2025/07/30",
+      "revenue": 81760,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5653",
+      "room": "ドッグB",
+      "checkin": "2025/07/31",
+      "revenue": 114620,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5614",
+      "room": "スタンダードA",
+      "checkin": "2025/07/31",
+      "revenue": 69760,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5557",
+      "room": "ドッグC",
+      "checkin": "2025/07/31",
+      "revenue": 90970,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5751",
+      "room": "コネクトE",
+      "checkin": "2025/08/01",
+      "revenue": 55660,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5750",
+      "room": "ドッグC",
+      "checkin": "2025/08/01",
+      "revenue": 67410,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5742",
+      "room": "ドッグB",
+      "checkin": "2025/08/01",
+      "revenue": 86460,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "5649",
+      "room": "コネクトF",
+      "checkin": "2025/08/01",
+      "revenue": 62980,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5619",
+      "room": "スタンダードA",
+      "checkin": "2025/08/01",
+      "revenue": 136120,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5459",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/01",
+      "revenue": 123290,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5431",
+      "room": "スタンダードD",
+      "checkin": "2025/08/01",
+      "revenue": 64710,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5716",
+      "room": "ドッグC",
+      "checkin": "2025/08/02",
+      "revenue": 91190,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5681",
+      "room": "ドッグB",
+      "checkin": "2025/08/02",
+      "revenue": 94190,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5680",
+      "room": "コネクトF",
+      "checkin": "2025/08/02",
+      "revenue": 63810,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5669",
+      "room": "コネクトE",
+      "checkin": "2025/08/02",
+      "revenue": 98370,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5661",
+      "room": "スタンダードA",
+      "checkin": "2025/08/02",
+      "revenue": 67210,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5627",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/02",
+      "revenue": 90560,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5545",
+      "room": "スタンダードD",
+      "checkin": "2025/08/02",
+      "revenue": 58960,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5699",
+      "room": "コネクトF",
+      "checkin": "2025/08/03",
+      "revenue": 68530,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5622",
+      "room": "スタンダードD",
+      "checkin": "2025/08/03",
+      "revenue": 77660,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5594",
+      "room": "ドッグB",
+      "checkin": "2025/08/03",
+      "revenue": 187440,
+      "nights": 2,
+      "ate": false
+    },
+    {
+      "id": "5561",
+      "room": "ドッグC",
+      "checkin": "2025/08/03",
+      "revenue": 208900,
+      "nights": 2,
+      "ate": false
+    },
+    {
+      "id": "5552",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/03",
+      "revenue": 148860,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5678",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/04",
+      "revenue": 124090,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5593",
+      "room": "コネクトF",
+      "checkin": "2025/08/04",
+      "revenue": 177320,
+      "nights": 2,
+      "ate": true
+    },
+    {
+      "id": "5768",
+      "room": "ドッグB",
+      "checkin": "2025/08/05",
+      "revenue": 173580,
+      "nights": 2,
+      "ate": false
+    },
+    {
+      "id": "5662",
+      "room": "ドッグC",
+      "checkin": "2025/08/05",
+      "revenue": 112300,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5616",
+      "room": "コネクトE",
+      "checkin": "2025/08/05",
+      "revenue": 80660,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5254",
+      "room": "スタンダードA",
+      "checkin": "2025/08/05",
+      "revenue": 155320,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5757",
+      "room": "コネクトE",
+      "checkin": "2025/08/06",
+      "revenue": 65010,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5664",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/06",
+      "revenue": 249180,
+      "nights": 2,
+      "ate": true
+    },
+    {
+      "id": "5772",
+      "room": "コネクトE",
+      "checkin": "2025/08/07",
+      "revenue": 63610,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5739",
+      "room": "ドッグB",
+      "checkin": "2025/08/07",
+      "revenue": 66110,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5658",
+      "room": "コネクトF",
+      "checkin": "2025/08/07",
+      "revenue": 106790,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5648",
+      "room": "スタンダードA",
+      "checkin": "2025/08/07",
+      "revenue": 128920,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5483",
+      "room": "ドッグC",
+      "checkin": "2025/08/07",
+      "revenue": 97570,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "5481",
+      "room": "スタンダードD",
+      "checkin": "2025/08/07",
+      "revenue": 84920,
+      "nights": 1,
+      "ate": null
+    },
+    {
+      "id": "5732",
+      "room": "コネクトE",
+      "checkin": "2025/08/08",
+      "revenue": 80660,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5720",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/08",
+      "revenue": 142920,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5718",
+      "room": "スタンダードD",
+      "checkin": "2025/08/08",
+      "revenue": 62510,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5688",
+      "room": "スタンダードA",
+      "checkin": "2025/08/08",
+      "revenue": 80660,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5677",
+      "room": "ドッグB",
+      "checkin": "2025/08/08",
+      "revenue": 117700,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5671",
+      "room": "コネクトF",
+      "checkin": "2025/08/08",
+      "revenue": 109600,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5637",
+      "room": "ドッグC",
+      "checkin": "2025/08/08",
+      "revenue": 139120,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5563",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/09",
+      "revenue": 76010,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5529",
+      "room": "スタンダードA",
+      "checkin": "2025/08/09",
+      "revenue": 80960,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5489",
+      "room": "スタンダードD",
+      "checkin": "2025/08/09",
+      "revenue": 68010,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5422",
+      "room": "ドッグC",
+      "checkin": "2025/08/09",
+      "revenue": 85140,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5310",
+      "room": "コネクトE",
+      "checkin": "2025/08/09",
+      "revenue": 84560,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5206",
+      "room": "ドッグB",
+      "checkin": "2025/08/09",
+      "revenue": 145420,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5156",
+      "room": "コネクトF",
+      "checkin": "2025/08/09",
+      "revenue": 65810,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5434",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/10",
+      "revenue": 151120,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5382",
+      "room": "コネクトE",
+      "checkin": "2025/08/10",
+      "revenue": 66110,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5367",
+      "room": "コネクトF",
+      "checkin": "2025/08/10",
+      "revenue": 253280,
+      "nights": 2,
+      "ate": true
+    },
+    {
+      "id": "5256",
+      "room": "スタンダードA",
+      "checkin": "2025/08/10",
+      "revenue": 99470,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5196",
+      "room": "ドッグB",
+      "checkin": "2025/08/10",
+      "revenue": 278660,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5182",
+      "room": "スタンダードD",
+      "checkin": "2025/08/10",
+      "revenue": 138520,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5516",
+      "room": "ドッグB",
+      "checkin": "2025/08/11",
+      "revenue": 121140,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5485",
+      "room": "ドッグC",
+      "checkin": "2025/08/11",
+      "revenue": 121376,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5408",
+      "room": "スタンダードA",
+      "checkin": "2025/08/11",
+      "revenue": 80960,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5387",
+      "room": "スタンダードD",
+      "checkin": "2025/08/11",
+      "revenue": 95370,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5373",
+      "room": "コネクトE",
+      "checkin": "2025/08/11",
+      "revenue": 101750,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5226",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/11",
+      "revenue": 159720,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5777",
+      "room": "コネクトF",
+      "checkin": "2025/08/12",
+      "revenue": 84180,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5656",
+      "room": "コネクトE",
+      "checkin": "2025/08/12",
+      "revenue": 114540,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5533",
+      "room": "スタンダードD",
+      "checkin": "2025/08/12",
+      "revenue": 79560,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5462",
+      "room": "ドッグB",
+      "checkin": "2025/08/12",
+      "revenue": 85360,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5449",
+      "room": "スタンダードA",
+      "checkin": "2025/08/12",
+      "revenue": 114840,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5414",
+      "room": "ドッグC",
+      "checkin": "2025/08/12",
+      "revenue": 148420,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5391",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/12",
+      "revenue": 128840,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5468",
+      "room": "スタンダードD",
+      "checkin": "2025/08/13",
+      "revenue": 86160,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5429",
+      "room": "ドッグB",
+      "checkin": "2025/08/13",
+      "revenue": 134530,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5375",
+      "room": "ドッグC",
+      "checkin": "2025/08/13",
+      "revenue": 154000,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5356",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/13",
+      "revenue": 118470,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5342",
+      "room": "スタンダードA",
+      "checkin": "2025/08/13",
+      "revenue": 65810,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5304",
+      "room": "コネクトE",
+      "checkin": "2025/08/13",
+      "revenue": 186530,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5834",
+      "room": "ドッグB",
+      "checkin": "2025/08/14",
+      "revenue": 75610,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5553",
+      "room": "スタンダードA",
+      "checkin": "2025/08/14",
+      "revenue": 62810,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5475",
+      "room": "スタンダードD",
+      "checkin": "2025/08/14",
+      "revenue": 141020,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5472",
+      "room": "コネクトE",
+      "checkin": "2025/08/14",
+      "revenue": 84160,
+      "nights": 1,
+      "ate": true
+    },
+    {
+      "id": "5430",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/14",
+      "revenue": 81210,
+      "nights": 1,
+      "ate": false
+    },
+    {
+      "id": "5335",
+      "room": "コネクトF",
+      "checkin": "2025/08/14",
+      "revenue": 306960,
+      "nights": 2,
+      "ate": true
+    },
+    {
+      "id": "5244",
+      "room": "ドッグC",
+      "checkin": "2025/08/14",
+      "revenue": 215040,
+      "nights": 2,
+      "ate": false
+    },
+    {
+      "id": "5581",
+      "room": "ドッグコテージG",
+      "checkin": "2025/08/15",
+      "revenue": 230890,
+      "nights": 2,
+      "ate": false
+    },
+    {
+      "id": "5536",
+      "room": "スタンダードA",
+      "checkin": "2025/08/15",
+      "revenue": 66310,
+      "nights": 1,
+      "ate": false
     }
   ],
-  "lastUpdated": "2026-08-31T09:20:04.048Z"
+  "lastUpdated": "2026-08-31T09:20:23.374Z"
 }
