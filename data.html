@@ -148,9 +148,10 @@ License: MIT
     <button class="nav-tab" data-page="meal">喫食率</button>
     <button class="nav-tab" data-page="option">オプション</button>
     <button class="nav-tab" data-page="other">その他</button>
+    <button id="settingsToggleBtn" style="margin-left:auto; background:none; border:1px solid var(--line); border-radius:20px; padding:7px 16px; font-size:12px; color:var(--ink-soft); cursor:pointer; font-family:inherit;">⚙ 設定</button>
   </nav>
 
-  <div class="upload" id="settingsPanel" style="margin-bottom:20px;">
+  <div class="upload" id="settingsPanel" style="margin-bottom:20px; display:none;">
     <div class="drop" style="flex:1 1 100%; cursor:default; text-align:left; border-style:solid;">
       <strong>GitHub連携設定</strong>（データの保存・読込に使用。トークンはこの端末のブラウザにのみ保存されます）
       <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; align-items:flex-end;">
@@ -174,16 +175,6 @@ License: MIT
       </div>
       <div id="cfgStatus" style="font-size:12.5px; color:var(--ink-soft); margin-top:10px;">未接続。トークンを入力して「保存して接続」を押してください。</div>
     </div>
-  </div>
-
-  <div class="upload">
-    <label class="drop" id="dropZone" for="fileInput">
-      <strong>CSVファイルを選択</strong>してください<br>
-      またはここにドラッグ＆ドロップ
-      <div class="filename" id="filenameLabel"></div>
-    </label>
-    <input type="file" id="fileInput" accept=".csv,text/csv">
-    <div id="status">予約番（ねっぱん）からダウンロードしたCSV（Shift-JIS）に対応しています。</div>
   </div>
 
   <div id="report" class="hidden">
@@ -377,18 +368,15 @@ async function connectAndLoad(){
     if(existing === null){
       dataset = [];
       currentSha = null;
-      cfgStatus.textContent = `接続成功。まだデータファイルがないため、CSVを最初にアップロードすると新規作成されます。`;
+      cfgStatus.textContent = `接続成功。まだデータファイルがありません。`;
     }else{
       dataset = existing.records || [];
       currentSha = existing.sha;
       cfgStatus.textContent = `接続成功。累積 ${dataset.length}件を読み込みました（最終更新: ${existing.lastUpdated || '不明'}）`;
     }
     cfgStatus.style.color = 'var(--good, #6b8f6a)';
-    if(dataset.length){
-      render(aggregate(dataset));
-      document.getElementById('report').classList.remove('hidden');
-      statusEl.textContent = `累積データ ${dataset.length}件を表示中です。CSVをアップロードすると更新されます。`;
-    }
+    render(aggregate(dataset));
+    document.getElementById('report').classList.remove('hidden');
 
     // 会計年度別データ（売上比較①・稼働率②・喫食率③）も同じ接続情報で読み込む
     await loadFiscalDataset();
@@ -398,6 +386,12 @@ async function connectAndLoad(){
     cfgStatus.style.color = 'var(--warn)';
   }
 }
+
+/* ---- 設定パネルの開閉 ---- */
+document.getElementById('settingsToggleBtn').addEventListener('click', () => {
+  const panel = document.getElementById('settingsPanel');
+  panel.style.display = panel.style.display === 'none' ? '' : 'none';
+});
 
 /* ============ GitHub API ============ */
 function utf8ToBase64(str){
@@ -451,76 +445,7 @@ async function githubSaveFile(cfg, records, sha){
   return json.content.sha;
 }
 
-/* ============ ファイル処理 ============ */
-const fileInput = document.getElementById('fileInput');
-const dropZone = document.getElementById('dropZone');
-const statusEl = document.getElementById('status');
-const filenameLabel = document.getElementById('filenameLabel');
 
-fileInput.addEventListener('change', e => { if(e.target.files[0]) handleFile(e.target.files[0]); });
-['dragover','dragenter'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('drag'); }));
-['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('drag'); }));
-dropZone.addEventListener('drop', e => { if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
-
-function handleFile(file){
-  filenameLabel.textContent = file.name;
-  statusEl.textContent = "読み込み中…";
-  statusEl.classList.remove('err');
-  const reader = new FileReader();
-  reader.onload = () => {
-    let text;
-    try{ text = new TextDecoder('shift-jis').decode(reader.result); }
-    catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
-    if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
-    parseAndSync(text);
-  };
-  reader.onerror = () => { statusEl.textContent = "ファイルの読み込みに失敗しました。"; statusEl.classList.add('err'); };
-  reader.readAsArrayBuffer(file);
-}
-
-async function parseAndSync(text){
-  const cfg = ghConfig();
-  if(!cfg.token){
-    statusEl.textContent = "先にGitHub連携設定（トークン）を入力・保存してください。";
-    statusEl.classList.add('err');
-    return;
-  }
-  const result = Papa.parse(text.trim(), { skipEmptyLines: true });
-  const rows = result.data.slice(1);
-  if(rows.length === 0){
-    statusEl.textContent = "データが見つかりませんでした。CSVの形式をご確認ください。";
-    statusEl.classList.add('err');
-    return;
-  }
-  try{
-    const newRecords = extractRecords(rows);
-
-    statusEl.textContent = "既存データを確認中…";
-    const existing = await githubGetFile(cfg);
-    const existingRecords = existing ? existing.records : [];
-    const sha = existing ? existing.sha : null;
-
-    const merged = mergeRecords(existingRecords, newRecords);
-
-    statusEl.textContent = "GitHubへ保存中…";
-    const newSha = await githubSaveFile(cfg, merged, sha);
-    currentSha = newSha;
-    dataset = merged;
-
-    const data = aggregate(dataset);
-    render(data);
-    document.getElementById('report').classList.remove('hidden');
-    statusEl.textContent = `保存しました。今回のCSV: ${newRecords.length}件 / 累積データ: ${dataset.length}件（${filenameLabel.textContent}）`;
-    statusEl.classList.remove('err');
-  }catch(e){
-    console.error(e);
-    statusEl.textContent = "処理中にエラーが発生しました： " + (e && e.message ? e.message : e);
-    statusEl.classList.add('err');
-  }
-}
-
-/* ============ CSV → 匿名化レコード抽出 ============ */
-const ROOM_CATEGORY_COUNT = { "スタンダード":2, "コネクト":2, "ドッグドーム":2, "ドッグコテージ":1 };
 function categorizeRoom(room){
   const s = String(room||'');
   if(s.indexOf('コテージ') !== -1) return 'ドッグコテージ';
@@ -530,44 +455,12 @@ function categorizeRoom(room){
   return 'その他';
 }
 function daysInMonth(year, month){ return new Date(year, month, 0).getDate(); }
-
 function toNum(v){ const n = parseFloat(String(v).replace(/,/g,'')); return isNaN(n) ? 0 : n; }
 function guessCountry(pref, addr){
   const known = ["Hong Kong","HongKong","Macao","Macau","China","Singapore","Taiwan","Korea","Denmark","USA","Australia","Thailand","France","Germany","UK"];
   const s = (pref||"") + (addr||"");
   for(const c of known){ if(s.includes(c)) return c === "HongKong" ? "Hong Kong" : c; }
   return s.trim() ? "海外（その他）" : "不明";
-}
-
-function extractRecords(rows){
-  const valid = rows.filter(r => !(r[COL.状態]||"").includes("キャンセル"));
-  return valid.map(r => {
-    const revenue = toNum(r[COL.予約料金合計]);
-    const pref = r[COL.都道府県] || "";
-    const isJapanPref = PREFS.includes(pref);
-    const region = isJapanPref ? pref : guessCountry(pref, pref);
-    const isInbound = !isJapanPref && region !== "不明";
-    const age = r[COL.年齢] && !isNaN(parseInt(r[COL.年齢])) ? parseInt(r[COL.年齢]) : null;
-    const past = r[COL.過去の宿泊] || "";
-    const isRepeat = past.includes("過去に宿泊");
-    const room = r[COL.部屋タイプ] || "不明";
-    const nights = toNum(r[COL.泊数]) || 1;
-    // 個人情報（氏名・電話・メール・住所詳細）は一切含めない
-    return {
-      id: r[COL.予約番号], checkin: r[COL.チェックイン], checkout: r[COL.チェックアウト],
-      room, revenue, nights, age, region, isInbound, isRepeat,
-      lodging: toNum(r[COL.宿泊料金合計]), meal: toNum(r[COL.食事料金合計]),
-      program: toNum(r[COL.プログラム料金合計]), option: toNum(r[COL.オプション料金合計]),
-      method: r[COL.予約方法] || "不明", channel: (r[COL.販売チャネル]||"").trim() || "直接予約"
-    };
-  });
-}
-
-function mergeRecords(existing, incoming){
-  const map = new Map();
-  for(const r of existing) map.set(String(r.id), r);
-  for(const r of incoming) map.set(String(r.id), r); // 同じ予約番号は上書き（最新化）
-  return Array.from(map.values());
 }
 
 function ageBucket(a){ if(a==null) return "不明"; return `${Math.floor(a/10)*10}代`; }
@@ -628,13 +521,6 @@ function aggregate(records){
 
 /* ============ 描画 ============ */
 function render(d){
-  document.getElementById('kpiCount').innerHTML = `${d.reservationCount}<span class="unit">件</span>`;
-  document.getElementById('kpiNights').innerHTML = `${d.totalNights}<span class="unit">泊</span>`;
-  document.getElementById('kpiRevenue').innerHTML = `¥${Math.round(d.totalRevenue).toLocaleString()}`;
-  document.getElementById('kpiAge').innerHTML = d.avgAge!=null ? `${d.avgAge.toFixed(1)}<span class="unit">歳</span>` : '–';
-  document.getElementById('kpiRepeat').innerHTML = `${d.repeatRate.toFixed(1)}<span class="unit">%</span>`;
-  document.getElementById('kpiInbound').innerHTML = `${d.inboundRate.toFixed(1)}<span class="unit">%</span>`;
-
   renderAge(d); renderRegion(d); renderRepeat(d); renderRevBreak(d); renderChannels(d); renderMonth(d);
 }
 function destroy(key){ if(charts[key]) charts[key].destroy(); }
@@ -791,7 +677,7 @@ function ateMealForReservation(items){
   return adultMealItems.some(t => !isNashiItem(t));
 }
 
-const FISCAL_DETAIL_COL = { id:0, room:16, revenue:36, nights:5, period:4, status:17, item:11 };
+const FISCAL_DETAIL_COL = { id:0, room:16, revenue:36, nights:5, period:4, status:17, item:11, age:23, customerType:24, region:25 };
 
 function parseUnifiedFiscalCsv(text){
   const result = Papa.parse(text.trim(), { skipEmptyLines: true });
@@ -815,9 +701,42 @@ function parseUnifiedFiscalCsv(text){
     const nights = toNum(first[FISCAL_DETAIL_COL.nights]) || 1;
     const items = lines.map(l => l[FISCAL_DETAIL_COL.item] || '');
     const ate = ateMealForReservation(items);
-    records.push({ id, room, checkin, revenue, nights, ate });
+
+    const ageRaw = first[FISCAL_DETAIL_COL.age];
+    const age = ageRaw && !isNaN(parseInt(ageRaw)) ? parseInt(ageRaw) : null;
+    const pref = first[FISCAL_DETAIL_COL.region] || '';
+    const isJapanPref = PREFS.includes(pref);
+    const region = isJapanPref ? pref : guessCountry(pref, pref);
+    const isInbound = !isJapanPref && region !== '不明';
+    const isRepeat = String(first[FISCAL_DETAIL_COL.customerType]||'').includes('リピート');
+
+    records.push({ id, room, checkin, revenue, nights, ate, age, region, isInbound, isRepeat });
   }
   return records;
+}
+
+function computeFiscalKpis(records){
+  const totalRevenue = records.reduce((s,r)=>s+r.revenue,0);
+  const totalNights = records.reduce((s,r)=>s+r.nights,0);
+  const ages = records.filter(r=>r.age!=null).map(r=>r.age);
+  const avgAge = ages.length ? ages.reduce((s,a)=>s+a,0)/ages.length : null;
+  const repeatCount = records.filter(r=>r.isRepeat).length;
+  const inboundCount = records.filter(r=>r.isInbound).length;
+  return {
+    count: records.length, totalRevenue, totalNights, avgAge,
+    repeatRate: records.length ? repeatCount/records.length*100 : 0,
+    inboundRate: records.length ? inboundCount/records.length*100 : 0
+  };
+}
+
+function renderFiscalKpis(records){
+  const k = computeFiscalKpis(records);
+  document.getElementById('kpiCount').innerHTML = `${k.count}<span class="unit">件</span>`;
+  document.getElementById('kpiNights').innerHTML = `${k.totalNights}<span class="unit">泊</span>`;
+  document.getElementById('kpiRevenue').innerHTML = `¥${Math.round(k.totalRevenue).toLocaleString()}`;
+  document.getElementById('kpiAge').innerHTML = k.avgAge!=null ? `${k.avgAge.toFixed(1)}<span class="unit">歳</span>` : '–';
+  document.getElementById('kpiRepeat').innerHTML = `${k.repeatRate.toFixed(1)}<span class="unit">%</span>`;
+  document.getElementById('kpiInbound').innerHTML = `${k.inboundRate.toFixed(1)}<span class="unit">%</span>`;
 }
 
 function mergeFiscalRecords(existing, incoming){
@@ -850,6 +769,7 @@ async function saveFiscalDataset(merged){
 }
 
 function renderAllFiscalSections(records){
+  renderFiscalKpis(records);
   renderSalesFiscal(records);
   renderOccupancyFiscal(records);
   renderMealFiscal(records);
