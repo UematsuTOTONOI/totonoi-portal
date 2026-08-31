@@ -220,20 +220,6 @@ License: MIT
         <h2><span class="no">02</span>部屋タイプ別 全体比較</h2>
         <div id="fiscalByRoomContainer"></div>
       </section>
-
-      <section class="block">
-        <h2><span class="no">03</span>売上比較（部屋別サマリー）</h2>
-        <p class="note">部屋タイプ（スタンダード／コネクト／ドッグドーム／ドッグコテージ）ごとの件数・売上・客単価</p>
-        <div class="grid2">
-          <div class="card"><h3>件数と売上</h3><canvas id="chartPlan" height="220"></canvas></div>
-          <div class="card"><h3>明細</h3><table id="tablePlan"><thead><tr><th>部屋タイプ</th><th>件数</th><th>売上</th><th>客単価</th></tr></thead><tbody></tbody></table></div>
-        </div>
-      </section>
-      <section class="block">
-        <h2><span class="no">04</span>部屋タイプ別 月次売上推移（累積データ）</h2>
-        <p class="note">チェックイン月ベース</p>
-        <div class="card"><canvas id="chartRevByMonth" height="220"></canvas></div>
-      </section>
     </div>
 
     <!-- ============ 稼働率比較（部屋別） ============ -->
@@ -403,6 +389,9 @@ async function connectAndLoad(){
       document.getElementById('report').classList.remove('hidden');
       statusEl.textContent = `累積データ ${dataset.length}件を表示中です。CSVをアップロードすると更新されます。`;
     }
+
+    // 会計年度別データ（売上比較①・稼働率②・喫食率③）も同じ接続情報で読み込む
+    await loadFiscalDataset();
   }catch(e){
     console.error(e);
     cfgStatus.textContent = "接続に失敗しました： " + (e && e.message ? e.message : e);
@@ -587,29 +576,6 @@ function ageBucket(a){ if(a==null) return "不明"; return `${Math.floor(a/10)*1
 function aggregate(records){
   const reservations = records.slice().sort((a,b) => new Date(a.checkin) - new Date(b.checkin));
 
-  // 部屋タイプ（カテゴリ）別
-  const planMap = {};
-  for(const r of reservations){
-    const cat = categorizeRoom(r.room);
-    if(!planMap[cat]) planMap[cat] = { count:0, revenue:0 };
-    planMap[cat].count++; planMap[cat].revenue += r.revenue;
-  }
-
-  // カテゴリ×月別（売上・稼働率・喫食率の元データ）
-  const categoryMonthMap = {}; // { category: { 'YYYY/MM': {count, revenue, nights, mealCount} } }
-  for(const r of reservations){
-    const cat = categorizeRoom(r.room);
-    const d = new Date(r.checkin);
-    if(isNaN(d)) continue;
-    const y = d.getFullYear(), m = d.getMonth()+1;
-    const key = `${y}/${String(m).padStart(2,'0')}`;
-    if(!categoryMonthMap[cat]) categoryMonthMap[cat] = {};
-    if(!categoryMonthMap[cat][key]) categoryMonthMap[cat][key] = { count:0, revenue:0, nights:0, mealCount:0, year:y, month:m };
-    const cell = categoryMonthMap[cat][key];
-    cell.count++; cell.revenue += r.revenue; cell.nights += r.nights;
-    if(r.meal > 0) cell.mealCount++;
-  }
-
   const ageMap = {};
   for(const r of reservations){
     const b = ageBucket(r.age);
@@ -649,23 +615,6 @@ function aggregate(records){
     monthMap[key].count++; monthMap[key].revenue += r.revenue;
   }
 
-  // 喫食率（食事料金>0の割合。月別・全体別）
-  const mealOverallByCategory = {};
-  for(const [cat, months] of Object.entries(categoryMonthMap)){
-    let count=0, mealCount=0;
-    for(const cell of Object.values(months)){ count+=cell.count; mealCount+=cell.mealCount; }
-    mealOverallByCategory[cat] = { count, mealCount, rate: count ? mealCount/count*100 : 0 };
-  }
-  const mealByMonth = {};
-  for(const r of reservations){
-    const d = new Date(r.checkin);
-    if(isNaN(d)) continue;
-    const key = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`;
-    if(!mealByMonth[key]) mealByMonth[key] = { count:0, mealCount:0 };
-    mealByMonth[key].count++;
-    if(r.meal > 0) mealByMonth[key].mealCount++;
-  }
-
   const totalRevenue = reservations.reduce((s,r)=>s+r.revenue,0);
   const totalNights = reservations.reduce((s,r)=>s+r.nights,0);
 
@@ -673,8 +622,7 @@ function aggregate(records){
     reservationCount: reservations.length, totalRevenue, totalNights, avgAge,
     repeatCount, repeatRate: reservations.length ? repeatCount/reservations.length*100 : 0,
     inboundCount: inboundRes.length, inboundRate: reservations.length ? inboundRes.length/reservations.length*100 : 0,
-    planMap, ageMap, regionMap, repeatPlanMap, revBreak, methodMap, channelMap, monthMap,
-    categoryMonthMap, mealOverallByCategory, mealByMonth
+    ageMap, regionMap, repeatPlanMap, revBreak, methodMap, channelMap, monthMap
   };
 }
 
@@ -687,7 +635,6 @@ function render(d){
   document.getElementById('kpiRepeat').innerHTML = `${d.repeatRate.toFixed(1)}<span class="unit">%</span>`;
   document.getElementById('kpiInbound').innerHTML = `${d.inboundRate.toFixed(1)}<span class="unit">%</span>`;
 
-  renderPlan(d); renderRevByMonth(d);
   renderAge(d); renderRegion(d); renderRepeat(d); renderRevBreak(d); renderChannels(d); renderMonth(d);
 }
 function destroy(key){ if(charts[key]) charts[key].destroy(); }
@@ -701,50 +648,6 @@ document.querySelectorAll('#pageNav .nav-tab').forEach(btn => {
     document.getElementById('page-' + btn.dataset.page).classList.add('active');
   });
 });
-
-/* ---- 部屋タイプ別 月次売上推移 ---- */
-function renderRevByMonth(d){
-  const cats = Object.keys(d.categoryMonthMap);
-  const allMonths = new Set();
-  cats.forEach(cat => Object.keys(d.categoryMonthMap[cat]).forEach(m => allMonths.add(m)));
-  const months = Array.from(allMonths).sort();
-  destroy('revByMonth');
-  charts.revByMonth = new Chart(document.getElementById('chartRevByMonth'), {
-    type:'line',
-    data:{
-      labels: months,
-      datasets: cats.map((cat,i) => ({
-        label: cat,
-        data: months.map(m => (d.categoryMonthMap[cat][m]||{revenue:0}).revenue),
-        borderColor: GOLD_SCALE[i%GOLD_SCALE.length], backgroundColor: GOLD_SCALE[i%GOLD_SCALE.length],
-        tension:.25
-      }))
-    },
-    options:{ responsive:true, plugins:{legend:{position:'bottom'}}, scales:{ y:{ title:{display:true,text:'売上(円)'} } } }
-  });
-}
-
-/* ---- 稼働率比較（部屋別・月次） ---- */
-
-function renderPlan(d){
-  const entries = Object.entries(d.planMap).sort((a,b)=>b[1].revenue-a[1].revenue);
-  destroy('plan');
-  charts.plan = new Chart(document.getElementById('chartPlan'), {
-    type:'bar',
-    data:{ labels: entries.map(e=>e[0]),
-      datasets:[
-        { label:'件数', data: entries.map(e=>e[1].count), backgroundColor:'#e3c78a', yAxisID:'y1' },
-        { label:'売上(円)', data: entries.map(e=>e[1].revenue), backgroundColor:'#b88931', yAxisID:'y2' },
-      ]},
-    options:{ responsive:true, scales:{
-      y1:{ position:'left', title:{display:true,text:'件数'} },
-      y2:{ position:'right', title:{display:true,text:'売上(円)'}, grid:{drawOnChartArea:false} }
-    }}
-  });
-  document.querySelector('#tablePlan tbody').innerHTML = entries.map(([name,v])=>
-    `<tr><td>${name}</td><td class="num">${v.count}件</td><td class="num">¥${Math.round(v.revenue).toLocaleString()}</td><td class="num">¥${Math.round(v.revenue/v.count).toLocaleString()}</td></tr>`
-  ).join('');
-}
 
 function renderAge(d){
   const order = ["10代","20代","30代","40代","50代","60代","70代","不明"];
@@ -869,33 +772,97 @@ function extractCheckinFromPeriod(periodStr){
   return m ? m[1] : '';
 }
 
-function parseSalesComparisonCsv(text){
+/* ============ 会計年度別データの統合パース＆永続化 ============ */
+const FISCAL_DETAIL_PATH = 'fiscal-detail.json';
+let fiscalDataset = [];
+let fiscalSha = null;
+
+function fiscalGhConfig(){
+  const cfg = ghConfig();
+  return { owner: cfg.owner, repo: cfg.repo, token: cfg.token, path: FISCAL_DETAIL_PATH };
+}
+
+function isNashiItem(text){
+  return /夕食無し/.test(text) || /朝食なし/.test(text);
+}
+function ateMealForReservation(items){
+  const adultMealItems = items.filter(t => /\[大人\]/.test(t) && (/夕食/.test(t) || /朝食/.test(t)));
+  if(adultMealItems.length === 0) return null; // 判定不能
+  return adultMealItems.some(t => !isNashiItem(t));
+}
+
+const FISCAL_DETAIL_COL = { id:0, room:16, revenue:36, nights:5, period:4, status:17, item:11 };
+
+function parseUnifiedFiscalCsv(text){
   const result = Papa.parse(text.trim(), { skipEmptyLines: true });
-  const rows = result.data.slice(1).filter(r => r.length > 1 && r[SALES_COL.id]);
-  // 予約番号ごとに最初の1行だけを採用（部屋・売上合計額は予約単位で全行共通のため）
-  const seen = new Set();
-  const records = [];
+  const rows = result.data.slice(1).filter(r => r.length > 1 && r[FISCAL_DETAIL_COL.id]);
+  const byId = new Map();
+  const order = [];
   for(const r of rows){
-    const id = r[SALES_COL.id];
-    if(seen.has(id)) continue;
-    seen.add(id);
-    if(String(r[SALES_COL.status]||'').includes('キャンセル')) continue;
-    const checkin = extractCheckinFromPeriod(r[SALES_COL.period]);
-    const room = r[SALES_COL.room] || '不明';
-    const revenue = toNum(r[SALES_COL.revenue]);
-    const fy = fiscalYearStart(checkin);
-    if(fy == null) continue;
-    records.push({ id, room, revenue, checkin, fiscalYearStart: fy });
+    const id = r[FISCAL_DETAIL_COL.id];
+    if(!byId.has(id)){ byId.set(id, []); order.push(id); }
+    byId.get(id).push(r);
+  }
+  const records = [];
+  for(const id of order){
+    const lines = byId.get(id);
+    const first = lines[0];
+    if(String(first[FISCAL_DETAIL_COL.status]||'').includes('キャンセル')) continue;
+    const checkin = extractCheckinFromPeriod(first[FISCAL_DETAIL_COL.period]);
+    if(!checkin) continue;
+    const room = first[FISCAL_DETAIL_COL.room] || '不明';
+    const revenue = toNum(first[FISCAL_DETAIL_COL.revenue]);
+    const nights = toNum(first[FISCAL_DETAIL_COL.nights]) || 1;
+    const items = lines.map(l => l[FISCAL_DETAIL_COL.item] || '');
+    const ate = ateMealForReservation(items);
+    records.push({ id, room, checkin, revenue, nights, ate });
   }
   return records;
 }
 
+function mergeFiscalRecords(existing, incoming){
+  const map = new Map();
+  existing.forEach(r => map.set(String(r.id), r));
+  incoming.forEach(r => map.set(String(r.id), r));
+  return Array.from(map.values());
+}
+
+async function loadFiscalDataset(){
+  try{
+    const existing = await githubGetFile(fiscalGhConfig());
+    if(existing){
+      fiscalDataset = existing.records || [];
+      fiscalSha = existing.sha;
+    }else{
+      fiscalDataset = [];
+      fiscalSha = null;
+    }
+    if(fiscalDataset.length){ renderAllFiscalSections(fiscalDataset); }
+  }catch(e){
+    console.error('会計年度別データの読み込みに失敗:', e);
+  }
+}
+
+async function saveFiscalDataset(merged){
+  const newSha = await githubSaveFile(fiscalGhConfig(), merged, fiscalSha);
+  fiscalSha = newSha;
+  fiscalDataset = merged;
+}
+
+function renderAllFiscalSections(records){
+  renderSalesFiscal(records);
+  renderOccupancyFiscal(records);
+  renderMealFiscal(records);
+}
+
+/* ---- ①売上比較（会計年度・3月始まり） ---- */
 function buildFiscalMonthMap(records, roomFilterFn){
-  // { fiscalYearLabel: { 'M月': revenue } }
   const map = {};
   for(const r of records){
     if(roomFilterFn && !roomFilterFn(r)) continue;
-    const label = fiscalYearLabel(r.fiscalYearStart);
+    const fy = fiscalYearStart(r.checkin);
+    if(fy == null) continue;
+    const label = fiscalYearLabel(fy);
     const d = new Date(r.checkin);
     const monthLabel = `${d.getMonth()+1}月`;
     if(!map[label]) map[label] = {};
@@ -923,8 +890,8 @@ function renderFiscalChartAndTable(canvasId, tableId, fiscalMap, chartKey){
   });
 
   const tbl = document.getElementById(tableId);
-  let thead = '<thead><tr><th></th>' + monthLabels.map(m=>`<th>${m}</th>`).join('') + '</tr></thead>';
-  let tbody = '<tbody>' + yearLabels.map(yl => {
+  const thead = '<thead><tr><th></th>' + monthLabels.map(m=>`<th>${m}</th>`).join('') + '</tr></thead>';
+  const tbody = '<tbody>' + yearLabels.map(yl => {
     const cells = monthLabels.map(ml => {
       const v = fiscalMap[yl][ml];
       return `<td>${v!=null ? Math.round(v).toLocaleString() : ''}</td>`;
@@ -935,67 +902,29 @@ function renderFiscalChartAndTable(canvasId, tableId, fiscalMap, chartKey){
   tbl.innerHTML = thead + tbody;
 }
 
-document.getElementById('salesCsvImportBtn').addEventListener('click', () => {
-  const fileInput = document.getElementById('salesCsvFile');
-  const statusEl = document.getElementById('salesCsvStatus');
-  const file = fileInput.files[0];
-  if(!file){
-    statusEl.textContent = 'CSVファイルを選択してください。';
-    statusEl.style.color = 'var(--warn)';
-    return;
-  }
-  statusEl.textContent = '読み込み中…';
-  statusEl.style.color = 'var(--ink-soft)';
-  const reader = new FileReader();
-  reader.onload = () => {
-    let text;
-    try{ text = new TextDecoder('shift-jis').decode(reader.result); }
-    catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
-    if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
+function renderSalesFiscal(records){
+  const overallMap = buildFiscalMonthMap(records, null);
+  document.getElementById('fiscalOverallSection').style.display = '';
+  renderFiscalChartAndTable('chartFiscalOverall', 'tableFiscalOverall', overallMap, 'fiscalOverall');
 
-    let records;
-    try{
-      records = parseSalesComparisonCsv(text);
-    }catch(e){
-      statusEl.textContent = 'CSVの解析に失敗しました： ' + (e.message||e);
-      statusEl.style.color = 'var(--warn)';
-      return;
-    }
-    if(records.length === 0){
-      statusEl.textContent = '予約データが見つかりませんでした。CSVの形式（部屋=Q列, 料金=AK列）をご確認ください。';
-      statusEl.style.color = 'var(--warn)';
-      return;
-    }
+  const roomContainer = document.getElementById('fiscalByRoomContainer');
+  roomContainer.innerHTML = '';
+  const categories = ['スタンダード','コネクト','ドッグドーム','ドッグコテージ'];
+  categories.forEach((cat, idx) => {
+    const canvasId = `chartFiscalRoom${idx}`;
+    const tableId = `tableFiscalRoom${idx}`;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `<h3 style="margin:22px 0 10px;font-size:13px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;">${cat}</h3>
+      <div class="card"><canvas id="${canvasId}" height="220"></canvas></div>
+      <div class="card"><div class="tablewrap"><table id="${tableId}"></table></div></div>`;
+    roomContainer.appendChild(wrap);
+    const map = buildFiscalMonthMap(records, r => categorizeRoomAt(r.room, r.checkin) === cat);
+    renderFiscalChartAndTable(canvasId, tableId, map, 'fiscalRoom'+idx);
+  });
+  document.getElementById('fiscalByRoomSection').style.display = '';
+}
 
-    // 全体
-    const overallMap = buildFiscalMonthMap(records, null);
-    document.getElementById('fiscalOverallSection').style.display = '';
-    renderFiscalChartAndTable('chartFiscalOverall', 'tableFiscalOverall', overallMap, 'fiscalOverall');
-
-    // 部屋タイプ別
-    const roomContainer = document.getElementById('fiscalByRoomContainer');
-    roomContainer.innerHTML = '';
-    const categories = ['スタンダード','コネクト','ドッグドーム','ドッグコテージ'];
-    categories.forEach((cat, idx) => {
-      const canvasId = `chartFiscalRoom${idx}`;
-      const tableId = `tableFiscalRoom${idx}`;
-      const wrap = document.createElement('div');
-      wrap.innerHTML = `<h3 style="margin:22px 0 10px;font-size:13px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;">${cat}</h3>
-        <div class="card"><canvas id="${canvasId}" height="220"></canvas></div>
-        <div class="card"><div class="tablewrap"><table id="${tableId}"></table></div></div>`;
-      roomContainer.appendChild(wrap);
-      const map = buildFiscalMonthMap(records, r => categorizeRoom(r.room) === cat);
-      renderFiscalChartAndTable(canvasId, tableId, map, 'fiscalRoom'+idx);
-    });
-    document.getElementById('fiscalByRoomSection').style.display = '';
-
-    statusEl.textContent = `${records.length}件の予約から会計年度別データを再構築しました（${file.name}）`;
-    statusEl.style.color = 'var(--good)';
-  };
-  reader.readAsArrayBuffer(file);
-});
-
-/* ============ 指示書②：稼働率比較（部屋別・会計年度別・折れ線グラフ） ============ */
+/* ---- ②稼働率比較（会計年度・7月始まり） ---- */
 const RECLASSIFY_DATE = new Date('2025-12-01');
 const FISCAL_MONTH_ORDER_JULY = [7,8,9,10,11,12,1,2,3,4,5,6];
 
@@ -1028,28 +957,7 @@ function fiscalYearLabelJuly(fyStart){
   return `${idx}年目（〜${endYY}年6月）`;
 }
 
-function parseOccupancyCsv(text){
-  const OCC_COL = { id:0, room:16, nights:5, period:4, status:17 };
-  const result = Papa.parse(text.trim(), { skipEmptyLines: true });
-  const rows = result.data.slice(1).filter(r => r.length > 1 && r[OCC_COL.id]);
-  const seen = new Set();
-  const records = [];
-  for(const r of rows){
-    const id = r[OCC_COL.id];
-    if(seen.has(id)) continue;
-    seen.add(id);
-    if(String(r[OCC_COL.status]||'').includes('キャンセル')) continue;
-    const checkin = extractCheckinFromPeriod(r[OCC_COL.period]);
-    if(!checkin) continue;
-    const room = r[OCC_COL.room] || '不明';
-    const nights = toNum(r[OCC_COL.nights]) || 1;
-    records.push({ id, room, nights, checkin });
-  }
-  return records;
-}
-
 function buildOccupancyMap(records, categoryFilterFn){
-  // { fiscalYearLabel: { 'M月': { nights, year, month } } }
   const map = {};
   for(const r of records){
     const cat = categorizeRoomAt(r.room, r.checkin);
@@ -1067,7 +975,6 @@ function buildOccupancyMap(records, categoryFilterFn){
 }
 
 function occupancyRateMap(nightsMap, category){
-  // nightsMap: { fyLabel: { 'M月': {nights, year, month} } } → { fyLabel: { 'M月': rate } }
   const rateMap = {};
   for(const [fyLabel, months] of Object.entries(nightsMap)){
     rateMap[fyLabel] = {};
@@ -1113,108 +1020,35 @@ function renderOccupancyChartAndTable(canvasId, tableId, rateMap, chartKey, yLab
   tbl.innerHTML = thead + tbody;
 }
 
-document.getElementById('occCsvImportBtn').addEventListener('click', () => {
-  const fileInput = document.getElementById('occCsvFile');
-  const statusEl = document.getElementById('occCsvStatus');
-  const file = fileInput.files[0];
-  if(!file){
-    statusEl.textContent = 'CSVファイルを選択してください。';
-    statusEl.style.color = 'var(--warn)';
-    return;
-  }
-  statusEl.textContent = '読み込み中…';
-  statusEl.style.color = 'var(--ink-soft)';
-  const reader = new FileReader();
-  reader.onload = () => {
-    let text;
-    try{ text = new TextDecoder('shift-jis').decode(reader.result); }
-    catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
-    if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
-
-    let records;
-    try{
-      records = parseOccupancyCsv(text);
-    }catch(e){
-      statusEl.textContent = 'CSVの解析に失敗しました： ' + (e.message||e);
-      statusEl.style.color = 'var(--warn)';
-      return;
-    }
-    if(records.length === 0){
-      statusEl.textContent = '予約データが見つかりませんでした。';
-      statusEl.style.color = 'var(--warn)';
-      return;
-    }
-
-    const container = document.getElementById('occupancyContainer');
-    container.innerHTML = '';
-    const blocks = [
-      { key:'全体', filter:null },
-      { key:'スタンダード', filter:c=>c==='スタンダード' },
-      { key:'コネクト', filter:c=>c==='コネクト' },
-      { key:'ドッグドーム', filter:c=>c==='ドッグドーム' },
-      { key:'ドッグコテージ', filter:c=>c==='ドッグコテージ' },
-    ];
-    blocks.forEach((b, idx) => {
-      const canvasId = `chartOcc${idx}`, tableId = `tableOcc${idx}`;
-      const wrap = document.createElement('section');
-      wrap.className = 'block';
-      wrap.innerHTML = `<h2><span class="no">${String(idx+1).padStart(2,'0')}</span>${b.key}（稼働率）</h2>
-        <div class="card"><canvas id="${canvasId}" height="240"></canvas></div>
-        <div class="card"><div class="tablewrap"><table id="${tableId}"></table></div></div>`;
-      container.appendChild(wrap);
-      const nightsMap = buildOccupancyMap(records, b.filter);
-      const rateMap = occupancyRateMap(nightsMap, b.key);
-      renderOccupancyChartAndTable(canvasId, tableId, rateMap, 'occ'+idx);
-    });
-
-    statusEl.textContent = `${records.length}件の予約から稼働率を再構築しました（${file.name}）`;
-    statusEl.style.color = 'var(--good)';
-  };
-  reader.readAsArrayBuffer(file);
-});
-
-/* ============ 指示書③：喫食率（部屋別・会計年度別・折れ線グラフ） ============ */
-const MEAL_COL = { id:0, room:16, item:11, period:4, status:17 };
-
-function isNashiItem(text){
-  return /夕食無し/.test(text) || /朝食なし/.test(text);
-}
-function ateMealForReservation(items){
-  const adultMealItems = items.filter(t => /\[大人\]/.test(t) && (/夕食/.test(t) || /朝食/.test(t)));
-  if(adultMealItems.length === 0) return null; // 判定不能（分母から除外）
-  return adultMealItems.some(t => !isNashiItem(t));
+function renderOccupancyFiscal(records){
+  const container = document.getElementById('occupancyContainer');
+  container.innerHTML = '';
+  const blocks = [
+    { key:'全体', filter:null },
+    { key:'スタンダード', filter:c=>c==='スタンダード' },
+    { key:'コネクト', filter:c=>c==='コネクト' },
+    { key:'ドッグドーム', filter:c=>c==='ドッグドーム' },
+    { key:'ドッグコテージ', filter:c=>c==='ドッグコテージ' },
+  ];
+  blocks.forEach((b, idx) => {
+    const canvasId = `chartOcc${idx}`, tableId = `tableOcc${idx}`;
+    const wrap = document.createElement('section');
+    wrap.className = 'block';
+    wrap.innerHTML = `<h2><span class="no">${String(idx+1).padStart(2,'0')}</span>${b.key}（稼働率）</h2>
+      <div class="card"><canvas id="${canvasId}" height="240"></canvas></div>
+      <div class="card"><div class="tablewrap"><table id="${tableId}"></table></div></div>`;
+    container.appendChild(wrap);
+    const nightsMap = buildOccupancyMap(records, b.filter);
+    const rateMap = occupancyRateMap(nightsMap, b.key);
+    renderOccupancyChartAndTable(canvasId, tableId, rateMap, 'occ'+idx);
+  });
 }
 
-function parseMealCsv(text){
-  const result = Papa.parse(text.trim(), { skipEmptyLines: true });
-  const rows = result.data.slice(1).filter(r => r.length > 1 && r[MEAL_COL.id]);
-  const byId = new Map();
-  const order = [];
-  for(const r of rows){
-    const id = r[MEAL_COL.id];
-    if(!byId.has(id)){ byId.set(id, []); order.push(id); }
-    byId.get(id).push(r);
-  }
-  const records = [];
-  for(const id of order){
-    const lines = byId.get(id);
-    const first = lines[0];
-    if(String(first[MEAL_COL.status]||'').includes('キャンセル')) continue;
-    const checkin = extractCheckinFromPeriod(first[MEAL_COL.period]);
-    if(!checkin) continue;
-    const room = first[MEAL_COL.room] || '不明';
-    const items = lines.map(l => l[MEAL_COL.item] || '');
-    const ate = ateMealForReservation(items);
-    if(ate === null) continue; // 判定不能は除外
-    records.push({ id, room, checkin, ate });
-  }
-  return records;
-}
-
+/* ---- ③喫食率（会計年度・7月始まり） ---- */
 function buildMealMap(records, categoryFilterFn){
-  // { fiscalYearLabel: { 'M月': { count, ateCount } } }
   const map = {};
   for(const r of records){
+    if(r.ate === null || r.ate === undefined) continue;
     const cat = categorizeRoomAt(r.room, r.checkin);
     if(categoryFilterFn && !categoryFilterFn(cat)) continue;
     const d = new Date(r.checkin);
@@ -1241,64 +1075,102 @@ function mealRateMap(countMap){
   return rateMap;
 }
 
-document.getElementById('mealCsvImportBtn').addEventListener('click', () => {
-  const fileInput = document.getElementById('mealCsvFile');
-  const statusEl = document.getElementById('mealCsvStatus');
-  const file = fileInput.files[0];
-  if(!file){
-    statusEl.textContent = 'CSVファイルを選択してください。';
-    statusEl.style.color = 'var(--warn)';
-    return;
-  }
+function renderMealFiscal(records){
+  const container = document.getElementById('mealContainer');
+  container.innerHTML = '';
+  const blocks = [
+    { key:'全体', filter:null },
+    { key:'スタンダード', filter:c=>c==='スタンダード' },
+    { key:'コネクト', filter:c=>c==='コネクト' },
+    { key:'ドッグドーム', filter:c=>c==='ドッグドーム' },
+    { key:'ドッグコテージ', filter:c=>c==='ドッグコテージ' },
+  ];
+  blocks.forEach((b, idx) => {
+    const canvasId = `chartMeal${idx}`, tableId = `tableMeal${idx}`;
+    const wrap = document.createElement('section');
+    wrap.className = 'block';
+    wrap.innerHTML = `<h2><span class="no">${String(idx+1).padStart(2,'0')}</span>喫食率データ比較（${b.key}）</h2>
+      <div class="card"><canvas id="${canvasId}" height="240"></canvas></div>
+      <div class="card"><div class="tablewrap"><table id="${tableId}"></table></div></div>`;
+    container.appendChild(wrap);
+    const countMap = buildMealMap(records, b.filter);
+    const rateMap = mealRateMap(countMap);
+    renderOccupancyChartAndTable(canvasId, tableId, rateMap, 'meal'+idx, '喫食率(%)');
+  });
+}
+
+/* ---- 共通アップロード処理（3つのボタン共通） ---- */
+function handleFiscalCsvUpload(file, statusEl){
   statusEl.textContent = '読み込み中…';
   statusEl.style.color = 'var(--ink-soft)';
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     let text;
     try{ text = new TextDecoder('shift-jis').decode(reader.result); }
     catch(e){ text = new TextDecoder('utf-8').decode(reader.result); }
     if((text.match(/\uFFFD/g)||[]).length > 5){ text = new TextDecoder('utf-8').decode(reader.result); }
 
-    let records;
+    let incoming;
     try{
-      records = parseMealCsv(text);
+      incoming = parseUnifiedFiscalCsv(text);
     }catch(e){
       statusEl.textContent = 'CSVの解析に失敗しました： ' + (e.message||e);
       statusEl.style.color = 'var(--warn)';
       return;
     }
-    if(records.length === 0){
-      statusEl.textContent = '判定可能な予約データが見つかりませんでした。';
+    if(incoming.length === 0){
+      statusEl.textContent = '予約データが見つかりませんでした。CSVの形式をご確認ください。';
       statusEl.style.color = 'var(--warn)';
       return;
     }
 
-    const container = document.getElementById('mealContainer');
-    container.innerHTML = '';
-    const blocks = [
-      { key:'全体', filter:null },
-      { key:'スタンダード', filter:c=>c==='スタンダード' },
-      { key:'コネクト', filter:c=>c==='コネクト' },
-      { key:'ドッグドーム', filter:c=>c==='ドッグドーム' },
-      { key:'ドッグコテージ', filter:c=>c==='ドッグコテージ' },
-    ];
-    blocks.forEach((b, idx) => {
-      const canvasId = `chartMeal${idx}`, tableId = `tableMeal${idx}`;
-      const wrap = document.createElement('section');
-      wrap.className = 'block';
-      wrap.innerHTML = `<h2><span class="no">${String(idx+1).padStart(2,'0')}</span>喫食率データ比較（${b.key}）</h2>
-        <div class="card"><canvas id="${canvasId}" height="240"></canvas></div>
-        <div class="card"><div class="tablewrap"><table id="${tableId}"></table></div></div>`;
-      container.appendChild(wrap);
-      const countMap = buildMealMap(records, b.filter);
-      const rateMap = mealRateMap(countMap);
-      renderOccupancyChartAndTable(canvasId, tableId, rateMap, 'meal'+idx, '喫食率(%)');
-    });
+    const cfg = fiscalGhConfig();
+    if(!cfg.owner || !cfg.repo || !cfg.token){
+      // GitHub未接続でもその場での表示だけは行う
+      renderAllFiscalSections(incoming);
+      statusEl.textContent = `${incoming.length}件を表示しました（GitHub未接続のため保存はされていません。上部の「GitHub連携設定」を保存すると次回から自動読込されます）`;
+      statusEl.style.color = 'var(--warn)';
+      return;
+    }
 
-    statusEl.textContent = `${records.length}件の予約（判定可能分）から喫食率を再構築しました（${file.name}）`;
-    statusEl.style.color = 'var(--good)';
+    statusEl.textContent = '既存データを確認中…';
+    try{
+      const existing = await githubGetFile(cfg);
+      const existingRecords = existing ? existing.records : [];
+      fiscalSha = existing ? existing.sha : null;
+      const merged = mergeFiscalRecords(existingRecords, incoming);
+
+      statusEl.textContent = 'GitHubへ保存中…';
+      await saveFiscalDataset(merged);
+
+      renderAllFiscalSections(merged);
+      statusEl.textContent = `今回のCSV: ${incoming.length}件 / 累積: ${merged.length}件を保存しました（${file.name}）`;
+      statusEl.style.color = 'var(--good)';
+    }catch(e){
+      statusEl.textContent = '保存に失敗しました： ' + (e.message||e);
+      statusEl.style.color = 'var(--warn)';
+    }
   };
   reader.readAsArrayBuffer(file);
+}
+
+document.getElementById('salesCsvImportBtn').addEventListener('click', () => {
+  const file = document.getElementById('salesCsvFile').files[0];
+  const statusEl = document.getElementById('salesCsvStatus');
+  if(!file){ statusEl.textContent = 'CSVファイルを選択してください。'; statusEl.style.color = 'var(--warn)'; return; }
+  handleFiscalCsvUpload(file, statusEl);
+});
+document.getElementById('occCsvImportBtn').addEventListener('click', () => {
+  const file = document.getElementById('occCsvFile').files[0];
+  const statusEl = document.getElementById('occCsvStatus');
+  if(!file){ statusEl.textContent = 'CSVファイルを選択してください。'; statusEl.style.color = 'var(--warn)'; return; }
+  handleFiscalCsvUpload(file, statusEl);
+});
+document.getElementById('mealCsvImportBtn').addEventListener('click', () => {
+  const file = document.getElementById('mealCsvFile').files[0];
+  const statusEl = document.getElementById('mealCsvStatus');
+  if(!file){ statusEl.textContent = 'CSVファイルを選択してください。'; statusEl.style.color = 'var(--warn)'; return; }
+  handleFiscalCsvUpload(file, statusEl);
 });
 </script>
 </body>
