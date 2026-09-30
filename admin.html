@@ -156,14 +156,20 @@ window.doLogin = async function () {
   let timeout;
   try {
     const collected = [];
-    let offset = 0, snapshotRows = null;
+    let offset = 0, snapshotRows = null, pageSize = 25, retries = 0;
     while (true) {
       timeout = setTimeout(() => controller.abort(), 45000);
-      const query = new URLSearchParams({pw: pass, limit: "50", offset: String(offset), _ts: String(Date.now())});
+      const query = new URLSearchParams({pw: pass, limit: String(pageSize), offset: String(offset), _ts: String(Date.now())});
       if (snapshotRows !== null) query.set("snapshotRows", String(snapshotRows));
       const res = await fetch(GAS_URL + "?" + query.toString(), {signal: controller.signal, cache: "no-store", credentials: "omit"});
       const body = await res.text();
       clearTimeout(timeout);
+      if (/^\s*</.test(body) && res.status === 404 && retries < 3) {
+        retries++;
+        pageSize = Math.max(5, Math.floor(pageSize / 2));
+        btn.textContent = "再試行中... " + collected.length;
+        continue;
+      }
       if (/^\s*</.test(body)) {
         const title = body.match(/<title[^>]*>([^<]*)<\/title>/i);
         console.warn("TOTONOI API returned HTML " + JSON.stringify({status: res.status, contentType: res.headers.get("content-type"), host: new URL(res.url).hostname, title: title ? title[1] : "(no title)"}));
@@ -183,6 +189,7 @@ window.doLogin = async function () {
         if (!Number.isInteger(json.total) || json.total < 0 || (snapshotRows !== null && snapshotRows !== json.total)) throw new Error("日報の件数が一致しません。再試行してください。");
         snapshotRows = json.total;
       }
+      retries = 0;
       collected.push(...json.reports);
       if (json.nextOffset == null) {
         if (snapshotRows !== null && collected.length !== snapshotRows) throw new Error("日報の取得が途中で終了しました。再試行してください。");
