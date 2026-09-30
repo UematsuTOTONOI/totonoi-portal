@@ -149,25 +149,44 @@ window.doLogin = async function () {
   const pass = document.getElementById("loginPass").value;
   const btn = document.getElementById("loginBtn");
   const errEl = document.getElementById("loginErr");
+  if (btn.disabled) return;
   errEl.style.display = "none";
   btn.disabled = true; btn.textContent = "確認中...";
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 45000);
   try {
-    const res = await fetch(`${GAS_URL}?pw=${encodeURIComponent(pass)}`);
-    const json = await res.json();
-    if (json.status !== "ok") {
+    const res = await fetch(GAS_URL + "?pw=" + encodeURIComponent(pass) + "&_ts=" + Date.now(), {
+      signal: controller.signal, cache: "no-store", credentials: "omit"
+    });
+    const body = await res.text();
+    if (/^\s*</.test(body)) {
+      const title = body.match(/<title[^>]*>([^<]*)<\/title>/i);
+      console.warn("TOTONOI API returned HTML", {status: res.status, contentType: res.headers.get("content-type"), host: new URL(res.url).hostname, title: title ? title[1] : "(no title)"});
+      throw new Error("接続先からJSONではなくHTMLが返りました。時間をおいて再試行してください。続く場合はGASの公開設定・実行状況の確認が必要です。");
+    }
+    if (!res.ok) throw new Error("接続先がHTTP " + res.status + "を返しました。時間をおいて再試行してください。");
+    let json;
+    try { json = JSON.parse(body); } catch (_) {
+      throw new Error("接続先の応答を読み取れませんでした。時間をおいて再試行してください。");
+    }
+    if (!json || typeof json !== "object" || Array.isArray(json)) throw new Error("接続先から想定外の応答が返りました。");
+    if (json.status === "unauthorized") {
+      errEl.textContent = "パスワードが違います";
       errEl.style.display = "block";
-      btn.disabled = false; btn.textContent = "ログイン";
       return;
     }
+    if (json.status !== "ok" || (json.reports != null && !Array.isArray(json.reports))) throw new Error("日報を取得できませんでした。GASの実行状況の確認が必要です。");
     allReports = dedupeReports(json.reports || []);
-    document.getElementById("loginWrap").style.display = "none";
-    document.getElementById("dashWrap").style.display = "block";
     document.getElementById("f-date").value = getDefaultDate();
     populateStaffFilter();
     applyFilter();
+    document.getElementById("loginWrap").style.display = "none";
+    document.getElementById("dashWrap").style.display = "block";
   } catch (e) {
-    errEl.textContent = "通信エラー：" + e.message;
+    errEl.textContent = controller.signal.aborted ? "通信がタイムアウトしました。時間をおいて再試行してください。" : "通信エラー：" + e.message;
     errEl.style.display = "block";
+  } finally {
+    clearTimeout(timeout);
     btn.disabled = false; btn.textContent = "ログイン";
   }
 };
