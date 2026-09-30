@@ -161,7 +161,7 @@ window.doLogin = async function () {
     const body = await res.text();
     if (/^\s*</.test(body)) {
       const title = body.match(/<title[^>]*>([^<]*)<\/title>/i);
-      console.warn("TOTONOI API returned HTML", {status: res.status, contentType: res.headers.get("content-type"), host: new URL(res.url).hostname, title: title ? title[1] : "(no title)"});
+      console.warn("TOTONOI API returned HTML " + JSON.stringify({status: res.status, contentType: res.headers.get("content-type"), host: new URL(res.url).hostname, title: title ? title[1] : "(no title)"}));
       throw new Error("接続先からJSONではなくHTMLが返りました。時間をおいて再試行してください。続く場合はGASの公開設定・実行状況の確認が必要です。");
     }
     if (!res.ok) throw new Error("接続先がHTTP " + res.status + "を返しました。時間をおいて再試行してください。");
