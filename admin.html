@@ -145,6 +145,40 @@ function getDefaultDate() {
   return `${y}-${m}-${day}`;
 }
 
+function loadReportsFromGAS(password) {
+  return new Promise((resolve, reject) => {
+    const bridgeId = crypto.randomUUID();
+    const frame = document.createElement("iframe");
+    frame.hidden = true;
+    frame.title = "TOTONOI 日報接続";
+    let bridgeWindow = null, bridgeOrigin = null;
+    const timeout = setTimeout(() => finish(new Error("通信がタイムアウトしました。時間をおいて再試行してください。")), 90000);
+    function finish(error, result) {
+      clearTimeout(timeout);
+      window.removeEventListener("message", receive);
+      frame.remove();
+      if (error) reject(error); else resolve(result);
+    }
+    function receive(event) {
+      const message = event.data;
+      if (!message || message.bridgeId !== bridgeId) return;
+      if (message.type === "totonoi-admin-ready" && !bridgeWindow) {
+        if (!/^https:\/\/(?:[a-z0-9-]+-)?script\.googleusercontent\.com$/.test(event.origin)) return;
+        bridgeWindow = event.source;
+        bridgeOrigin = event.origin;
+        bridgeWindow.postMessage({type:"totonoi-admin-request",bridgeId,password}, bridgeOrigin);
+        return;
+      }
+      if (message.type !== "totonoi-admin-result" || event.source !== bridgeWindow || event.origin !== bridgeOrigin) return;
+      finish(message.error ? new Error(message.error) : null, message.result);
+    }
+    window.addEventListener("message", receive);
+    const query = new URLSearchParams({action:"adminBridge",bridgeId});
+    frame.src = GAS_URL + "?" + query.toString();
+    document.body.appendChild(frame);
+  });
+}
+
 window.doLogin = async function () {
   const pass = document.getElementById("loginPass").value;
   const btn = document.getElementById("loginBtn");
@@ -152,64 +186,25 @@ window.doLogin = async function () {
   if (btn.disabled) return;
   errEl.style.display = "none";
   btn.disabled = true; btn.textContent = "確認中...";
-  const controller = new AbortController();
-  let timeout;
   try {
-    const collected = [];
-    let offset = 0, snapshotRows = null, pageSize = 25, retries = 0;
-    while (true) {
-      timeout = setTimeout(() => controller.abort(), 45000);
-      const query = new URLSearchParams({pw: pass, limit: String(pageSize), offset: String(offset), _ts: String(Date.now())});
-      if (snapshotRows !== null) query.set("snapshotRows", String(snapshotRows));
-      const res = await fetch(GAS_URL + "?" + query.toString(), {signal: controller.signal, cache: "no-store", credentials: "omit"});
-      const body = await res.text();
-      clearTimeout(timeout);
-      if (/^\s*</.test(body) && res.status === 404 && retries < 3) {
-        retries++;
-        pageSize = Math.max(5, Math.floor(pageSize / 2));
-        btn.textContent = "再試行中... " + collected.length;
-        continue;
-      }
-      if (/^\s*</.test(body)) {
-        const title = body.match(/<title[^>]*>([^<]*)<\/title>/i);
-        console.warn("TOTONOI API returned HTML " + JSON.stringify({status: res.status, contentType: res.headers.get("content-type"), host: new URL(res.url).hostname, title: title ? title[1] : "(no title)"}));
-        throw new Error("接続先からJSONではなくHTMLが返りました。時間をおいて再試行してください。続く場合はGASの公開設定・実行状況の確認が必要です。");
-      }
-      if (!res.ok) throw new Error("接続先がHTTP " + res.status + "を返しました。時間をおいて再試行してください。");
-      let json;
-      try { json = JSON.parse(body); } catch (_) { throw new Error("接続先の応答を読み取れませんでした。"); }
-      if (!json || typeof json !== "object" || Array.isArray(json)) throw new Error("接続先から想定外の応答が返りました。");
-      if (json.status === "unauthorized") {
-        errEl.textContent = "パスワードが違います";
-        errEl.style.display = "block";
-        return;
-      }
-      if (json.status !== "ok" || !Array.isArray(json.reports)) throw new Error("日報を取得できませんでした。GASの実行状況の確認が必要です。");
-      if (json.total != null) {
-        if (!Number.isInteger(json.total) || json.total < 0 || (snapshotRows !== null && snapshotRows !== json.total)) throw new Error("日報の件数が一致しません。再試行してください。");
-        snapshotRows = json.total;
-      }
-      retries = 0;
-      collected.push(...json.reports);
-      if (json.nextOffset == null) {
-        if (snapshotRows !== null && collected.length !== snapshotRows) throw new Error("日報の取得が途中で終了しました。再試行してください。");
-        break;
-      }
-      if (!Number.isInteger(json.nextOffset) || json.nextOffset !== offset + json.reports.length || json.nextOffset <= offset || snapshotRows === null || json.nextOffset >= snapshotRows) throw new Error("日報の取得位置が不正です。再試行してください。");
-      offset = json.nextOffset;
-      btn.textContent = "読み込み中... " + collected.length + "/" + snapshotRows;
+    const json = await loadReportsFromGAS(pass);
+    if (!json || typeof json !== "object" || Array.isArray(json)) throw new Error("接続先から想定外の応答が返りました。");
+    if (json.status === "unauthorized") {
+      errEl.textContent = "パスワードが違います";
+      errEl.style.display = "block";
+      return;
     }
-    allReports = dedupeReports(collected);
+    if (json.status !== "ok" || !Array.isArray(json.reports)) throw new Error("日報を取得できませんでした。GASの実行状況の確認が必要です。");
+    allReports = dedupeReports(json.reports);
     document.getElementById("f-date").value = getDefaultDate();
     populateStaffFilter();
     applyFilter();
     document.getElementById("loginWrap").style.display = "none";
     document.getElementById("dashWrap").style.display = "block";
   } catch (e) {
-    errEl.textContent = controller.signal.aborted ? "通信がタイムアウトしました。時間をおいて再試行してください。" : "通信エラー：" + e.message;
+    errEl.textContent = "通信エラー：" + e.message;
     errEl.style.display = "block";
   } finally {
-    clearTimeout(timeout);
     btn.disabled = false; btn.textContent = "ログイン";
   }
 };
