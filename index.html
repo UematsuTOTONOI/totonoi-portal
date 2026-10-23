@@ -67,6 +67,15 @@ body{font-family:'Noto Sans JP','Hiragino Sans',sans-serif;background:var(--bg);
 .btn.primary:hover{background:var(--green-dk);}
 .btn.orange{background:var(--orange);color:white;border-color:var(--orange);}
 .btn.sm{padding:4px 10px;font-size:11px;}
+.daily-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.daily-tbl{border-collapse:collapse;font-size:12px;min-width:100%;}
+.daily-tbl th,.daily-tbl td{border:1px solid var(--border);padding:5px 8px;text-align:center;white-space:nowrap;vertical-align:middle;}
+.daily-tbl td.wrap{white-space:pre-wrap;min-width:90px;text-align:left;font-size:11px;}
+.daily-tbl th{background:var(--bg);color:var(--text2);font-weight:600;font-size:11px;}
+.daily-tbl .rl{position:sticky;left:0;background:var(--bg);color:var(--text2);font-weight:600;text-align:left;font-size:11px;z-index:1;}
+.daily-tbl tr.hl td{background:var(--green-lt);font-weight:600;}
+.daily-tbl td.task{background:#f7fbf9;}
+.daily-tbl td.rest{color:var(--text3);background:var(--bg);}
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;}
 .card-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
 .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
@@ -232,6 +241,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
             <div id="shift-table-wrap"><div class="loading"><span class="spinner"></span>読み込み中...</div></div>
           </div>
           <div class="card" style="grid-column:1/-1;">
+            <div class="card-title"><span>🛏 本日の予約表</span><button class="btn sm" onclick="loadDaily()">更新</button></div>
+            <div id="daily-res-wrap" class="daily-wrap"><div class="loading"><span class="spinner"></span>読み込み中...</div></div>
+          </div>
+          <div class="card" style="grid-column:1/-1;">
+            <div class="card-title"><span>🕒 本日のタイムテーブル</span></div>
+            <div id="daily-tt-wrap" class="daily-wrap"><div class="loading"><span class="spinner"></span>読み込み中...</div></div>
+          </div>
+          <div class="card" style="grid-column:1/-1;">
             <div class="card-title"><span>📢 伝達事項</span><button class="btn sm primary" onclick="toggleNoticeForm()">＋ 追加</button></div>
             <div id="notice-list"><div class="loading"><span class="spinner"></span>読み込み中...</div></div>
             <div class="notice-form" id="notice-form" style="display:none;">
@@ -369,6 +386,7 @@ const app=initializeApp(firebaseConfig),db=getFirestore(app);
 const PASSWORDS={"里吉":"3847","梶原":"9162","保乃圭":"5031","阿部":"7284","稜奈":"6519","璃胡":"2473","管理者":"4494"};
 const STAFF_LIST=["里吉","梶原","保乃圭","阿部","稜奈","璃胡"];
 const SHIFT_OPTIONS=["早番","中番（現場）","中番（定期清掃）","遅番","休み"];
+const DAILY_GAS_URL="https://script.google.com/macros/s/AKfycbz5rRq4BTkDGT-LGlXQkN0xqQqEEHyQku3txDP0M9OJYEXafFFbXHE4uWYkiFbdOS6oSA/exec";
 const GAS_URL="https://script.google.com/macros/s/AKfycbx55qhEqhaXZPMKIuSEhjmTBqprKlJFENmfygkBa2uMOjZ7BzsYkY3QCmxW0UsrVJ-_/exec";
 const TASKS_DEF={"早番":[{id:"s01",label:"公式LINEの確認",time:"7:30"},{id:"s02",label:"朝食調理"},{id:"s03",label:"朝食配膳",time:"8:00"},{id:"s04",label:"洗濯＆乾燥",time:"7:30〜9:30"},{id:"s05",label:"メールチェック",time:"8:00〜"},{id:"s06",label:"キャンセル確認・Payn送信",time:"7:30〜10:00"},{id:"s07",label:"2日後の予約表作成",time:"8:15〜8:40"},{id:"s08",label:"ウェルカムボード作成",time:"8:15〜8:40"},{id:"s09",label:"翌日タイムテーブル作成"},{id:"s10",label:"受付棟清掃",time:"8:30",note:"灰捨ても含む"},{id:"s11",label:"受付棟トイレ清掃"},{id:"s12",label:"薪の補充（5束程度）"},{id:"s13",label:"チェックアウト案内LINE送信",time:"9:00"},{id:"s14",label:"販売品在庫チェック",time:"9:30"},{id:"s15",label:"Google口コミ確認",time:"9:45"},{id:"s16",label:"チェックアウト業務",time:"10:00"},{id:"s17",label:"精算業務",time:"10:00"},{id:"s18",label:"食器洗浄"},{id:"s19",label:"HCSに鍵・共有事項伝える",time:"10:00"},{id:"s20",label:"サウナ清掃",time:"10:00〜"},{id:"s21",label:"夕食調理"}],"中番（現場）":[{id:"n01",label:"仕込み（野菜カット・サラダ用含む）"},{id:"n02",label:"翌日準備"},{id:"n03",label:"次の日の翌準表作成"},{id:"n04",label:"食器洗浄"},{id:"n05",label:"食材チェック【買出し確認】"},{id:"n06",label:"食材チェック＆発注"},{id:"n07",label:"チェック（全体確認）"},{id:"n08",label:"庭の確認"},{id:"n09",label:"翌日の予約最終確認"},{id:"n10",label:"販売品在庫チェック"},{id:"n11",label:"CI対応（チェックイン）",time:"14:30"},{id:"n12",label:"ホテルクリーンサービス清掃連絡",time:"15:00〜"},{id:"n13",label:"15:30サウナ案内（火付け）",time:"15:30"},{id:"n14",label:"翌日の発注数確認"},{id:"n15",label:"メール確認・返信"},{id:"n16",label:"アメニティ確認"},{id:"n17",label:"無料貸出品確認"},{id:"n18",label:"ウェルカム（キャンプファイヤー）実施"},{id:"n19",label:"CIお客様アンケート入力"},{id:"n22",label:"17:30サウナ案内",time:"17:30"},{id:"n23",label:"夕食配膳"},{id:"n24",label:"洗濯"},{id:"n27",label:"アンケート送信",time:"19:00"},{id:"n28",label:"火気連絡",time:"19:00"},{id:"n29",label:"重油確認"},{id:"n30",label:"19:30サウナ案内",time:"19:30"},{id:"n33",label:"Instagramメッセージ確認・返信"},{id:"n34",label:"夜メール確認・返信"},{id:"n36",label:"施設改善シート記入"}],"中番（定期清掃）":[{id:"c01",label:"ウェーバー鉄板洗浄"},{id:"c02",label:"ウェーバーガス口清掃"},{id:"c03",label:"布団洗い2棟"},{id:"c04",label:"洗車"},{id:"c05",label:"Aドームスチーム"},{id:"c06",label:"Bドームスチーム"},{id:"c07",label:"Cドームスチーム"},{id:"c08",label:"Dドームスチーム"},{id:"c09",label:"Eドームスチーム"},{id:"c10",label:"Fドームスチーム"},{id:"c11",label:"Gドームスチーム"},{id:"c14",label:"受付棟スチーム"},{id:"c15",label:"キッチン換気扇"},{id:"c16",label:"トイレ換気扇"},{id:"c17",label:"グリル上換気扇"},{id:"c18",label:"シャワー室換気扇"},{id:"c19",label:"換気扇フィルターシール交換"},{id:"c20",label:"ガゼボエアコン清掃"},{id:"c21",label:"ドームエアコン"},{id:"c22",label:"サウナ煙突清掃"},{id:"c23",label:"グリル清掃"}],"遅番":[{id:"n01",label:"仕込み（野菜カット・サラダ用含む）"},{id:"n02",label:"翌日準備"},{id:"n03",label:"次の日の翌準表作成"},{id:"n04",label:"食器洗浄"},{id:"n05",label:"食材チェック【買出し確認】"},{id:"n06",label:"食材チェック＆発注"},{id:"n07",label:"チェック（全体確認）"},{id:"n08",label:"庭の確認"},{id:"n09",label:"翌日の予約最終確認"},{id:"n10",label:"販売品在庫チェック"},{id:"n11",label:"CI対応（チェックイン）",time:"14:30"},{id:"n12",label:"ホテルクリーンサービス清掃連絡",time:"15:00〜"},{id:"n13",label:"15:30サウナ案内（火付け）",time:"15:30"},{id:"n14",label:"翌日の発注数確認"},{id:"n15",label:"メール確認・返信"},{id:"n16",label:"アメニティ確認"},{id:"n17",label:"無料貸出品確認"},{id:"n18",label:"ウェルカム（キャンプファイヤー）実施"},{id:"n19",label:"CIお客様アンケート入力"},{id:"n22",label:"17:30サウナ案内",time:"17:30"},{id:"n23",label:"夕食配膳"},{id:"n24",label:"洗濯"},{id:"n27",label:"アンケート送信",time:"19:00"},{id:"n28",label:"火気連絡",time:"19:00"},{id:"n29",label:"重油確認"},{id:"n30",label:"19:30サウナ案内",time:"19:30"},{id:"n33",label:"Instagramメッセージ確認・返信"},{id:"n34",label:"夜メール確認・返信"},{id:"n36",label:"施設改善シート記入"},{id:"l01",label:"食器回収・ガス元栓確認",time:"21:30"},{id:"l02",label:"サウナ最終チェック",note:"タープを畳み、水風呂抜く",cls:"hi-red"},{id:"l03",label:"受付カギ閉め",time:"21:00"},{id:"l04",label:"車の鍵回収",time:"21:30"},{id:"l05",label:"サイレントタイム送信",time:"22:00"},{id:"l06",label:"食器洗浄（夜）"},{id:"l07",label:"厨房ゴミ袋交換"},{id:"l08",label:"電話転送設定",note:"TOTONOIとふじとわ"}]};
 const ROOMS=["A棟","B棟","C棟","D棟","E棟","F棟","G棟"],AGES=["10代","20代","30代","40代","50代","60代以上","不明"],TYPES=["家族","友達","カップル","その他"],SATS=["判断できない","1","2","3","4","5"];
@@ -392,9 +410,48 @@ window.doLogin=async function(){
   document.getElementById("board-date").textContent=dateStr;
   document.getElementById("my-date").value=todayKey;
   document.getElementById("my-staff-display").textContent=staff;
-  initRooms();startBoardListener();startNoticeListener();loadShift();
+  initRooms();startBoardListener();startNoticeListener();loadShift();loadDaily();
   await loadSavedState();
 };
+const escH=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+window.loadDaily=async function(){
+  const rw=document.getElementById("daily-res-wrap"),tw=document.getElementById("daily-tt-wrap");
+  const msg=t=>`<div style="color:var(--text3);font-size:12px;padding:8px 0;">${t}</div>`;
+  if(!DAILY_GAS_URL.startsWith("http")){rw.innerHTML=tw.innerHTML=msg("予約表連携URLが未設定です");return;}
+  rw.innerHTML=tw.innerHTML='<div class="loading"><span class="spinner"></span>読み込み中...</div>';
+  try{
+    const json=await(await fetch(`${DAILY_GAS_URL}?date=${todayKey}`)).json();
+    rw.innerHTML=json.reservation?renderDailyRes(json.reservation):msg(`【${json.date}】予約表 のシートが見つかりません`);
+    tw.innerHTML=json.timetable?renderDailyTT(json.timetable):msg(`【${json.date}】タイムテーブル のシートが見つかりません`);
+  }catch(e){console.error(e);rw.innerHTML=tw.innerHTML=msg("読み込みに失敗しました");}
+};
+function renderDailyRes(v){
+  const C=[2,3,4,5,6,7,8],cell=(r,c)=>(v[r]&&v[r][c]!=null?String(v[r][c]).trim():"");
+  const ri=v.findIndex(r=>String(r[0]).trim()==="名前");if(ri<0)return"";
+  let type="",types=C.map(c=>(type=cell(ri-2,c)||type));
+  let h='<table class="daily-tbl"><tr><th class="rl">棟</th>'+C.map((c,i)=>`<th>${escH(types[i])}<br>${escH(cell(ri-1,c))}</th>`).join("")+"</tr>";
+  let grp="";
+  for(let r=ri;r<v.length;r++){
+    const a=cell(r,0);if(a==="属性")break;if(a)grp=a;
+    const vals=C.map(c=>cell(r,c));
+    if(!["名前","チェックイン"].includes(a)&&vals.every(x=>!x||x==="FALSE"))continue;
+    const lbl=cell(r,1)?`${grp==="サウナ予約"?"サウナ ":""}${cell(r,1)}`:a;
+    const isWrap=a==="備考";
+    h+=`<tr class="${["名前","チェックイン"].includes(a)?"hl":""}"><td class="rl">${escH(lbl)}</td>`+vals.map(x=>`<td class="${isWrap?"wrap":""}">${escH(x)}</td>`).join("")+"</tr>";
+  }
+  return h+"</table>";
+}
+function renderDailyTT(v){
+  const hdr=(v[0]||[]).map(x=>String(x).trim()),cols=[];hdr.forEach((x,i)=>{if(i>0&&x)cols.push(i);});
+  if(!cols.length)return"";
+  let h='<table class="daily-tbl"><tr><th class="rl">時間</th>'+cols.map(c=>`<th>${escH(hdr[c])}</th>`).join("")+"</tr>";
+  for(let r=1;r<v.length;r++){
+    const t=String(v[r][0]||"").trim(),vals=cols.map(c=>String(v[r][c]??"").trim());
+    if(!t||vals.every(x=>!x))continue;
+    h+=`<tr><td class="rl">${escH(t)}</td>`+vals.map(x=>`<td class="${x==="休"?"rest":x?"task":""}">${escH(x)}</td>`).join("")+"</tr>";
+  }
+  return h+"</table>";
+}
 async function loadShift(){
   try{
     const res=await fetch(`${GAS_URL}?action=getShift&date=${todayKey}`);
