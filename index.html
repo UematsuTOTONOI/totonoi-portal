@@ -236,7 +236,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0
           <div><div class="page-title">ホーム</div><div class="page-sub" id="home-date"></div></div>
         </div>
         <div class="home-grid">
-          <div class="card" style="grid-column:1/-1;">
+          <div class="card" style="grid-column:1/-1;display:none;">
             <div class="card-title"><span>📅 本日のシフト</span><button class="btn sm" onclick="openShiftEdit()">編集</button></div>
             <div id="shift-table-wrap"><div class="loading"><span class="spinner"></span>読み込み中...</div></div>
           </div>
@@ -410,7 +410,7 @@ window.doLogin=async function(){
   document.getElementById("board-date").textContent=dateStr;
   document.getElementById("my-date").value=todayKey;
   document.getElementById("my-staff-display").textContent=staff;
-  initRooms();startBoardListener();startNoticeListener();loadShift();loadDaily();
+  initRooms();startBoardListener();startNoticeListener();loadDaily();
   await loadSavedState();
 };
 const escH=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
